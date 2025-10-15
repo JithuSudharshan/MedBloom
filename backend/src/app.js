@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import userRoutes from "./routes/userRoutes.js"
 
 export const app = express();
 
@@ -13,5 +14,6 @@ app.use(helmet());
 app.get('/', (req, res) => {
     res.json('Hello from backend!');
 });
+app.use('/api/user', userRoutes)
 
 export default app;
