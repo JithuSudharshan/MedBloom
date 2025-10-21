@@ -5,32 +5,35 @@ import bcrypt from "bcrypt"
 export const signUp = async (req, res) => {
 
     try {
-        const { name, email, newPassword, confirmPassword, role, phone } = req.body;
+        const { name, email, password, confirmPassword, role, phone } = req.body;
 
-        //chechking whther the email id already exsist
+        //chechking whether the email id already exsist
         const exsistingUser = await User.findOne({ email })
-        if (exsistingUser) return res.status(401).json({ message: "User with this Email already exsist!" })
+        if (exsistingUser) return res.status(409).json({ success: false, message: "User with this Email already exsist!" })
 
         //checking whether password and confirmed  password are same
-        if (newPassword !== confirmPassword) {
-            res.status(400), json({ message: "Password do not match" })
+        if (password !== confirmPassword) {
+            return res.status(400).json({ success: false, message: "Password do not match" })
         }
 
-        const password = newPassword;
+        const passwordHash = await bcrypt.hash(password, 10)
+
 
         const newUser = new User({
             role,
             name,
             email,
             phone,
-            passwordHash: password,
+            passwordHash,
+            isVerified: false
         });
 
-        await newUser.save();
-        res.status(201).json({ message: "New user registered succesfully" })
+        const response = await newUser.save();
+        console.log(response)
+        res.status(201).json({ success: true, message: `Registered succesfully as ${response.role}` })
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: "Internal Server error whie signing Up" })
+        res.status(500).json({ success: false, message: "Internal Server error while signing Up" })
     }
 
 }
