@@ -1,14 +1,19 @@
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import SignUp from "./pages/SignUp";
+import { Toaster } from 'sonner'
+import VerifyEmailLink from "./pages/VerifyEmailLink";
 
 function App() {
-
   return (
-    <>
-      <div>
-        <p>Hi jithu sudharshan </p>
-      </div>
-
-    </>
-  )
+    <BrowserRouter>
+      <Toaster position="top-right" richColors />
+      <Routes>
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/verify/email/link" element={<VerifyEmailLink />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
