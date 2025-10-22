@@ -4,6 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { signupUser } from '../api/authApi';
 import { showToast } from '../components/ui/Toast';
+import { useNavigate } from 'react-router-dom';
 
 
 //Schema validation using yup
@@ -19,6 +20,10 @@ const schema = yup.object({
 
 
 export default function useSignup() {
+
+    const navigate = useNavigate();
+
+
     const { register, handleSubmit, formState, reset, watch } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
@@ -45,8 +50,11 @@ export default function useSignup() {
                 console.log(res?.data?.data);
                 return showToast.error(res?.data?.message);
             }
-
+            const email = data.email;
+            navigate("/verify/email/link", { state: { email } })
             showToast.success(res?.data?.message)
+
+
 
             reset();
         } catch (err) {
