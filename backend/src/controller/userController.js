@@ -1,5 +1,6 @@
 import User from "../model/userModel.js";
-import bcrypt from "bcrypt"
+import bcrypt from "bcrypt";
+import jwt from 'jsonwebtoken'
 
 
 export const signUp = async (req, res) => {
@@ -18,7 +19,6 @@ export const signUp = async (req, res) => {
 
         const passwordHash = await bcrypt.hash(password, 10)
 
-
         const newUser = new User({
             role,
             name,
@@ -30,10 +30,14 @@ export const signUp = async (req, res) => {
 
         const response = await newUser.save();
         console.log(response)
-        res.status(201).json({ success: true, message: `Registered succesfully as ${response.role}` })
+        res.status(201).json({ success: true, message: "Signup successful! verify email to continue" })
     } catch (error) {
         console.log(error)
         res.status(500).json({ success: false, message: "Internal Server error while signing Up" })
     }
+}
+
+export const sendVerificationLink = async (req, res) => {
+
 
 }
