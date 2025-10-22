@@ -1,6 +1,7 @@
 import User from "../model/userModel.js";
 import bcrypt from "bcrypt";
-import jwt from 'jsonwebtoken'
+import { generateAndStoreToken } from "../utils/tokenService.js";
+import { sendVerificationEmail } from "../utils/sendEmail.js";
 
 
 export const signUp = async (req, res) => {
@@ -29,15 +30,17 @@ export const signUp = async (req, res) => {
         });
 
         const response = await newUser.save();
-        console.log(response)
+
+
+        const token = await generateAndStoreToken(response._id)
+        console.log(token);
+
+        const verificationLink = `http://localhost:3000/verify-email/${response._id.toString()}/${token}`;
+        await sendVerificationEmail(email, verificationLink);
+
         res.status(201).json({ success: true, message: "Signup successful! verify email to continue" })
     } catch (error) {
         console.log(error)
         res.status(500).json({ success: false, message: "Internal Server error while signing Up" })
     }
-}
-
-export const sendVerificationLink = async (req, res) => {
-
-
 }
