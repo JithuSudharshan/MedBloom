@@ -1,16 +1,16 @@
 import React from 'react'
 import LeftHero from '../components/layout/LeftHero'
-import RightVerifyEmail from '../components/layout/RightVerifyEmail'
+import RightRedirectVerifyEmail from '../components/layout/RightRedirectVerifyEmail'
 import heroImg from "../assets/hero-illustration.png";
 
 
-const VerifyEmailLink = () => {
+const RedirectToEmail = () => {
     return (
         <div className='flex h-screen'>
             <LeftHero imgSrc={heroImg} sentence={"Create an account to book appointments, access medical records, and connect with healthcare professionals."} />
-            <RightVerifyEmail />
+            <RightRedirectVerifyEmail />
         </div>
     )
 }
 
-export default VerifyEmailLink
+export default RedirectToEmail
