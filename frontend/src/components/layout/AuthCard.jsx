@@ -92,5 +92,4 @@ const AuthCard = ({ oneLine }) => {
         </div>
     );
 };
-
 export default AuthCard;
