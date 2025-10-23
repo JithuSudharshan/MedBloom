@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-
+//Creating  DB server start function
 const connectDB = async () => {
     try {
         const conn = await mongoose.connect(process.env.MONGO_URI)

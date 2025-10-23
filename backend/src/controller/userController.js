@@ -1,7 +1,8 @@
 import User from "../model/userModel.js";
 import bcrypt from "bcrypt";
-import { generateAndStoreToken } from "../utils/tokenService.js";
+import { deleteToken, generateAndStoreToken, searchAndFindToken } from "../utils/tokenService.js";
 import { sendVerificationEmail } from "../utils/sendEmail.js";
+import { safeCompare } from "../utils/compareToken.js";
 
 
 export const signUp = async (req, res) => {
@@ -35,9 +36,10 @@ export const signUp = async (req, res) => {
 
         //generating token with crypto
         const token = await generateAndStoreToken(response._id)
+        console.log("hashed token after sending : ", token)
 
         //basic skeleton of the verification link send to user
-        const verificationLink = `http://localhost:3000/verify-email/${response._id.toString()}/${token}`;
+        const verificationLink = `http://localhost:5000/api/user/verify-email/${response._id.toString()}/${token}`;
 
         //sending verification Email to user
         await sendVerificationEmail(email, verificationLink);
@@ -49,4 +51,39 @@ export const signUp = async (req, res) => {
         console.log(error)
         res.status(500).json({ success: false, message: "Internal Server error while signing Up" })
     }
+}
+
+export const verifyToken = async (req, res) => {
+
+    try {
+        const { id, token } = req.params
+
+        //cheking whether the req actually has id and token
+        if (!token || !id)
+            return res.status(400).redirect("http://localhost:5173/verify/email/link?status=failed")
+
+        //Retrieving previously stored token in redis
+        const storedToken = await searchAndFindToken(id)
+
+        if (!storedToken)
+            return res.status(400).redirect("http://localhost:5173/verify/email/link?status=failed")
+
+        //Comparing both the hashedtoken 
+        const isMatch = await safeCompare(storedToken, token)
+        if (!isMatch)
+            return res.status(400).redirect("http://localhost:5173/verify/email/link?status=failed")
+
+        //Updating the user verified status
+        await User.updateOne({ _id: id }, { isVerified: true });
+
+        //deleting the token in redis
+        deleteToken(id)
+
+        res.status(200).redirect("http://localhost:5173/verify/email/link?status=success")
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: "internal server error" })
+    }
+
+
 }
