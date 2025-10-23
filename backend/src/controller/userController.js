@@ -36,7 +36,6 @@ export const signUp = async (req, res) => {
 
         //generating token with crypto
         const token = await generateAndStoreToken(response._id)
-        console.log("hashed token after sending : ", token)
 
         //basic skeleton of the verification link send to user
         const verificationLink = `http://localhost:5000/api/user/verify-email/${response._id.toString()}/${token}`;

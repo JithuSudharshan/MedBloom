@@ -8,8 +8,9 @@ export async function safeCompare(hash1, hash2) {
     // Length check first
     if (buffer1.length !== buffer2.length) return false;
 
-    // Constant-time comparison
+    // Constant-time comparison to prevent time based attacks
     const isMatch = crypto.timingSafeEqual(buffer1, buffer2);
+
     if (isMatch) {
         console.log(" Tokens match");
         return true

@@ -9,8 +9,6 @@ export async function generateAndStoreToken(userId) {
 
         //Hashing the GEnerated Token
         const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-        console.log("hashed token while sending : ", hashedToken)
-        console.log("userID : ", userId.toString())
 
         //Storing the hashed Token in redis
         await redisClient.setEx(`verifyToken:${userId.toString()}`, 3600, hashedToken);
