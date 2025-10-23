@@ -7,6 +7,7 @@ import { sendVerificationEmail } from "../utils/sendEmail.js";
 export const signUp = async (req, res) => {
 
     try {
+        //destructuring form data
         const { name, email, password, confirmPassword, role, phone } = req.body;
 
         //chechking whether the email id already exsist
@@ -18,8 +19,10 @@ export const signUp = async (req, res) => {
             return res.status(400).json({ success: false, message: "Password do not match" })
         }
 
+        //Hashing the password before storing in DB
         const passwordHash = await bcrypt.hash(password, 10)
 
+        //creating new USER 
         const newUser = new User({
             role,
             name,
@@ -28,18 +31,21 @@ export const signUp = async (req, res) => {
             passwordHash,
             isVerified: false
         });
-
         const response = await newUser.save();
 
-
+        //generating token with crypto
         const token = await generateAndStoreToken(response._id)
-        console.log(token);
 
+        //basic skeleton of the verification link send to user
         const verificationLink = `http://localhost:3000/verify-email/${response._id.toString()}/${token}`;
+
+        //sending verification Email to user
         await sendVerificationEmail(email, verificationLink);
 
-        res.status(201).json({ success: true, message: "Signup successful! verify email to continue" })
+        res.status(201).json({ success: true, message: "Signup successful.! verify email to continue" })
+
     } catch (error) {
+
         console.log(error)
         res.status(500).json({ success: false, message: "Internal Server error while signing Up" })
     }
