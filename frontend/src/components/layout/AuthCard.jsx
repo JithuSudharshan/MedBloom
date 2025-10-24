@@ -8,6 +8,7 @@ import useSignup from "../../hooks/UseSignup";
 
 const AuthCard = ({ oneLine }) => {
     const [selected, setSelected] = useState("Patient");
+    const [loading, setLoading] = useState(false)
 
     const {
         register,
@@ -40,7 +41,7 @@ const AuthCard = ({ oneLine }) => {
                     <div className="flex-1 h-px bg-gray-300"></div>
                 </div>
 
-                <form onSubmit={handleSubmit((data) => onSubmit(data, selected))} className="flex flex-col gap-3">
+                <form onSubmit={handleSubmit((data) => onSubmit(data, selected, setLoading))} className="flex flex-col gap-3">
                     <Input
                         label="Fullname"
                         name="name"
@@ -79,7 +80,7 @@ const AuthCard = ({ oneLine }) => {
                         placeholder="Confirm your password"
                     />
 
-                    <Button type="submit">Register as {selected}</Button>
+                    <Button loading={loading} type="submit">{loading ? "Registering..." : `Register as ${selected}`}</Button>
                 </form>
 
                 <p className="text-sm text-center text-gray-600 mt-4">
@@ -89,7 +90,7 @@ const AuthCard = ({ oneLine }) => {
                     </a>
                 </p>
             </div>
-        </div>
+        </div >
     );
 };
 export default AuthCard;

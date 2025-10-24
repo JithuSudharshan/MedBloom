@@ -56,21 +56,22 @@ export const verifyToken = async (req, res) => {
 
     try {
         const { id, token } = req.params
+        const user = await User.findById({ _id: id });
 
         //cheking whether the req actually has id and token
         if (!token || !id)
-            return res.status(400).redirect("http://localhost:5173/verify/email/link?status=failed")
+            return res.status(400).redirect(`http://localhost:5173/verify/email/link?status=&email=${encodeURIComponent(user.email)}`)
 
         //Retrieving previously stored token in redis
         const storedToken = await searchAndFindToken(id)
 
         if (!storedToken)
-            return res.status(400).redirect("http://localhost:5173/verify/email/link?status=failed")
+            return res.status(400).redirect(`http://localhost:5173/verify/email/link?status=failed&email=${encodeURIComponent(user.email)}`)
 
         //Comparing both the hashedtoken 
         const isMatch = await safeCompare(storedToken, token)
         if (!isMatch)
-            return res.status(400).redirect("http://localhost:5173/verify/email/link?status=failed")
+            return res.status(400).redirect(`http://localhost:5173/verify/email/link?status=failed&email=${encodeURIComponent(user.email)}`)
 
         //Updating the user verified status
         await User.updateOne({ _id: id }, { isVerified: true });
@@ -78,7 +79,7 @@ export const verifyToken = async (req, res) => {
         //deleting the token in redis
         deleteToken(id)
 
-        res.status(200).redirect("http://localhost:5173/verify/email/link?status=success")
+        res.status(200).redirect(`http://localhost:5173/verify/email/link?status=success&email=${encodeURIComponent(user.email)}`)
 
     } catch (error) {
         res.status(500).json({ success: false, message: "internal server error" })

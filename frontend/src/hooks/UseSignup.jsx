@@ -36,8 +36,10 @@ export default function useSignup() {
     });
 
 
-    const onSubmit = useCallback(async (data, selected) => {
+    const onSubmit = useCallback(async (data, selected, setLoading) => {
         try {
+
+            setLoading(true)
 
             const payload = {
                 ...data,
@@ -52,6 +54,7 @@ export default function useSignup() {
             }
             const email = data.email;
             navigate("/verify/email/link", { state: { email } })
+            setLoading(false);
             showToast.success(res?.data?.message)
 
 
