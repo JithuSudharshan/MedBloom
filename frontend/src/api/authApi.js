@@ -5,7 +5,7 @@ export const signupUser = async (payload) => {
     return response;
 }
 
-export const verifyLink = async (email) => {
-    const response = await api.post("/user/verify/email/link", email)
-    return response;
+export const resendEmail = async (email) => {
+    const response = await api.post("/user/verify/resend-email", { email })
+    return response
 }

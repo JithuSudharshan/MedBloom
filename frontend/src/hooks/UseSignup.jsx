@@ -36,7 +36,7 @@ export default function useSignup() {
     });
 
 
-    const onSubmit = useCallback(async (data, selected, setLoading) => {
+    const onSubmit = async (data, selected, setLoading) => {
         try {
 
             setLoading(true)
@@ -49,15 +49,14 @@ export default function useSignup() {
             const res = await signupUser(payload)
 
             if (!res?.data?.success) {
-                console.log(res?.data?.data);
                 return showToast.error(res?.data?.message);
             }
+
             const email = data.email;
             navigate("/verify/email/link", { state: { email } })
-            setLoading(false);
+
+
             showToast.success(res?.data?.message)
-
-
 
             reset();
         } catch (err) {
@@ -69,8 +68,10 @@ export default function useSignup() {
                 showToast.error("Unexpected Error:", err.message);
             }
 
+        } finally {
+            setLoading(false)
         }
-    }, [reset]);
+    };
 
     return { register, handleSubmit, onSubmit, formState, watch };
 }
