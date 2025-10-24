@@ -10,8 +10,8 @@ export async function generateAndStoreToken(userId) {
         //Hashing the GEnerated Token
         const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
-        //Storing the hashed Token in redis
-        await redisClient.setEx(`verifyToken:${userId.toString()}`, 3600, hashedToken);
+        //Storing the hashed Token in redis and will expire in 30-Mins
+        await redisClient.setEx(`verifyToken:${userId.toString()}`, 1800, hashedToken);
 
         return hashedToken
 
@@ -40,6 +40,7 @@ export async function deleteToken(userId) {
     try {
         //deleting the token after verification success
         await redisClient.del(`verifyToken:${userId}`)
+        console.log("token deleted")
     } catch (error) {
         console.log("Error in deleting token", error)
     }
