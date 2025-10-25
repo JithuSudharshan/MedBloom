@@ -8,7 +8,8 @@ import useSignup from "../../hooks/UseSignup";
 
 const AuthCard = ({ oneLine }) => {
     const [selected, setSelected] = useState("Patient");
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [purpose, setPurpose] = useState("sign Up")
 
     const {
         register,
@@ -16,6 +17,10 @@ const AuthCard = ({ oneLine }) => {
         onSubmit,
         formState: { errors },
     } = useSignup()
+
+    const switchToSignin = () => {
+        setPurpose("sign In")
+    }
 
     return (
         <div className="flex flex-col justify-center items-center w-full md:w-1/2 bg-[#EBFFFF] py-10">
@@ -85,7 +90,7 @@ const AuthCard = ({ oneLine }) => {
 
                 <p className="text-sm text-center text-gray-600 mt-4">
                     Already have an account?{" "}
-                    <a href="#" className="text-teal-500 font-medium hover:underline">
+                    <a href="#" onClick={switchToSignin} className="text-teal-500 font-medium hover:underline">
                         Login
                     </a>
                 </p>

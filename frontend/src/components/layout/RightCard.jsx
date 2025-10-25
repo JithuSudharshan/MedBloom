@@ -14,7 +14,6 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
     const [email, setEmail] = useState("");
     const [isResending, setIsResending] = useState(false);
     const [resendStatus, setResendStatus] = useState('idle');
-    const [countdown, setCountdown] = useState(getInitialCountdown);
 
     //Initialize countdown from localStorage
     const getInitialCountdown = () => {
@@ -27,10 +26,7 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
         }
         return 0;
     };
-
-    useEffect(() => {
-        setEmail(Email);
-    }, [Email]);
+    const [countdown, setCountdown] = useState(getInitialCountdown);
 
     //Save countdown to localStorage whenever it changes
     useEffect(() => {
@@ -43,6 +39,10 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
             localStorage.removeItem(`resend_countdown_${Email}`);
         }
     }, [countdown, Email]);
+
+    useEffect(() => {
+        setEmail(Email);
+    }, [Email]);
 
     //Countdown timer
     useEffect(() => {
