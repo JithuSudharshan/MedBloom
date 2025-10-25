@@ -33,12 +33,18 @@ const userSchema = new mongoose.Schema(
         },
         passwordHash: {
             type: String,
-            required: [true, 'Password is required']
+            required: [true, 'Password is required'],
+            select: false
         },
         isVerified: {
             type: Boolean,
             required: [true, 'Verification status is required']
-        }
+        },
+        status: {
+            type: String,
+            enum: ['active', 'suspended', 'banned'],
+            default: 'active'
+        },
     },
     {
         timestamps: true
