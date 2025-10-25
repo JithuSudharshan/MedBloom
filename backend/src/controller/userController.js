@@ -1,8 +1,8 @@
 import User from "../model/userModel.js";
 import bcrypt from "bcrypt";
-import { deleteToken, generateAndStoreToken, searchAndFindToken } from "../utils/tokenService.js";
+import { generateAndStoreToken } from "../utils/tokenService.js";
 import { sendVerificationEmail } from "../utils/sendEmail.js";
-import { safeCompare } from "../utils/compareToken.js";
+import { checkLoginAttempts, logFailedLoginAttempt } from "../utils/MonitorFailedLoginAttempt.js";
 
 
 export const signUp = async (req, res) => {
@@ -52,68 +52,35 @@ export const signUp = async (req, res) => {
     }
 }
 
-export const verifyToken = async (req, res) => {
+export const loginUser = async (req, res) => {
+    const { email, password } = req.body
 
-    try {
-        const { id, token } = req.params
-        const user = await User.findById({ _id: id });
+    if (!email || !password)
+        return res.status(400).json({ success: false, message: "Email and password are required" })
 
-        //cheking whether the req actually has id and token
-        if (!token || !id)
-            return res.status(400).redirect(`http://localhost:5173/verify/email/link?status=&email=${encodeURIComponent(user.email)}`)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email))
+        return res.status(400).json({ success: false, message: "Invalid email format" })
 
-        //Retrieving previously stored token in redis
-        const storedToken = await searchAndFindToken(id)
+    const user = await User.findOne({ email })
+    if (!user)
+        return res.status(400).json({ success: false, message: "Invalid credentials" })
 
-        if (!storedToken)
-            return res.status(400).redirect(`http://localhost:5173/verify/email/link?status=failed&email=${encodeURIComponent(user.email)}`)
+    if (!user.isVerified)
+        return res.status(400).json({ success: false, message: "Verify Your email before Login" })
 
-        //Comparing both the hashedtoken 
-        const isMatch = await safeCompare(storedToken, token)
-        if (!isMatch)
-            return res.status(400).redirect(`http://localhost:5173/verify/email/link?status=failed&email=${encodeURIComponent(user.email)}`)
+    if (user.status === "suspended" || user.status === "banned")
+        return res.status(400).json({ success: false, message: "Your account has been suspended" })
 
-        //Updating the user verified status
-        await User.updateOne({ _id: id }, { isVerified: true });
-
-        //deleting the token in redis
-        await deleteToken(id)
-
-        res.status(200).redirect(`http://localhost:5173/verify/email/link?status=success&email=${encodeURIComponent(user.email)}`)
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: "internal server error" })
+    const isValidPassword = await bcrypt.compare(password, user.passwordHash)
+    if (!isValidPassword) {
+        await logFailedLoginAttempt(user._id, req.ip)
+        return res.status(400).json({ success: false, message: "Invalid Credentials" })
     }
-}
 
-export const resendVerificationMail = async (req, res) => {
-
-    try {
-
-        const { email } = req.body
-
-        if (!email)
-            return res.status(400).json({ success: false, message: "Email not found! " })
-
-        const isExisting = await User.findOne({ email })
-
-        if (!isExisting)
-            return res.status(400).json({ success: false, message: "Email is Invalid!" })
-
-        const id = isExisting._id.toString()
-
-        await deleteToken(id)
-
-        const token = await generateAndStoreToken(id)
-
-        //basic skeleton of the verification link send to user
-        const verificationLink = `http://localhost:5000/api/user/verify-email/${id}/${token}`;
-
-        await sendVerificationEmail(email, verificationLink)
-        return res.status(200).json({ success: true, message: "verification email send!" })
-
-    } catch (error) {
-        console.log("Error while resending email", error)
-        res.status(500).json({ success: false, message: "Error while resending email" })
+    const recentFailedAttempts = await checkLoginAttempts(user._id, req.ip)
+    if (recentFailedAttempts > 5) {
+        return res.status(400).json({ success: false, message: "Too many failed Attempts, Try againj in 15 Minutes!" })
     }
+
 }
