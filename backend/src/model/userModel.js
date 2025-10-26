@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema(
             minlength: [2, 'Name must be at least 2 characters long'],
             maxlength: [50, 'Name cannot exceed 50 characters']
         },
+        avatar: {
+            type: String,
+            default: "https://media.istockphoto.com/id/1451587807/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-vector.jpg?s=612x612&w=0&k=20&c=yDJ4ITX1cHMh25Lt1vI1zBn2cAKKAlByHBvPJ8gEiIg="
+        },
         email: {
             type: String,
             required: [true, 'Email is required'],
@@ -45,6 +49,21 @@ const userSchema = new mongoose.Schema(
             enum: ['active', 'suspended', 'banned'],
             default: 'active'
         },
+        refreshTokens: [{
+            token: { type: String, required: true },
+            createdAt: { type: Date, default: Date.now },
+            expiresAt: { type: Date, required: true },
+            userAgent: String,
+            ipAddress: String
+        }],
+        failedLoginAttempts: [{
+            timestamp: Date,
+            ipAddress: String
+        }],
+        lastLogin: {
+            type: Date,
+            default: Date.now()
+        }
     },
     {
         timestamps: true

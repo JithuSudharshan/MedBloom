@@ -52,17 +52,20 @@ export const resendVerificationMail = async (req, res) => {
 
         const id = isExisting._id.toString()
 
+        //Delete existing token
         await deleteToken(id)
 
+        //Generate and store token
         const token = await generateAndStoreToken(id)
 
-        //basic skeleton of the verification link send to user
+        //Basic skeleton of the verification link send to user
         const verificationLink = `http://localhost:5000/api/user/verify-email/${id}/${token}`;
 
         await sendVerificationEmail(email, verificationLink)
         return res.status(200).json({ success: true, message: "verification email send!" })
 
     } catch (error) {
+
         console.log("Error while resending email", error)
         res.status(500).json({ success: false, message: "Error while resending email" })
     }
