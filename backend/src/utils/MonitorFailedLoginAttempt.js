@@ -1,10 +1,16 @@
 import User from "../model/userModel.js";
 
-export const logFailedLoginAttempt = async (email, ipAddress) => {
+export const logFailedLoginAttempt = async (userId, ipAddress) => {
     try {
-        await User.findByIdAndUpdate({ email }, {
-            ipAddress
-        });
+        await User.findByIdAndUpdate(userId,
+            {
+                $push: {
+                    failedLoginAttempts: {
+                        ipAddress,
+                        timestamp: Date.now()
+                    }
+                }
+            })
     } catch (error) {
         console.error('Error logging failed login attempt:', error);
     }
@@ -25,7 +31,7 @@ export const checkLoginAttempts = async (email, ipAddress) => {
         // 1 hour ago
         const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
-        // Count recent failed attempts from the same IP within last hour
+        // Count recent failed attempts from the same IP within last 1 hour
         const recentAttempts = user.failedLoginAttempts.filter(attempt =>
             attempt.timestamp >= oneHourAgo &&
             attempt.ipAddress === ipAddress

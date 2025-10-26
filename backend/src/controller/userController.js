@@ -2,7 +2,7 @@ import User from "../model/userModel.js";
 import bcrypt from "bcrypt";
 import { generateAccessToken, generateAndStoreToken, generateRefreshToken } from "../utils/tokenService.js";
 import { sendVerificationEmail } from "../utils/sendEmail.js";
-import { checkLoginAttempts, logFailedLoginAttempt } from "../utils/MonitorFailedLoginAttempt.js";
+import { checkLoginAttempts, clearFailedLoginAttempts, logFailedLoginAttempt } from "../utils/MonitorFailedLoginAttempt.js";
 import { ENV } from "../config/env.js";
 
 
@@ -23,7 +23,7 @@ export const signUp = async (req, res) => {
         }
 
         //Hashing the password before storing in DB
-        const passwordHash = await bcrypt.hash(password, 10)
+        const passwordHash = await bcrypt.hash(password, ENV.SALTROUND)
 
         //creating new USER 
         const newUser = new User({
@@ -65,7 +65,7 @@ export const loginUser = async (req, res) => {
         if (!emailRegex.test(email))
             return res.status(400).json({ success: false, message: "Invalid email format" })
 
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ email }).select('+passwordHash')
         if (!user)
             return res.status(400).json({ success: false, message: "Invalid credentials" })
 
@@ -75,16 +75,19 @@ export const loginUser = async (req, res) => {
         if (user.status === "suspended" || user.status === "banned")
             return res.status(400).json({ success: false, message: "Your account has been suspended" })
 
+
         const isValidPassword = await bcrypt.compare(password, user.passwordHash)
+
         if (!isValidPassword) {
-            await logFailedLoginAttempt(user.email, req.ip)
-            return res.status(400).json({ success: false, message: "Invalid Credentials" })
+            await logFailedLoginAttempt(user._id, req.ip)
+            return res.status(400).json({ success: false, message: "Invalid credentials" })
         }
 
         const recentFailedAttempts = await checkLoginAttempts(user._id, req.ip)
-        if (recentFailedAttempts > 5) {
+        if (recentFailedAttempts.isLocked) {
             return res.status(400).json({ success: false, message: "Too many failed Attempts, Try againj in 15 Minutes!" })
         }
+
         const accessToken = await generateAccessToken(user._id, user.email, user.role);
 
         const refreshToken = await generateRefreshToken(user._id);
@@ -116,6 +119,9 @@ export const loginUser = async (req, res) => {
             })
         }
 
+        //clear all failed login after successfull login
+        await clearFailedLoginAttempts(user._id, req.ip);
+
         res.status(200).json({
             success: true,
             message: "Login successful",
@@ -129,7 +135,7 @@ export const loginUser = async (req, res) => {
             }
         })
     } catch (error) {
-        console.log("Error while loggin in:", err)
+        console.log("Error while loggin in:", error)
         res.status(500).json({ success: false, message: "Internal server error while login" })
     }
 }

@@ -62,7 +62,8 @@ const userSchema = new mongoose.Schema(
         }],
         lastLogin: {
             type: Date,
-            default: Date.now()
+            default: Date.now(),
+            select: false
         }
     },
     {
@@ -74,15 +75,6 @@ const userSchema = new mongoose.Schema(
 userSchema.methods.isValidPassword = async function (password) {
     return await bcrypt.compare(password, this.passwordHash);
 };
-
-// hash password before saving
-userSchema.pre('save', async function (next) {
-    if (this.isModified('passwordHash')) {
-        const salt = await bcrypt.genSalt(10);
-        this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
-    }
-    next();
-});
 
 const User = mongoose.model('User', userSchema);
 

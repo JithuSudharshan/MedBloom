@@ -7,6 +7,7 @@ export const ENV = {
     PORT: process.env.PORT || 5000,
     NODE_ENV: process.env.NODE_ENV || "production",
     MONGO_URI: process.env.MONGO_URI,
+    SALTROUND: Number(process.env.SALTROUND),
     JWT_SECRET: process.env.JWT_SECRET || "supersecretkey",
     REDIS_HOST: process.env.REDIS_HOST || "127.0.0.1",
     REDIS_PORT: process.env.REDIS_PORT6379,
