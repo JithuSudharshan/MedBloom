@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import LeftHero from '../components/layout/LeftHero';
 import RightCard from '../components/layout/RightCard';
 import heroImg from "../assets/hero-illustration.png";
-import verifyIcon from "../assets/animations/User Authentication.json";
+import verifyIcon from "../assets/animations/Success.json";
 import rejectedIcon from "../assets/animations/Rejected.json";
 
 const VerifyEmail = () => {
