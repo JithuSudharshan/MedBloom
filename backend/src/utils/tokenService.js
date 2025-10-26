@@ -1,7 +1,9 @@
 import crypto from 'crypto'
 import redisClient from '../config/redisClient.js';
+import jwt from 'jsonwebtoken'
+import { ENV } from '../config/env.js';
 
-export async function generateAndStoreToken(userId) {
+export const generateAndStoreToken = async (userId) => {
 
     try {
         //Generating random token
@@ -21,7 +23,7 @@ export async function generateAndStoreToken(userId) {
 
 }
 
-export async function searchAndFindToken(userId) {
+export const searchAndFindToken = async (userId) => {
 
     try {
         //chechking whether the token truly exist
@@ -35,7 +37,7 @@ export async function searchAndFindToken(userId) {
 
 }
 
-export async function deleteToken(userId) {
+export const deleteToken = async (userId) => {
 
     try {
         //deleting the token after verification success
@@ -46,7 +48,7 @@ export async function deleteToken(userId) {
     }
 }
 
-export async function safeCompare(hash1, hash2) {
+export const safeCompare = async (hash1, hash2) => {
 
     const buffer1 = Buffer.from(hash1, "utf8");
     const buffer2 = Buffer.from(hash2, "utf8");
@@ -65,3 +67,30 @@ export async function safeCompare(hash1, hash2) {
         return false
     }
 }
+
+export const generateAccessToken = (user_Id, user_email, user_role) => {
+    return new Promise((resolve, reject) => {
+        jwt.sign({
+            userId: user_Id,
+            userEmail: user_email,
+            userRole: user_role
+        }, ENV.JWT_ACCESS_SECRET, { expiresIn: '15m' },
+            (err, token) => {
+                if (err) reject(err);
+                else resolve(token);
+            })
+    })
+}
+
+export const generateRefreshToken = (user_id) => {
+    return new Promise((resolve, reject) => {
+        jwt.sign({
+            userId: user_id
+        }, ENV.JWT_REFERSH_TOKEN, { expiresIn: '7d' },
+            (err, token) => {
+                if (err) reject(err)
+                else resolve(token)
+            })
+    })
+}
+

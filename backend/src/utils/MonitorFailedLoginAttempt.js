@@ -1,35 +1,73 @@
-import { FailedLogin } from "../model/FailedLoginModel.js";
+import User from "../model/userModel.js";
 
-export async function logFailedLoginAttempt(userId, ipAddress) {
+export const logFailedLoginAttempt = async (email, ipAddress) => {
     try {
-        await FailedLogin.create({
-            userId,
-            ipAddress,
-            attemptedAt: new Date()
+        await User.findByIdAndUpdate({ email }, {
+            ipAddress
         });
     } catch (error) {
         console.error('Error logging failed login attempt:', error);
     }
 }
 
-// Optional: Function to check if user/IP is locked out
-export async function checkLoginAttempts(userId, ipAddress) {
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
-    const attemptCount = await FailedLogin.countDocuments({
-        userId,
-        ipAddress,
-        attemptedAt: { $gte: oneHourAgo }
-    });
+export const checkLoginAttempts = async (email, ipAddress) => {
+    try {
+        const user = await User.findOne({ email });
 
-    const MAX_ATTEMPTS = 5;
-    return {
-        isLocked: attemptCount >= MAX_ATTEMPTS,
-        remainingAttempts: Math.max(0, MAX_ATTEMPTS - attemptCount)
-    };
+        if (!user || !user.failedLoginAttempts || user.failedLoginAttempts.length === 0) {
+            return {
+                isLocked: false,
+                remainingAttempts: 5,
+                attemptsCount: 0
+            };
+        }
+        // 1 hour ago
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
+        // Count recent failed attempts from the same IP within last hour
+        const recentAttempts = user.failedLoginAttempts.filter(attempt =>
+            attempt.timestamp >= oneHourAgo &&
+            attempt.ipAddress === ipAddress
+        );
+
+        const attemptCount = recentAttempts.length;
+        const MAX_ATTEMPTS = 5;
+
+        return {
+            isLocked: attemptCount >= MAX_ATTEMPTS,
+            remainingAttempts: Math.max(0, MAX_ATTEMPTS - attemptCount),
+            attemptsCount: attemptCount
+        };
+
+    } catch (error) {
+        console.error('Error checking login attempts:', error);
+        return {
+            isLocked: false,
+            remainingAttempts: 5,
+            attemptsCount: 0
+        };
+    }
 }
+
 
 // Clear failed attempts after successful login
-export async function clearFailedLoginAttempts(userId, ipAddress) {
-    await FailedLogin.deleteMany({ userId, ipAddress });
+export const clearFailedLoginAttempts = async (email, ipAddress) => {
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) return
+
+        // Remove attempts from specific IP address
+        if (user.failedLoginAttempts && user.failedLoginAttempts.length > 0) {
+            user.failedLoginAttempts = user.failedLoginAttempts.filter(
+                attempt => attempt.ipAddress !== ipAddress
+            );
+            await user.save();
+        }
+
+    } catch (error) {
+        console.error('Error clearing failed login attempts:', error);
+    }
 }
+
