@@ -1,11 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import OAuthButton from "../form/OAuthButton";
 import ToggleButtons from "../ui/ToggleButton";
 import SignupForm from "../form/SignupForm";
+import LoginForm from "../form/LoginForm";
 
 
-const AuthCard = ({ oneLine }) => {
+const AuthCard = ({ oneLine, onChange, authState }) => {
     const [selected, setSelected] = useState("Patient"); // Track selected role (Patient/Doctor)
+
+    useEffect(() => {
+        sendRole();
+    }, [selected])
+
+    const sendRole = () => {
+        return onChange(selected)
+    }
 
     return (
         <div className="flex flex-col justify-center items-center w-full md:w-1/2 bg-[#EBFFFF] py-10">
@@ -38,7 +47,10 @@ const AuthCard = ({ oneLine }) => {
 
 
                 {/* Registration form */}
-                <SignupForm selected={selected} />
+                {authState === "login" ? <LoginForm selected={selected} /> : <SignupForm selected={selected} />}
+
+
+
             </div>
         </div >
     );
