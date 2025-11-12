@@ -1,11 +1,42 @@
 import api from '../api/axiosInstance'
 
 export const signupUser = async (payload) => {
-    const response = await api.post("/user/signup", payload);
-    return response;
+
+    try {
+
+        const response = await api.post("/user/signup", payload);
+        return response;
+
+    } catch (error) {
+        console.log("something went wrong", error)
+        throw error
+    }
 }
 
 export const resendEmail = async (email) => {
-    const response = await api.post("/user/verify/resend-email", { email })
-    return response
+
+    try {
+        const response = await api.post("/user/verify/resend-email", { email })
+        return response
+    } catch (error) {
+        console.log("something went wrong:", error)
+        throw error
+    }
 }
+
+export const loginUser = async (payload) => {
+
+    try {
+
+        const response = await api.post("/user/login", payload);
+
+        if (response.data.accessToken) {
+            localStorage.setItem('accessToken', response.data.accessToken)
+        }
+        return response
+    } catch (error) {
+        console.log("something went wrong", error)
+    }
+
+}
+
