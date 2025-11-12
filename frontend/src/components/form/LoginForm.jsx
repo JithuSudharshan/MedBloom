@@ -1,9 +1,9 @@
 import Input from './Input'
 import PasswordInput from './PasswordInput'
 import Button from '../ui/Button'
-import useSignup from '../../hooks/UseSignup'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import useLogin from '../../hooks/UseLogin'
 
 const LoginForm = ({ selected }) => {
     const [loading, setLoading] = useState(false);
@@ -14,7 +14,7 @@ const LoginForm = ({ selected }) => {
         handleSubmit,
         onSubmit,
         formState: { errors },
-    } = useSignup()
+    } = useLogin()
 
     const switchToSignup = () => {
         navigate('/signup')
@@ -36,20 +36,21 @@ const LoginForm = ({ selected }) => {
                     name="password"
                     register={register}
                     error={errors?.password}
-                    placeholder="Create a password"
+                    placeholder="Enter your password"
                 />
 
+                <p className="text-xs font-medium md-3 text-right hover:underline text-teal-600 cursor-pointer " >forgot password</p>
+
                 <Button loading={loading} type="submit">{loading ? "Signing in..." : `Sign In as ${selected}`}</Button>
-                <p className="text-sm font-medium md-3 text-right hover:underline text-teal-600 cursor-pointer " >forgot password</p>
+
             </form>
             {/* Link to login page */}
-            <p className="text-sm text-center mt-5 text-gray-600 mt-4">
+            <p className="text-sm text-left mt-5 text-gray-600 mt-4">
                 Not registered yet? Join now{" "}
                 <a href="/signup" onClick={switchToSignup} className="text-teal-500 font-medium hover:underline">
                     Register
                 </a>
             </p>
-
         </div>
     )
 }
