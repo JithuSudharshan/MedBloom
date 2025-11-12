@@ -59,7 +59,7 @@ export const resendVerificationMail = async (req, res) => {
         const token = await generateAndStoreToken(id)
 
         //Basic skeleton of the verification link send to user
-        const verificationLink = `http://localhost:5000/api/user/verify-email/${id}/${token}`;
+        const verificationLink = `http://localhost:5000/api/user/verify-email/${id}/${token}`
 
         await sendVerificationEmail(email, verificationLink)
         return res.status(200).json({ success: true, message: "verification email send!" })
