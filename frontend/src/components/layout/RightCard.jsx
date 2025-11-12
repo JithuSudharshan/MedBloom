@@ -15,7 +15,7 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
     const [isResending, setIsResending] = useState(false);
     const [resendStatus, setResendStatus] = useState('idle');
 
-    //Initialize countdown from localStorage
+    // Initialize countdown from localStorage to persist timer across page refreshes
     const getInitialCountdown = () => {
         const stored = localStorage.getItem(`resend_countdown_${Email}`);
         if (stored) {
@@ -28,7 +28,7 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
     };
     const [countdown, setCountdown] = useState(getInitialCountdown);
 
-    //Save countdown to localStorage whenever it changes
+    // Save countdown to localStorage whenever it changes
     useEffect(() => {
         if (countdown > 0) {
             localStorage.setItem(`resend_countdown_${Email}`, JSON.stringify({
@@ -44,7 +44,7 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
         setEmail(Email);
     }, [Email]);
 
-    //Countdown timer
+    // Countdown timer - decrements every second
     useEffect(() => {
         if (countdown > 0) {
             const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -62,6 +62,7 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
         else navigate('/signup');
     };
 
+    // Handle resend email with 60 second cooldown
     const handleResendEmail = async () => {
         setIsResending(true);
         setResendStatus('idle');
@@ -72,7 +73,7 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
             if (res?.data?.success) {
                 showToast.success(res.data.message);
                 setResendStatus('sent');
-                setCountdown(60);
+                setCountdown(60); // Start 60 second countdown
             } else {
                 showToast.error(res.data.message);
                 setResendStatus('failed');
@@ -88,6 +89,7 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
 
     return (
         <div className="flex justify-center flex-col items-center w-full md:w-1/2 bg-[#EBFFFF] p-8 md:p-16 text-center">
+            {/* Logo */}
             <div className="mb-10 text-4xl font-bold">
                 <span className="text-gray-900">MED</span>
                 <span className={primaryColor}>BLOOM</span>
@@ -95,12 +97,14 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
 
             <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6">{status}</h1>
 
+            {/* Success/Failure animation */}
             {(isSuccess || isFailed) && (
                 <div className='w-2xs pb-8'>
                     <Lottie animationData={statusIcon} loop={false} />
                 </div>
             )}
 
+            {/* Status message */}
             <p className="text-gray-700 text-lg mb-6">
                 {isSuccess && <>Your email <strong>{email}</strong> has been successfully verified.</>}
                 {isFailed && <>Verification failed for <strong>{email}</strong>. <p className={`mt-2 ${primaryColor}`}>Please try again with a different email.</p></>}
@@ -112,6 +116,7 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
                 )}
             </p>
 
+            {/* Navigation button (success/failure) */}
             {showButton && (
                 <button
                     onClick={buttonHandler}
@@ -121,6 +126,7 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
                 </button>
             )}
 
+            {/* Pending verification - paper plane animation and resend options */}
             {!isSuccess && !isFailed && (
                 <>
                     <Lottie animationData={paperPlane} />
@@ -149,6 +155,7 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
                             )}
                         </button>
                     </p>
+                    {/* Resend status messages */}
                     {resendStatus === 'sent' && (
                         <p className="text-green-600 text-sm mt-2">✓ Email sent successfully!</p>
                     )}

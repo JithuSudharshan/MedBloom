@@ -66,7 +66,7 @@ const SignupForm = ({ selected }) => {
             {/* Link to login page */}
             <p className="text-sm text-center text-gray-600 mt-4">
                 Already have an account?{" "}
-                <a href="#" onClick={switchToSignin} className="text-teal-500 font-medium hover:underline">
+                <a href="/login" onClick={switchToSignin} className="text-teal-500 font-medium hover:underline">
                     Login
                 </a>
             </p>
