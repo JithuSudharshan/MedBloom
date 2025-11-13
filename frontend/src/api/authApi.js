@@ -36,7 +36,24 @@ export const loginUser = async (payload) => {
         return response
     } catch (error) {
         console.log("something went wrong", error)
+        throw error
     }
 
 }
+
+export const logoutUser = async () => {
+    try {
+        const response = await api.post("/user/logout")
+        localStorage.removeItem('accessToken')
+        return response;
+
+    } catch (error) {
+        localStorage.removeItem('accessToken')
+        console.log("something went wrong while logout", error)
+        throw error
+
+    }
+}
+
+
 
