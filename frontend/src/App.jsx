@@ -1,11 +1,11 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import SignUp from "./pages/SignUp";
+import SignUp from "./pages/auth/SignUp";
 import { Toaster } from 'sonner'
-import VerifyEmail from "./pages/VerifyEmail";
-import Login from "./pages/Login";
-import PatientDashboard from "./pages/PatientDashboard";
-import DoctorDashboard from "./pages/DoctorDashboard";
+import VerifyEmail from "./pages/auth/VerifyEmail";
+import Login from "./pages/auth/Login";
+import PatientDashboard from "./pages/patient/PatientDashboard";
+import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 
 function App() {
   return (

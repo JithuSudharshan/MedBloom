@@ -1,8 +1,8 @@
 import React from 'react'
-import Button from '../components/ui/Button'
+import Button from '../../components/ui/Button'
 import { useState } from 'react'
-import { logoutUser } from '../api/authApi'
-import { showToast } from '../components/ui/Toast'
+import { logoutUser } from '../../api/authApi'
+import { showToast } from '../../components/ui/Toast'
 import { useNavigate } from 'react-router-dom'
 
 const DoctorDashboard = () => {
@@ -30,7 +30,7 @@ const DoctorDashboard = () => {
     return (
         <div>
             <Button onClick={handleLogout}  >{isloggingOut ? "logging out.." : "logout"}</Button>
-            <p>welcome to PatientDashboard</p>
+            <p>welcome to doctorDashboard</p>
         </div>
 
     )
