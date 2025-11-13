@@ -57,6 +57,7 @@ export const loginUser = async (req, res) => {
             user.refreshTokens = user.refreshTokens.slice(-5)
         }
 
+
         user.lastLogin = Date.now();
 
         const response = await user.save();

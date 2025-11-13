@@ -13,6 +13,6 @@ router.get('/verify-email/:id/:token', verifyToken)
 router.post('/verify/resend-email', resendVerificationMail)
 router.post('/login', loginUser)
 router.get('/auth/refresh', refreshToken)
-router.get('/user/logout', authenticate, logout)
+router.post('/logout', authenticate, logout)
 
 export default router;

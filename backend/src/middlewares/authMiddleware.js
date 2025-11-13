@@ -28,7 +28,7 @@ export const authenticate = async (req, res, next) => {
                 })
             }
 
-            return res.status(401).json({
+            return res.status(400).json({
                 success: false,
                 message: 'Invalid access token'
             })
