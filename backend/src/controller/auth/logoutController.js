@@ -7,6 +7,7 @@ export const logout = async (req, res) => {
         const userId = req.user.userId
 
         if (refreshToken && userId) {
+
             // Remove this specific refresh token from database
             await User.findByIdAndUpdate(userId, {
                 $pull: { refreshTokens: { token: refreshToken } }

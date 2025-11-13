@@ -1,6 +1,6 @@
 // middleware/auth.js
 import jwt from 'jsonwebtoken';
-import User from '../models/userModel.js';
+import { ENV } from '../config/env.js';
 
 export const authenticate = async (req, res, next) => {
     try {
@@ -15,8 +15,10 @@ export const authenticate = async (req, res, next) => {
         }
         const token = authHeader.split(' ')[1]
 
+        let decoded;
+
         try {
-            const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+            decoded = jwt.verify(token, ENV.JWT_ACCESS_SECRET);
         } catch (error) {
             if (error.name === 'TokenExpiredError') {
                 return res.status(401).json({
