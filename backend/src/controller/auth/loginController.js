@@ -7,7 +7,8 @@ import { ENV } from "../../config/env.js"
 export const loginUser = async (req, res) => {
 
     try {
-        const { email, password } = req.body;
+        const { email, password, } = req.body;
+        const role = req.body.selected;
 
         if (!email || !password)
             return res.status(400).json({ success: false, message: "Email and password are required" })
@@ -25,6 +26,9 @@ export const loginUser = async (req, res) => {
 
         if (user.status === "suspended" || user.status === "banned")
             return res.status(400).json({ success: false, message: "Your account has been suspended" })
+
+        if (role.toLowerCase() !== user.role)
+            return res.status(400).json({ success: false, message: "Invalid credentials" })
 
 
         const isValidPassword = await bcrypt.compare(password, user.passwordHash)
