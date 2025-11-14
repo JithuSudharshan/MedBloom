@@ -6,6 +6,8 @@ import VerifyEmail from "./pages/auth/VerifyEmail";
 import Login from "./pages/auth/Login";
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
+import CreateNewPassword from "./pages/auth/CreateNewPassword";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/patient/dashboard" element={<PatientDashboard />} />
         <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/create-newPassword/link" element={<CreateNewPassword />} />
       </Routes>
     </BrowserRouter>
   );
