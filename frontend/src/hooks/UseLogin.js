@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 const schema = yup.object({
     email: yup.string().email('Invalid email').required('Email is required'),
-    password: yup.string().min(6, 'Password must be at least 6 chars').required('Password required')
+    password: yup.string().min(8, 'Password must be at least 8 chars').required('Password required')
 }).required();
 
 export default function useLogin() {

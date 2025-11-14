@@ -13,18 +13,23 @@ const CreateNewPassword = () => {
     const [loading, setLoading] = useState(false)
     const [email, setEmail] = useState("")
     const location = useLocation()
-    const navigate = useNavigate(0)
+    const navigate = useNavigate()
 
     useEffect(() => {
-
         const query = new URLSearchParams(location.search)
         const queryEmail = query.get("email")
-        if (queryEmail) setEmail(queryEmail)
 
-    }, [location.search])
+        if (!queryEmail) {
+            showToast.error("Invalid or expired link.");
+            navigate("/forgot-password");
+            return;
+        }
+        setEmail(queryEmail)
+
+    }, [location.search, navigate])
 
     const schema = yup.object({
-        password: yup.string().min(6, 'Password must be at least 6 chars').required('Password required'),
+        password: yup.string().min(8, 'Password must be at least 8 chars').required('Password required'),
         confirmPassword: yup.string()
             .oneOf([yup.ref('password')], 'Passwords must match')
             .required('Confirm password required')
@@ -45,23 +50,29 @@ const CreateNewPassword = () => {
         try {
             setLoading(true)
 
-            const payload = {
+            let payload = {
                 email,
                 ...data
             }
-
+            console.log("Payload being sent:", payload) // ADD THIS LINE
+            console.log("Email value:", email) // ADD THIS LINE
             const response = await updateNewPassword(payload)
 
             if (!response?.data?.success) {
                 showToast.error(response?.data?.message || 'Something went wrong');
                 return;
             }
+
+
+            showToast.success('Password updated. Please log in.');
             reset()
             navigate("/login")
-            showToast.success('Password updated,Login to continue');
+
+
 
         } catch (error) {
             console.log("Something went wrong while updating password", error)
+            showToast.error("Something went wrong. Try again.")
         } finally {
             setLoading(false)
         }
@@ -109,7 +120,7 @@ const CreateNewPassword = () => {
                     </div>
 
                     {/* Submit Button */}
-                    <Button type="submit" className='w-full mb-10 mt-4'  > {loading ? "loading..." : "Reset Password"}</Button>
+                    <Button loading={loading} type="submit" className='w-full mb-10 mt-4'  > {loading ? "Resetting..." : "Reset Password"}</Button>
                 </form>
             </div>
         </div>

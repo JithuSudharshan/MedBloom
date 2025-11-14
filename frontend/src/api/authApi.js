@@ -58,18 +58,20 @@ export const logoutUser = async () => {
 export const forgotPasswordEmailVerification = async (email) => {
     try {
 
-        const response = await api.post("/user/forgotPassword/send-verificationEmail", email);
+        const response = await api.post("/user/forgot-Password/send-verificationEmail", email);
         return response
 
     } catch (error) {
-
+        console.log("Something went wrong", error)
+        throw error
     }
 }
 
 export const updateNewPassword = async (payload) => {
     try {
 
-        const response = await api.post("user/update-password", payload)
+        const response = await api.post("/user/create-new-password", payload)
+        console.log(response)
         return response
 
     } catch (error) {

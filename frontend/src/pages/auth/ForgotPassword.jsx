@@ -81,7 +81,7 @@ const ForgotPassword = () => {
                     </div>
 
                     {/* Submit Button */}
-                    <Button type="submit" className='w-full mb-10 mt-4'  > {loading ? "Sending verification link.." : "Send verification link"}</Button>
+                    <Button loading={loading} type="submit" className='w-full mb-10 mt-4'  > {loading ? "Sending verification link.." : "Send verification link"}</Button>
                 </form>
             </div>
         </div>
