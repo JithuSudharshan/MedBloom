@@ -55,5 +55,15 @@ export const logoutUser = async () => {
     }
 }
 
+export const forgotPasswordEmailVerification = async (email) => {
+    try {
+        const response = await api.post("/user/forgotPassword/send-verificationEmail", email);
+
+        return response
+    } catch (error) {
+
+    }
+}
+
 
 
