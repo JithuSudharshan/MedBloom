@@ -10,7 +10,6 @@ const VerifyEmail = () => {
     const location = useLocation();
     const [status, setStatus] = useState("checking");
     const [email, setEmail] = useState("");
-    console.log(email)
 
     useEffect(() => {
 

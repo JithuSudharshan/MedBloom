@@ -20,16 +20,12 @@ export default function useLogin() {
         defaultValues: {
             email: '',
             password: '',
-        },
+        }
     })
-
-
 
     const onSubmit = async (data, selected, setLoading) => {
 
         try {
-
-
             setLoading(true)
 
             const payload = {
@@ -45,7 +41,6 @@ export default function useLogin() {
                 return;
             }
 
-            // Success - tokens are already stored by authApi
             showToast.success('Login successful!');
 
             // Navigate based on role

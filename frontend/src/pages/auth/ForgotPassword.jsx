@@ -11,6 +11,7 @@ import { showToast } from '../../components/ui/Toast'
 const ForgotPassword = () => {
     const [loading, setLoading] = useState(false)
 
+
     const schema = yup.object({
         email: yup.string().email('Invalid email').required('Email is required')
     }).required()
