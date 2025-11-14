@@ -2,7 +2,7 @@ import User from "../model/userModel.js";
 import { deleteToken, generateAndStoreToken, searchAndFindToken, safeCompare } from "../utils/tokenService.js";
 import { sendVerificationEmail } from "../utils/sendEmail.js";
 
-export const verifyToken = async (req, res) => {
+export const verifyUser = async (req, res) => {
 
     try {
         const { id, token } = req.params
@@ -68,5 +68,35 @@ export const resendVerificationMail = async (req, res) => {
 
         console.log("Error while resending email", error)
         res.status(500).json({ success: false, message: "Error while resending email" })
+    }
+}
+
+export const verifyEmailForForgotPassword = async (req, res) => {
+    try {
+        const { id, token } = req.params
+        const user = await User.findById({ _id: id });
+
+        //cheking whether the req actually has id and token
+        if (!token || !id)
+            return res.status(400).redirect(`http://localhost:5173/verify/email/link?status=&email=${encodeURIComponent(user.email)}`)
+
+        //Retrieving previously stored token in redis
+        const storedToken = await searchAndFindToken(id)
+
+        if (!storedToken)
+            return res.status(400).redirect(`http://localhost:5173/verify/email/link?status=failed&email=${encodeURIComponent(user.email)}`)
+
+        //Comparing both the hashedtoken 
+        const isMatch = await safeCompare(storedToken, token)
+        if (!isMatch)
+            return res.status(400).redirect(`http://localhost:5173/verify/email/link?status=failed&email=${encodeURIComponent(user.email)}`)
+
+        //deleting the token in redis
+        await deleteToken(id)
+
+        res.status(200).redirect(`http://localhost:5173/create-newPassword/link?status=success&email=${encodeURIComponent(user.email)}`)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ success: false, message: "internal server error" })
     }
 }
