@@ -19,6 +19,9 @@ const LoginForm = ({ selected }) => {
     const switchToSignup = () => {
         navigate('/signup')
     }
+    const naviagteToForgotPassword = () => {
+        navigate('/forgot-password')
+    }
 
     return (
         <div>
@@ -39,7 +42,7 @@ const LoginForm = ({ selected }) => {
                     placeholder="Enter your password"
                 />
 
-                <p className="text-xs font-medium md-3 text-right hover:underline text-teal-600 cursor-pointer " >forgot password</p>
+                <p className="text-xs font-medium md-3 text-right hover:underline text-teal-600 cursor-pointer " onClick={naviagteToForgotPassword} >forgot password</p>
 
                 <Button loading={loading} type="submit">{loading ? "Signing in..." : `Sign In as ${selected}`}</Button>
 
