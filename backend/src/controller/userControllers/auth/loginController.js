@@ -1,8 +1,8 @@
-import User from "../../model/userModel.js"
+import User from "../../../model/userModel.js"
 import bcrypt from "bcrypt"
-import { generateAccessToken, generateRefreshToken } from "../../utils/tokenService.js"
-import { checkLoginAttempts, clearFailedLoginAttempts, logFailedLoginAttempt } from "../../utils/MonitorFailedLoginAttempt.js"
-import { ENV } from "../../config/env.js"
+import { generateAccessToken, generateRefreshToken } from "../../../utils/tokenService.js"
+import { checkLoginAttempts, clearFailedLoginAttempts, logFailedLoginAttempt } from "../../../utils/MonitorFailedLoginAttempt.js"
+import { ENV } from "../../../config/env.js"
 
 export const loginUser = async (req, res) => {
 

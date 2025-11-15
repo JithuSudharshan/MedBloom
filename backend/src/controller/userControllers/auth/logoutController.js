@@ -1,5 +1,5 @@
-import User from "../../model/userModel.js"
-import { ENV } from "../../config/env.js"
+import User from "../../../model/userModel.js"
+import { ENV } from "../../../config/env.js"
 
 export const logout = async (req, res) => {
     try {

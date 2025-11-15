@@ -42,9 +42,11 @@ export const deleteToken = async (userId) => {
     try {
         //deleting the token after verification success
         await redisClient.del(`verifyToken:${userId}`)
-        console.log("token deleted")
+
     } catch (error) {
+
         console.log("Error in deleting token", error)
+
     }
 }
 
@@ -60,24 +62,27 @@ export const safeCompare = async (hash1, hash2) => {
     const isMatch = crypto.timingSafeEqual(buffer1, buffer2);
 
     if (isMatch) {
-        console.log(" Tokens match");
         return true
     } else {
-        console.log(" Tokens do not match");
         return false
     }
 }
 
 export const generateAccessToken = (user_Id, user_email, user_role) => {
     return new Promise((resolve, reject) => {
+
         jwt.sign({
+
             userId: user_Id,
             userEmail: user_email,
             userRole: user_role
+
         }, ENV.JWT_ACCESS_SECRET, { expiresIn: '15m' },
             (err, token) => {
-                if (err) reject(err);
-                else resolve(token);
+
+                if (err) reject(err)
+                else resolve(token)
+
             })
     })
 }
@@ -85,11 +90,15 @@ export const generateAccessToken = (user_Id, user_email, user_role) => {
 export const generateRefreshToken = (user_id) => {
     return new Promise((resolve, reject) => {
         jwt.sign({
+
             userId: user_id
+
         }, ENV.JWT_REFERSH_TOKEN, { expiresIn: '7d' },
             (err, token) => {
+
                 if (err) reject(err)
                 else resolve(token)
+
             })
     })
 }

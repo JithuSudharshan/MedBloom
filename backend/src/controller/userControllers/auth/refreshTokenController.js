@@ -1,6 +1,6 @@
-import User from "../../model/userModel.js"
-import { generateAccessToken } from "../../utils/tokenService.js"
-import { ENV } from "../../config/env.js"
+import User from "../../../model/userModel.js"
+import { generateAccessToken } from "../../../utils/tokenService.js"
+import { ENV } from "../../../config/env.js"
 
 export const refreshToken = async (req, res) => {
     try {

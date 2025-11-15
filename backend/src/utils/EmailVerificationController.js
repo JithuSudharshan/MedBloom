@@ -1,6 +1,6 @@
 import User from "../model/userModel.js";
-import { deleteToken, generateAndStoreToken, searchAndFindToken, safeCompare } from "../utils/tokenService.js";
-import { sendVerificationEmail } from "../utils/sendEmail.js";
+import { deleteToken, generateAndStoreToken, searchAndFindToken, safeCompare } from "./tokenService.js";
+import { sendVerificationEmail } from "./sendEmail.js";
 
 export const verifyUser = async (req, res) => {
 

@@ -1,12 +1,11 @@
-import User from "../../model/userModel.js"
-import { ENV } from "../../config/env.js"
+import User from "../../../model/userModel.js"
+import { ENV } from "../../../config/env.js"
 import bcrypt from 'bcrypt'
 
 
 export const createPassword = async (req, res) => {
     try {
         const { email, password, confirmPassword } = req.body
-        console.log(email, password, confirmPassword)
 
         if (!email)
             return res.status(400).json({

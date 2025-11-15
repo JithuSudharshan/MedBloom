@@ -1,6 +1,6 @@
-import User from "../../model/userModel.js";
-import { sendVerificationEmail } from "../../utils/sendEmail.js";
-import { generateAndStoreToken } from "../../utils/tokenService.js";
+import User from "../../../model/userModel.js";
+import { sendVerificationEmail } from "../../../utils/sendEmail.js";
+import { generateAndStoreToken } from "../../../utils/tokenService.js";
 
 export const sendEmailForForgotPassword = async (req, res) => {
     try {
@@ -8,11 +8,17 @@ export const sendEmailForForgotPassword = async (req, res) => {
         const { email } = req.body;
 
         if (!email)
-            return res.status(400).json({ success: false, message: "Email is required" })
+            return res.status(400).json({
+                success: false,
+                message: "Email is required"
+            })
 
         const user = await User.findOne({ email })
         if (!user)
-            return res.status(400).json({ success: false, message: "Invalid email Id" })
+            return res.status(400).json({
+                success: false,
+                message: "Invalid email Id"
+            });
 
         const token = await generateAndStoreToken(user._id)
 

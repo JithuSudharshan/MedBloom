@@ -1,6 +1,6 @@
 import express from "express"
-import { signUp, loginUser, refreshToken, logout, sendEmailForForgotPassword, createPassword } from "../controller/auth/index.js"
-import { resendVerificationMail, verifyEmailForForgotPassword, verifyUser } from "../controller/EmailVerificationController.js";
+import { signUp, loginUser, refreshToken, logout, sendEmailForForgotPassword, createPassword } from "../controller/userControllers/auth/index.js"
+import { resendVerificationMail, verifyEmailForForgotPassword, verifyUser } from "../utils/EmailVerificationController.js";
 import { authenticate } from "../middlewares/authMiddleware.js";
 
 

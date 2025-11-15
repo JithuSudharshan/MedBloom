@@ -65,7 +65,6 @@ export const sendVerificationEmail = async (to, verificationLink) => {
         `,
         });
 
-        console.log("Email send succesfully");
     } catch (error) {
         console.log("Internal server error while sending mail ", error)
     }

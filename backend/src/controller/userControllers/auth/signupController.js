@@ -1,8 +1,8 @@
-import User from "../../model/userModel.js"
+import User from "../../../model/userModel.js";
 import bcrypt from "bcrypt"
-import { generateAndStoreToken } from "../../utils/tokenService.js"
-import { sendVerificationEmail } from "../../utils/sendEmail.js"
-import { ENV } from "../../config/env.js"
+import { generateAndStoreToken } from "../../../utils/tokenService.js";
+import { sendVerificationEmail } from "../../../utils/sendEmail.js"
+import { ENV } from "../../../config/env.js"
 
 export const signUp = async (req, res) => {
 
