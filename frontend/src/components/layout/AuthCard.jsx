@@ -5,7 +5,7 @@ import SignupForm from "../form/SignupForm";
 import LoginForm from "../form/LoginForm";
 
 
-const AuthCard = ({ oneLine, onChange, authState }) => {
+const AuthCard = ({ oneLine, onChange, authState, isAdmin }) => {
     const [selected, setSelected] = useState("Patient"); // Track selected role (Patient/Doctor)
 
     useEffect(() => {
@@ -29,25 +29,32 @@ const AuthCard = ({ oneLine, onChange, authState }) => {
                 </p>
 
 
-                {/* Role selector - Patient or Doctor */}
-                <ToggleButtons
-                    options={["Patient", "Doctor"]}
-                    value={selected}
-                    onChange={setSelected}
-                />
+
+                {/* Role selector - Patient or Doctor or Admin */}
+                {isAdmin ? <div className="flex justify-center gap-2 mb-4 bg-white p-1 rounded-full w-max mx-auto">
+                    <button className="px-4 py-1 rounded-full text-sm font-medium transition-all duration-200 bg-linear-to-br from-[#00737A] to-[#00C8C7] text-white">Admin</button>
+                </div> :
+                    <ToggleButtons
+                        options={["Patient", "Doctor"]}
+                        value={selected}
+                        onChange={setSelected}
+                    />}
+
 
 
                 {/* OAuth login options */}
-                <OAuthButton />
-                <div className="flex items-center my-3">
-                    <div className="flex-1 h-px bg-gray-300"></div>
-                    <span className="px-2 text-gray-400 text-sm">OR</span>
-                    <div className="flex-1 h-px bg-gray-300"></div>
-                </div>
+                {isAdmin ? <></> : <>
+                    <OAuthButton />
+                    <div className="flex items-center my-3">
+                        <div className="flex-1 h-px bg-gray-300"></div>
+                        <span className="px-2 text-gray-400 text-sm">OR</span>
+                        <div className="flex-1 h-px bg-gray-300"></div>
+                    </div>
+                </>}
 
 
                 {/* Registration form */}
-                {authState === "login" ? <LoginForm selected={selected} /> : <SignupForm selected={selected} />}
+                {authState === "login" ? <LoginForm isAdmin={isAdmin} selected={selected} /> : <SignupForm selected={selected} />}
 
 
 

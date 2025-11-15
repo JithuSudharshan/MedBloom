@@ -55,6 +55,18 @@ export const logoutUser = async () => {
     }
 }
 
+export const loginAdmin = async (payload) => {
+    try {
+
+        const response = await api.post("admin/login", payload)
+        return response
+
+    } catch (error) {
+        console.log("something went wronf while Admin login", error)
+        throw error
+    }
+}
+
 export const forgotPasswordEmailVerification = async (email) => {
     try {
 

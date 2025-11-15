@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { loginUser } from '../api/authApi';
+import { loginAdmin, loginUser } from '../api/authApi';
 import { showToast } from '../components/ui/Toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,7 +23,7 @@ export default function useLogin() {
         }
     })
 
-    const onSubmit = async (data, selected, setLoading) => {
+    const onSubmit = async (data, selected, setLoading, isAdmin) => {
 
         try {
             setLoading(true)
@@ -34,24 +34,43 @@ export default function useLogin() {
             }
             console.log(payload)
             // Call login API
-            const response = await loginUser(payload);
+            if (isAdmin) {
+                let res = await loginAdmin(payload)
 
-            if (!response?.data?.success) {
-                showToast.error(response?.data?.message || 'Login failed');
-                return;
-            }
+                if (!res?.data?.success) {
+                    showToast.error(response?.data?.message || 'Login failed');
+                    return;
+                }
 
-            showToast.success('Login successful!');
+                showToast.success('Login successful!');
 
-            // Navigate based on role
-            const userRole = response.data.user?.role || selected.toLowerCase();
-            if (userRole === 'doctor') {
-                navigate('/doctor/dashboard');
+                // Navigate based on role
+                navigate("/admin/dashboard")
+
+                reset();
             } else {
-                navigate('/patient/dashboard');
+
+                const response = await loginUser(payload);
+
+                if (!response?.data?.success) {
+                    showToast.error(response?.data?.message || 'Login failed');
+                    return;
+                }
+
+                showToast.success('Login successful!');
+
+                // Navigate based on role
+                const userRole = response.data.user?.role || selected.toLowerCase();
+                if (userRole === 'doctor') {
+                    navigate('/doctor/dashboard');
+                } else {
+                    navigate('/patient/dashboard');
+                }
+
+                reset();
+
             }
 
-            reset();
 
         } catch (err) {
             console.error('Login error:', err);
