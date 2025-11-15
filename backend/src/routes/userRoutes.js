@@ -5,6 +5,7 @@ import { authenticate } from "../middlewares/authMiddleware.js";
 
 
 
+
 const router = express.Router()
 
 //UserRoutes
@@ -17,5 +18,7 @@ router.post('/logout', authenticate, logout)
 router.post('/forgot-Password/send-verificationEmail', sendEmailForForgotPassword)
 router.get('/verify-email-forgotPassword/:id/:token', verifyEmailForForgotPassword)
 router.post('/create-new-password', createPassword)
+
+
 
 export default router;
