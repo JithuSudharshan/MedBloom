@@ -1,6 +1,6 @@
-import LeftHero from "../../components/layout/LeftHero";
-import AuthCard from "../../components/layout/AuthCard";
-import heroImg from "../../assets/hero-illustration.png";
+import LeftHero from "../../../components/layout/LeftHero";
+import AuthCard from "../../../components/layout/AuthCard";
+import heroImg from "../../../assets/hero-illustration.png";
 import { useState } from "react";
 
 const SignUp = () => {

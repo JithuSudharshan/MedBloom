@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import LeftHero from '../../components/layout/LeftHero'
-import patientImg from '../../assets/images/patientLogin.png'
-import doctorImg from '../../assets/images/doctorLogin.png'
-import AuthCard from '../../components/layout/AuthCard'
+import LeftHero from '../../../components/layout/LeftHero'
+import patientImg from '../../../assets/images/patientLogin.png'
+import doctorImg from '../../../assets/images/doctorLogin.png'
+import AuthCard from '../../../components/layout/AuthCard'
 
 const Login = () => {
     const [role, setRole] = useState("Patient")

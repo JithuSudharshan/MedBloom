@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
-import Button from '../../components/ui/Button'
-import PasswordInput from '../../components/form/PasswordInput'
+import Button from '../../../components/ui/Button'
+import PasswordInput from '../../../components/form/PasswordInput'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { updateNewPassword } from '../../api/authApi'
-import { showToast } from '../../components/ui/Toast'
+import { updateNewPassword } from '../../../api/authApi'
+import { showToast } from '../../../components/ui/Toast'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const CreateNewPassword = () => {

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import Button from '../../components/ui/Button'
-import Input from '../../components/form/Input'
+import Button from '../../../components/ui/Button'
+import Input from '../../../components/form/Input'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { forgotPasswordEmailVerification } from '../../api/authApi'
-import { showToast } from '../../components/ui/Toast'
+import { forgotPasswordEmailVerification } from '../../../api/authApi'
+import { showToast } from '../../../components/ui/Toast'
 
 const ForgotPassword = () => {
     const [loading, setLoading] = useState(false)
