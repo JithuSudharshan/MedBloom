@@ -1,13 +1,14 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import SignUp from "./pages/auth/SignUp";
+import SignUp from "./pages/user/auth/SignUp";
 import { Toaster } from 'sonner'
-import VerifyEmail from "./pages/auth/VerifyEmail";
-import Login from "./pages/auth/Login";
-import PatientDashboard from "./pages/patient/PatientDashboard";
-import DoctorDashboard from "./pages/doctor/DoctorDashboard";
-import CreateNewPassword from "./pages/auth/CreateNewPassword";
-import ForgotPassword from "./pages/auth/ForgotPassword";
+import VerifyEmail from "./pages/user/auth/VerifyEmail";
+import Login from "./pages/user/auth/Login";
+import PatientDashboard from "./pages/user/patient/PatientDashboard";
+import DoctorDashboard from "./pages/user/doctor/DoctorDashboard";
+import CreateNewPassword from "./pages/user/auth/CreateNewPassword";
+import ForgotPassword from "./pages/user/auth//ForgotPassword";
+import AdminLogin from "./pages/admin/auth/AdminLogin";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/create-newPassword/link" element={<CreateNewPassword />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
       </Routes>
     </BrowserRouter>
   );
