@@ -59,13 +59,31 @@ export const loginAdmin = async (payload) => {
     try {
 
         const response = await api.post("admin/login", payload)
+        if (response.data.token) {
+            localStorage.setItem('token', response.data.accessToken)
+        }
         return response
 
     } catch (error) {
-        console.log("something went wronf while Admin login", error)
+        console.log("something went wrong while Admin login", error)
         throw error
     }
 }
+
+export const logoutAdmin = async () => {
+    try {
+        const response = await api.post("/admin/logout")
+        localStorage.removeItem('token')
+        return response;
+
+    } catch (error) {
+        localStorage.removeItem('token')
+        console.log("something went wrong while admin logout", error)
+        throw error
+
+    }
+}
+
 
 export const forgotPasswordEmailVerification = async (email) => {
     try {
@@ -91,6 +109,7 @@ export const updateNewPassword = async (payload) => {
         throw error
     }
 }
+
 
 
 
