@@ -14,11 +14,19 @@ export const sendEmailForForgotPassword = async (req, res) => {
             })
 
         const user = await User.findOne({ email })
+
         if (!user)
             return res.status(400).json({
                 success: false,
                 message: "Invalid email Id"
             });
+
+        if (!user.authMethod === "google") {
+            return res.status(400).json({
+                error: 'This account uses Google Sign-In. Please sign in with Google.',
+                authMethod: 'google'
+            });
+        }
 
         const token = await generateAndStoreToken(user._id)
 
