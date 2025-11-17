@@ -13,7 +13,7 @@ router.post('/signup', signUp);
 router.get('/verify-email/:id/:token', verifyUser)
 router.post('/verify/resend-email', resendVerificationMail)
 router.post('/login', loginUser)
-router.get('/auth/refresh', refreshToken)
+router.get('/auth/refresh-Token', refreshToken)
 router.post('/logout', authenticate, logout)
 router.post('/forgot-Password/send-verificationEmail', sendEmailForForgotPassword)
 router.get('/verify-email-forgotPassword/:id/:token', verifyEmailForForgotPassword)

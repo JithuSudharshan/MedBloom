@@ -31,18 +31,25 @@ const userSchema = new mongoose.Schema(
         },
         phone: {
             type: String,
-            required: [true, "Phone number is required"],
             trim: true,
             match: [/^\+?[1-9]\d{1,14}$/, 'Please use a valid phone number'] //E.164 formaat
         },
         passwordHash: {
             type: String,
-            required: [true, 'Password is required'],
             select: false
+        },
+        isAuthenticated: {
+            type: Boolean,
+            default: false
+        },
+        authMethod: {
+            type: String,
+            enum: ['local', 'google', 'both'],
+            default: 'local'
         },
         isVerified: {
             type: Boolean,
-            required: [true, 'Verification status is required']
+            default: false
         },
         status: {
             type: String,
