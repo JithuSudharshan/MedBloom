@@ -18,5 +18,9 @@ export const ENV = {
     EMAIL_USER: process.env.EMAIL_USER,
     EMAIL_PASS: process.env.EMAIL_PASS,
     JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || "my secret access token",
-    JWT_REFERSH_TOKEN: process.env.JWT_REFERSH_TOKEN || "my secret refresh token"
+    JWT_REFERSH_TOKEN: process.env.JWT_REFERSH_TOKEN || "my secret refresh token",
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    SESSION_SECRET: process.env.SESSION_SECRET,
+    MAX_REFRESH_TOKENS: process.env.MAX_REFRESH_TOKENS
 }
