@@ -50,9 +50,16 @@ export const refreshToken = async (req, res) => {
         const newAccessToken = generateAccessToken(user._id, user.email, user.role)
 
         // Send new access token
+        res.cookie('accessToken', newAccessToken, {
+            httpOnly: true,
+            secure: ENV.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 15 * 60 * 1000 //15 min
+        })
+
         res.status(200).json({
             success: true,
-            accessToken: newAccessToken
+            message: "accessToken refreshed"
         })
 
     } catch (error) {

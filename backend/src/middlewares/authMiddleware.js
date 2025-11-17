@@ -4,16 +4,8 @@ import { ENV } from '../config/env.js';
 
 export const authenticate = async (req, res, next) => {
     try {
-        // 1. Get token from Authorization header
-        const authHeader = req.headers.authorization
 
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({
-                success: false,
-                message: 'Access token required'
-            })
-        }
-        const token = authHeader.split(' ')[1]
+        const token = req.cookies.accessToken;
 
         let decoded;
 

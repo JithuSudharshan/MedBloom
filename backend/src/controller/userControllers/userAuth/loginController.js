@@ -69,9 +69,16 @@ export const loginUser = async (req, res) => {
         if (response) {
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
-                secure: ENV.NODE_ENV,
+                secure: ENV.NODE_ENV === 'production',
                 sameSite: 'strict',
+                path: "/api/auth/refresh-token",
                 maxAge: 7 * 24 * 60 * 60 * 1000 //7 days
+            })
+            res.cookie('accessToken', accessToken, {
+                httpOnly: true,
+                secure: ENV.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 15 * 60 * 1000 //15 min
             })
         }
 
@@ -81,7 +88,6 @@ export const loginUser = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Login successful",
-            accessToken,
             user: {
                 id: user._id,
                 name: user.name,
