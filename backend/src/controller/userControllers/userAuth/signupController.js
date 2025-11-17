@@ -31,7 +31,8 @@ export const signUp = async (req, res) => {
             email,
             phone,
             passwordHash,
-            isVerified: false
+            isVerified: false,
+            authMethod: 'local'
         });
         const response = await newUser.save();
 
