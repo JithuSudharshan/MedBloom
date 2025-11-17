@@ -44,7 +44,7 @@ const AuthCard = ({ oneLine, onChange, authState, isAdmin }) => {
 
                 {/* OAuth login options */}
                 {isAdmin ? <></> : <>
-                    <OAuthButton />
+                    <OAuthButton role={selected.toLocaleLowerCase()} />
                     <div className="flex items-center my-3">
                         <div className="flex-1 h-px bg-gray-300"></div>
                         <span className="px-2 text-gray-400 text-sm">OR</span>
