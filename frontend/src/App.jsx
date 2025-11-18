@@ -10,24 +10,53 @@ import CreateNewPassword from "./pages/user/auth/CreateNewPassword";
 import ForgotPassword from "./pages/user/auth//ForgotPassword";
 import AdminLogin from "./pages/admin/auth/AdminLogin";
 import AdminDashboard from "./pages/admin/dashboard/AdminDashboard";
+import PatientOnboardingForm from "./pages/user/patient/PatientOnboardingForm";
+import { AuthProvider } from "./context/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoutes";
+import { PublicRoute } from "./components/PublicRoutes";
+import { Navigate } from "react-router-dom";
+import HomePage from "./pages/landing pages/HomePage";
 
 function App() {
   return (
     <BrowserRouter>
-      <Toaster position="top-right" richColors />
-      <Routes>
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/verify/email/link" element={<VerifyEmail />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/patient/dashboard" element={<PatientDashboard />} />
-        <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/create-newPassword/link" element={<CreateNewPassword />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      </Routes>
+      <AuthProvider>
+        <Toaster position="top-right" richColors />
+        <Routes>
+
+          {/* Root redirect */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+
+          {/* Public Routes - Redirect to dashboard if logged in */}
+          <Route element={<PublicRoute />}>
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/homePage" element={<HomePage />} />
+          </Route>
+
+          {/* Semi-public routes (allow access but no redirect) */}
+          <Route path="/verify/email/link" element={<VerifyEmail />} />
+          <Route path="/create-newPassword/link" element={<CreateNewPassword />} />
+
+          <Route element={<ProtectedRoute allowedRoles={['patient']} />} >
+            <Route path="/patient/dashboard" element={<PatientDashboard />} />
+            <Route path="/patient/onboarding" element={<PatientOnboardingForm />} />
+          </Route>
+
+          <Route element={<ProtectedRoute allowedRoles={['doctor']} />} >
+            <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+          </Route>
+
+          <Route element={<ProtectedRoute allowedRoles={['admin']} />} >
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          </Route>
+
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
-  );
+  )
 }
 
 export default App;
