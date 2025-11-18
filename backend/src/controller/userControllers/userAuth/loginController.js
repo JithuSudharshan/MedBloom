@@ -7,8 +7,8 @@ import { ENV } from "../../../config/env.js"
 export const loginUser = async (req, res) => {
 
     try {
-        const { email, password, } = req.body;
-        const role = req.body.selected;
+        const { email, password, } = req.body
+        const role = req.body.selected
 
         if (!email || !password)
             return res.status(400).json({ success: false, message: "Email and password are required" })
@@ -62,9 +62,9 @@ export const loginUser = async (req, res) => {
         }
 
 
-        user.lastLogin = Date.now();
+        user.lastLogin = Date.now()
 
-        const response = await user.save();
+        const response = await user.save()
 
         if (response) {
             res.cookie('refreshToken', refreshToken, {
@@ -83,7 +83,7 @@ export const loginUser = async (req, res) => {
         }
 
         //clear all failed login after successfull login
-        await clearFailedLoginAttempts(user._id, req.ip);
+        await clearFailedLoginAttempts(user._id, req.ip)
 
         res.status(200).json({
             success: true,

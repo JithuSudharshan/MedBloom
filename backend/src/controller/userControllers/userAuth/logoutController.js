@@ -10,17 +10,17 @@ export const logout = async (req, res) => {
         if (refreshToken && userId) {
             await User.findByIdAndUpdate(userId, {
                 $pull: { refreshTokens: { token: refreshToken } }
-            });
+            })
         }
 
         // Passport logout (for both OAuth and local session-based auth)
         req.logout((err) => {
             if (err) {
-                console.error('Passport logout error:', err);
+                console.error('Passport logout error:', err)
                 return res.status(500).json({
                     success: false,
                     error: 'Logout failed'
-                });
+                })
             }
 
             // Destroy session completely
@@ -35,41 +35,41 @@ export const logout = async (req, res) => {
                     httpOnly: true,
                     secure: ENV.NODE_ENV === 'production',
                     sameSite: 'lax'
-                });
+                })
 
                 res.clearCookie('refreshToken', {
                     path: '/',
                     httpOnly: true,
                     secure: ENV.NODE_ENV === 'production',
                     sameSite: 'strict'
-                });
+                })
 
                 res.clearCookie('accessToken', {
                     path: '/',
                     httpOnly: true,
                     secure: ENV.NODE_ENV === 'production',
                     sameSite: 'strict'
-                });
+                })
 
                 res.status(200).json({
                     success: true,
                     message: 'Logged out successfully'
-                });
-            });
-        });
+                })
+            })
+        })
 
     } catch (error) {
         console.error('Logout error:', error);
 
         // Fallback: clear cookies even if error occurs
-        res.clearCookie('connect.sid');
-        res.clearCookie('refreshToken');
-        res.clearCookie('accessToken');
+        res.clearCookie('connect.sid')
+        res.clearCookie('refreshToken')
+        res.clearCookie('accessToken')
 
         res.status(500).json({
             success: false,
             message: 'Logout failed',
             error: error.message
-        });
+        })
     }
-};
+}

@@ -13,7 +13,7 @@ router.get('/google/callback',
         failureRedirect: 'http://localhost:5173/login?error=auth_failed'
     }),
     oauthController.handleOAuthCallback
-);
+)
 
 // Check if user is authenticated
 router.get('/login/success', oauthController.checkAuthStatus)

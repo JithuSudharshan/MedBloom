@@ -33,25 +33,25 @@ export const signUp = async (req, res) => {
             passwordHash,
             isVerified: false,
             authMethod: 'local'
-        });
-        const response = await newUser.save();
+        })
+        const response = await newUser.save()
 
         //generating token with crypto
-        const token = await generateAndStoreToken(response._id);
+        const token = await generateAndStoreToken(response._id)
 
         //basic skeleton of the verification link send to user
-        const verificationLink = `http://localhost:5000/api/user/verify-email/${response._id.toString()}/${token}`;
+        const verificationLink = `http://localhost:5000/api/user/verify-email/${response._id.toString()}/${token}`
 
         //sending verification Email to user
         await sendVerificationEmail(email, verificationLink);
-        res.status(201).json({ success: true, message: "Signup successful.! verify email to continue" });
+        res.status(201).json({ success: true, message: "Signup successful.! verify email to continue" })
 
     } catch (error) {
         console.log(error);
         res.status(500).json({
             success: false,
             message: "Internal Server error while signing Up"
-        });
+        })
     }
 }
 

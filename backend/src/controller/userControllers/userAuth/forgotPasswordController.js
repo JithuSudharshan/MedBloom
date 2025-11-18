@@ -14,17 +14,18 @@ export const sendEmailForForgotPassword = async (req, res) => {
             })
 
         const user = await User.findOne({ email })
+        console.log("user: ", user)
 
-        if (!user)
+        if (!user || user === null)
             return res.status(400).json({
                 success: false,
                 message: "Invalid email Id"
             });
 
-        if (!user.authMethod === "google") {
+        if (user.authMethod === "google") {
             return res.status(400).json({
-                error: 'This account uses Google Sign-In. Please sign in with Google.',
-                authMethod: 'google'
+                success: false,
+                message: "This account uses Google Sign-In. Please sign in with Google."
             });
         }
 
@@ -38,7 +39,7 @@ export const sendEmailForForgotPassword = async (req, res) => {
 
 
     } catch (error) {
-        console.log("something went wrong while sending fPass email", error)
+        console.log("something went wrong while sending Pass email", error)
         res.status(500).json({ success: false, message: "Internal server error" })
     }
 }
