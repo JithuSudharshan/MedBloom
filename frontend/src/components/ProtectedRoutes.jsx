@@ -1,19 +1,28 @@
-import { Navigate } from "react-router-dom"
-import { useSelector } from 'react-redux'
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-const ProtectedRoutes = ({ children, allowedRoles = [] }) => {
+export const ProtectedRoute = ({ allowedRoles }) => {
+    const { user, loading, isAuthenticated } = useAuth()
 
-    const accessToken = localStorage.getItem('accessToken')
-    const { user } = useSelector((state) => state.auth.user)
-
-    if (!accessToken) {
-        return <Navigate to={'/login'} replace />
+    // Show loading spinner while checking auth
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+            </div>
+        )
     }
 
-    if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-        return <Navigate to={'/unauthorized'} replace />
+    // Not authenticated - redirect to login
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />
     }
-    return children
-}
 
-export default ProtectedRoutes
+    // Check role-based access if allowedRoles specified
+    if (allowedRoles && !allowedRoles.includes(user.role)) {
+        return <Navigate to="/unauthorized" replace />
+    }
+
+    // Authenticated and authorized - render child routes
+    return <Outlet />;
+};
