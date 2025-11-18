@@ -4,17 +4,19 @@ import { useState } from 'react'
 import { logoutAdmin } from '../../../api/authApi'
 import { showToast } from '../../../components/ui/Toast'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../../context/AuthContext'
 
 const AdminDashboard = () => {
   const [isloggingOut, setIsLoggingOut] = useState(false)
   const navigate = useNavigate()
+  const { adminLogout } = useAuth()
 
   const handleLogout = async () => {
 
     setIsLoggingOut(!isloggingOut)
     try {
 
-      const res = await logoutAdmin()
+      const res = await adminLogout()
       if (!res?.data?.success) {
         showToast.error(res.data.message)
       }

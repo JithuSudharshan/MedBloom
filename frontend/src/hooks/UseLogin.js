@@ -1,9 +1,9 @@
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { loginAdmin, loginUser } from '../api/authApi';
 import { showToast } from '../components/ui/Toast';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 
 const schema = yup.object({
@@ -14,6 +14,7 @@ const schema = yup.object({
 export default function useLogin() {
 
     const navigate = useNavigate()
+    const { login, adminLogin } = useAuth()
 
     const { register, handleSubmit, formState, reset, watch } = useForm({
         resolver: yupResolver(schema),
@@ -35,7 +36,7 @@ export default function useLogin() {
             console.log(payload)
             // Call login API
             if (isAdmin) {
-                let res = await loginAdmin(payload)
+                let res = await adminLogin(payload)
 
                 if (!res?.data?.success) {
                     showToast.error(response?.data?.message || 'Login failed');
@@ -50,7 +51,7 @@ export default function useLogin() {
                 reset();
             } else {
 
-                const response = await loginUser(payload);
+                const response = await login(payload);
 
                 if (!response?.data?.success) {
                     showToast.error(response?.data?.message || 'Login failed');

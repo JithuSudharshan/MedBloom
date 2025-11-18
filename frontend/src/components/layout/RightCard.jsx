@@ -17,16 +17,16 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
 
     // Initialize countdown from localStorage to persist timer across page refreshes
     const getInitialCountdown = () => {
-        const stored = localStorage.getItem(`resend_countdown_${Email}`);
+        const stored = localStorage.getItem(`resend_countdown_${Email}`)
         if (stored) {
-            const { countdown, timestamp } = JSON.parse(stored);
-            const elapsed = Math.floor((Date.now() - timestamp) / 1000);
-            const remaining = countdown - elapsed;
-            return remaining > 0 ? remaining : 0;
+            const { countdown, timestamp } = JSON.parse(stored)
+            const elapsed = Math.floor((Date.now() - timestamp) / 1000)
+            const remaining = countdown - elapsed
+            return remaining > 0 ? remaining : 0
         }
-        return 0;
+        return 0
     };
-    const [countdown, setCountdown] = useState(getInitialCountdown);
+    const [countdown, setCountdown] = useState(getInitialCountdown)
 
     // Save countdown to localStorage whenever it changes
     useEffect(() => {
@@ -34,56 +34,56 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
             localStorage.setItem(`resend_countdown_${Email}`, JSON.stringify({
                 countdown,
                 timestamp: Date.now()
-            }));
+            }))
         } else {
             localStorage.removeItem(`resend_countdown_${Email}`);
         }
-    }, [countdown, Email]);
+    }, [countdown, Email])
 
     useEffect(() => {
-        setEmail(Email);
-    }, [Email]);
+        setEmail(Email)
+    }, [Email])
 
     // Countdown timer - decrements every second
     useEffect(() => {
         if (countdown > 0) {
-            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-            return () => clearTimeout(timer);
+            const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
+            return () => clearTimeout(timer)
         }
-    }, [countdown]);
+    }, [countdown])
 
-    const isSuccess = status === "Verification successful";
-    const isFailed = status === "Verification failed";
-    const showButton = isSuccess || isFailed;
-    const buttonText = isSuccess ? "Go to Login" : "Go to Signup";
+    const isSuccess = status === "Verification successful"
+    const isFailed = status === "Verification failed"
+    const showButton = isSuccess || isFailed
+    const buttonText = isSuccess ? "Go to Login" : "Go to Signup"
 
     const buttonHandler = () => {
-        if (isSuccess) navigate('/login');
-        else navigate('/signup');
-    };
+        if (isSuccess) navigate('/login')
+        else navigate('/signup')
+    }
 
     // Handle resend email with 60 second cooldown
     const handleResendEmail = async () => {
-        setIsResending(true);
-        setResendStatus('idle');
+        setIsResending(true)
+        setResendStatus('idle')
 
         try {
-            const res = await resendEmail(email);
+            const res = await resendEmail(email)
 
             if (res?.data?.success) {
-                showToast.success(res.data.message);
-                setResendStatus('sent');
-                setCountdown(60); // Start 60 second countdown
+                showToast.success(res.data.message)
+                setResendStatus('sent')
+                setCountdown(60); //start 60 second countdown
             } else {
-                showToast.error(res.data.message);
-                setResendStatus('failed');
+                showToast.error(res.data.message)
+                setResendStatus('failed')
             }
         } catch (error) {
-            console.error('Resend error:', error);
+            console.error('Resend error:', error)
             showToast.error(error.response?.data?.message || 'Failed to resend email');
-            setResendStatus('failed');
+            setResendStatus('failed')
         } finally {
-            setIsResending(false);
+            setIsResending(false)
         }
     };
 
@@ -165,7 +165,7 @@ const RightCard = ({ statusText, statusIcon, EmailParam }) => {
                 </>
             )}
         </div>
-    );
-};
+    )
+}
 
 export default RightCard;

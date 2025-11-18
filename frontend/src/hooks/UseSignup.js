@@ -20,7 +20,7 @@ const schema = yup.object({
 
 export default function useSignup() {
 
-    const navigate = useNavigate();
+    const navigate = useNavigate()
 
 
     const { register, handleSubmit, formState, reset, watch } = useForm({
@@ -32,7 +32,7 @@ export default function useSignup() {
             password: '',
             confirmPassword: ''
         },
-    });
+    })
 
 
     const onSubmit = async (data, selected, setLoading) => {
@@ -70,7 +70,7 @@ export default function useSignup() {
         } finally {
             setLoading(false)
         }
-    };
+    }
 
-    return { register, handleSubmit, onSubmit, formState, watch };
+    return { register, handleSubmit, onSubmit, formState, watch }
 }

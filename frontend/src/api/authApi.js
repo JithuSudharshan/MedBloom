@@ -39,7 +39,9 @@ export const loginUser = async (payload) => {
 
 export const logoutUser = async () => {
     try {
-        const response = await api.post("/user/logout")
+        const response = await api.post("/user/logout", {}, {
+            withCredentials: true
+        })
         return response;
 
     } catch (error) {

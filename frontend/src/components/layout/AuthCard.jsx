@@ -6,7 +6,7 @@ import LoginForm from "../form/LoginForm";
 
 
 const AuthCard = ({ oneLine, onChange, authState, isAdmin }) => {
-    const [selected, setSelected] = useState("Patient"); // Track selected role (Patient/Doctor)
+    const [selected, setSelected] = useState("Patient")
 
     useEffect(() => {
         sendRole();
