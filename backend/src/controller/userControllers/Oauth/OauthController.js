@@ -173,3 +173,34 @@ export const checkAuthStatus = (req, res) => {
         message: "User not authenticated"
     })
 }
+
+export const verifyToken = async (req, res) => {
+    try {
+        // User is already attached by authenticateToken middleware
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: "User not authenticated"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            user: {
+                id: req.user._id,
+                email: req.user.email,
+                name: req.user.name,
+                role: req.user.role,
+                profilePicture: req.user.profilePicture,
+                isOnboarded: req.user.isOnboarded || false
+            }
+        })
+
+    } catch (error) {
+        console.error('Verify token error:', error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error during verification"
+        })
+    }
+};
