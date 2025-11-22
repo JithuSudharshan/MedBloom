@@ -55,9 +55,6 @@ export const loginAdmin = async (payload) => {
     try {
 
         const response = await api.post("admin/login", payload)
-        if (response.data.token) {
-            localStorage.setItem('token', response.data.accessToken)
-        }
         return response
 
     } catch (error) {
@@ -69,7 +66,6 @@ export const loginAdmin = async (payload) => {
 export const logoutAdmin = async () => {
     try {
         const response = await api.post("/admin/logout")
-        localStorage.removeItem('token')
         return response;
 
     } catch (error) {
@@ -102,6 +98,16 @@ export const updateNewPassword = async (payload) => {
 
     } catch (error) {
         console.log('Something went wrong', error)
+        throw error
+    }
+}
+
+export const UserEnquiry = async (payload) => {
+    try {
+        const response = await api.post('/user/enquiry', payload)
+        return response
+    } catch (error) {
+        console.log("Error submitting enquiry form", error)
         throw error
     }
 }
