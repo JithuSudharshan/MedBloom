@@ -3,6 +3,9 @@ import HeroSection from '../../components/landing page/HeroSection';
 import WhyChooseSection from '../../components/landing page/WhyChooseUs';
 import HomePage_image from '../../assets/images/DrImage_homePage.png'
 import ServicesSection from '../../components/landing page/ServiceSection';
+import VdoCallPromoSection from '../../components/landing page/VdoCallPromoSection';
+import PatientReviewPromo from '../../components/landing page/PatientReviewPromo';
+import Footer from '../../components/landing page/Footer';
 
 const HomePage = () => {
     return (
@@ -11,6 +14,9 @@ const HomePage = () => {
             <HeroSection imgSrc={HomePage_image} />
             <WhyChooseSection />
             <ServicesSection />
+            <VdoCallPromoSection />
+            <PatientReviewPromo />
+            <Footer />
         </div>
     );
 };
