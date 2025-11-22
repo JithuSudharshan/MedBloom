@@ -11,6 +11,13 @@ export const signUp = async (req, res) => {
         //destructuring form data
         const { name, email, password, confirmPassword, role, phone } = req.body;
 
+        if (!name || !email || !phone || !password || !confirmPassword || !role)
+            return res.status(200).json({ success: false, message: "Fill all the fields" })
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email))
+            return res.status(400).json({ success: false, message: "Invalid email format" })
+
         //chechking whether the email id already exsist
         const exsistingUser = await User.findOne({ email })
         if (exsistingUser)
