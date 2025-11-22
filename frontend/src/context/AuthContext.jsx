@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
             const res = await loginAdmin(payload)
             setUser(res.data.user)
             return res
-        } catch (error) {
+        } catch (err) {
             return {
                 success: false,
                 message: err.response?.data?.message || "Login failed",

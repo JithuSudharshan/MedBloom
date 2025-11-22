@@ -15,7 +15,7 @@ export const ProtectedRoute = ({ allowedRoles }) => {
 
     // Not authenticated - redirect to login
     if (!isAuthenticated) {
-        return <Navigate to="/login" replace />
+        return <Navigate to="/" replace />
     }
 
     // Check role-based access if allowedRoles specified

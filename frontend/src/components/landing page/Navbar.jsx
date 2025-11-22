@@ -7,7 +7,7 @@ const Navbar = () => {
         { label: 'Services', href: '#services' },
         { label: 'Find Doctors', href: '#doctors' },
         { label: 'Login', href: '/login' },
-        { label: 'Admin', href: '#admin' },
+        { label: 'Admin', href: '/admin/login' },
         { label: 'Articles', href: '#articles' }
     ];
 
