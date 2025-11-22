@@ -25,7 +25,7 @@ function App() {
         <Routes>
 
           {/* Root redirect */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/homePage" replace />} />
 
           {/* Public Routes - Redirect to dashboard if logged in */}
           <Route element={<PublicRoute />}>

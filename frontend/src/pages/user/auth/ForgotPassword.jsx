@@ -80,8 +80,8 @@ const ForgotPassword = () => {
             const response = await forgotPasswordEmailVerification(data)
 
             if (!response?.data?.success) {
-                showToast.error(response?.data?.message || 'Invalid Email Id')
-                return
+                return showToast.error(response?.data?.message || 'Invalid Email Id')
+
             }
 
             showToast.success('Email sent. Verify to continue')
