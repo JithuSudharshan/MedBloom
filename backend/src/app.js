@@ -9,7 +9,9 @@ import { ENV } from './config/env.js';
 import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import oauthRoutes from "./routes/oauthRoutes.js";
+import patientRoutes from './routes/patientRoutes.js';
 import "./config/passport.js";
+import { authenticateToken, authorizeRole } from './middlewares/authMiddleware.js';
 
 export const app = express()
 
@@ -61,5 +63,6 @@ app.get('/', (req, res) => {
 app.use('/api/user', userRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/oauth', oauthRoutes)
+app.use('/api/patient', authenticateToken, authorizeRole("patient"), patientRoutes)
 
 export default app
