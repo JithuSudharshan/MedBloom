@@ -1,11 +1,14 @@
-import User from "../../../model/userModel.js"
-import { generateAccessToken } from "../../../utils/tokenService.js"
-import { ENV } from "../../../config/env.js"
+import User from "../../../model/userModel.js";
+import { generateAccessToken } from "../../../utils/tokenService.js";
+import { ENV } from "../../../config/env.js";
+import jwt from "jsonwebtoken";
 
 export const refreshToken = async (req, res) => {
     try {
         // Get refresh token from httpOnly cookie
-        const refreshToken = req.cookies.refreshToken
+        const refreshToken = req.cookies.refreshToken;
+
+        console.log("Refresh function called. Token:", refreshToken);
 
         if (!refreshToken) {
             return res.status(401).json({
@@ -14,9 +17,10 @@ export const refreshToken = async (req, res) => {
             })
         }
 
-        // Verify refresh token
+        let decoded;
         try {
-            const decoded = jwt.verify(refreshToken, ENV.JWT_REFERSH_TOKEN)
+            decoded = jwt.verify(refreshToken, ENV.JWT_REFERSH_TOKEN);
+            console.log("Decoded token:", decoded);
         } catch (error) {
             return res.status(401).json({
                 success: false,
@@ -25,7 +29,9 @@ export const refreshToken = async (req, res) => {
         }
 
         // Find user and check if token exists in database
-        const user = await User.findById(decoded.userId)
+        const user = await User.findById(decoded.userId);
+
+        console.log("Decoded user:", user);
 
         if (!user) {
             return res.status(401).json({
@@ -47,27 +53,26 @@ export const refreshToken = async (req, res) => {
         }
 
         // Generate new access token
-        const newAccessToken = generateAccessToken(user._id, user.email, user.role)
+        const newAccessToken = generateAccessToken(user._id, user.email, user.role);
 
-        // Send new access token
+        // Send new access token as httpOnly cookie
         res.cookie('accessToken', newAccessToken, {
             httpOnly: true,
             secure: ENV.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 15 * 60 * 1000 //15 min
+            maxAge: 15 * 60 * 1000 // 15 min
         })
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            message: "accessToken refreshed"
+            message: "Access token refreshed"
         })
 
     } catch (error) {
-        console.error('Token refresh error:', error)
-        res.status(500).json({
+        console.error('Token refresh error:', error);
+        return res.status(500).json({
             success: false,
             message: 'Failed to refresh token'
         })
     }
 }
-

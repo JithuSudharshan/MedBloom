@@ -1,13 +1,16 @@
 import jwt from 'jsonwebtoken';
 import User from '../model/userModel.js';
 import { ENV } from '../config/env.js';
-import Admin from '../model/adminModel.js'
+import Admin from '../model/adminModel.js';
 
 // Middleware that works with BOTH Passport session AND JWT
 export const authenticateToken = async (req, res, next) => {
     try {
         //1: Check for JWT in cookies (your OAuth sets this)
-        const accessToken = req.cookies.accessToken;
+        const accessToken = req.cookies.accessToken
+
+        const refreshToken = req.cookies.refreshToken
+        console.log(" Refresh function called ", refreshToken)
 
         if (accessToken) {
             try {
@@ -16,9 +19,10 @@ export const authenticateToken = async (req, res, next) => {
                 if (decoded.userRole === 'admin') {
                     const admin = await Admin.findById(decoded.userId)
                     if (!admin) {
-                        return res.status(404).json({
+                        return res.status(401).json({
                             success: false,
-                            message: 'admin not found'
+                            message: 'admin not found',
+                            requiresRefresh: true
                         });
                     }
 
@@ -31,10 +35,11 @@ export const authenticateToken = async (req, res, next) => {
                 console.log("user : ", user)
 
                 if (!user) {
-                    return res.status(404).json({
+                    return res.status(401).json({
                         success: false,
-                        message: 'User not found'
-                    });
+                        message: 'User not found',
+                        requiresRefresh: true
+                    })
                 }
 
                 req.user = user;
@@ -54,16 +59,16 @@ export const authenticateToken = async (req, res, next) => {
         return res.status(401).json({
             success: false,
             message: 'Authentication required'
-        });
+        })
 
     } catch (error) {
         console.error('Authentication middleware error:', error);
         return res.status(500).json({
             success: false,
             message: 'Authentication failed'
-        });
+        })
     }
-};
+}
 
 // Optional: Role-based middleware
 export const authorizeRole = (...allowedRoles) => {
@@ -72,7 +77,7 @@ export const authorizeRole = (...allowedRoles) => {
             return res.status(401).json({
                 success: false,
                 message: 'Authentication required'
-            });
+            })
         }
 
         if (!allowedRoles.includes(req.user.role)) {
@@ -82,8 +87,8 @@ export const authorizeRole = (...allowedRoles) => {
             });
         }
 
-        next();
-    };
-};
+        next()
+    }
+}
 
 

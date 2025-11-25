@@ -68,7 +68,7 @@ export const clearFailedLoginAttempts = async (email, ipAddress) => {
         if (user.failedLoginAttempts && user.failedLoginAttempts.length > 0) {
             user.failedLoginAttempts = user.failedLoginAttempts.filter(
                 attempt => attempt.ipAddress !== ipAddress
-            );
+            )
             await user.save();
         }
 

@@ -71,7 +71,6 @@ export const loginUser = async (req, res) => {
                 httpOnly: true,
                 secure: ENV.NODE_ENV === 'production',
                 sameSite: 'strict',
-                path: "/api/auth/refresh-token",
                 maxAge: 7 * 24 * 60 * 60 * 1000 //7 days
             })
             res.cookie('accessToken', accessToken, {
