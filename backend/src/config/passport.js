@@ -9,14 +9,14 @@ passport.use(
             clientID: ENV.GOOGLE_CLIENT_ID,
             clientSecret: ENV.GOOGLE_CLIENT_SECRET,
             callbackURL: "http://localhost:5000/api/oauth/google/callback",
-            passReqToCallback: true  // ✅ ADD THIS - gives access to req in callback
+            passReqToCallback: true
         },
 
         async (req, accessToken, refreshToken, profile, done) => {
             try {
                 const email = profile.emails[0].value;
 
-                // ✅ Get role from request (set by initiateGoogleOAuth)
+                // Get role from request (set by initiateGoogleOAuth)
                 const requestedRole = req.session?.oauth_role || req.query?.role;
 
                 console.log('Passport Strategy - Requested Role:', requestedRole);
@@ -67,7 +67,7 @@ passport.use(
                     return done(null, user);
                 }
 
-                // ✅ Create new user WITH role from OAuth flow
+                // Create new user WITH role from OAuth flow
                 console.log('Creating new user with email:', email, 'role:', requestedRole);
 
                 // Validate role before creating
@@ -83,7 +83,7 @@ passport.use(
                     profilePicture: profile.photos[0]?.value,
                     authMethod: 'google',
                     isVerified: true,
-                    role: requestedRole  // ✅ SET ROLE HERE
+                    role: requestedRole  // SET ROLE HERE
                 });
 
                 console.log('New user created with role:', user.role);
