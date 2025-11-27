@@ -5,6 +5,14 @@ const api = axios.create({
     withCredentials: true
 });
 
+// Variable to store logout function
+let logoutFn = null;
+
+// Setter method to store logout function from AuthContext
+api.setLogout = (fn) => {
+    logoutFn = fn
+};
+
 // Response interceptor - handle token refresh automatically
 api.interceptors.response.use(
     (response) => response,
@@ -25,6 +33,7 @@ api.interceptors.response.use(
                 // Retry the original request
                 return api(originalRequest)
             } catch (refreshError) {
+                if (logoutFn) logoutFn();
                 return Promise.reject(refreshError)
             }
         }

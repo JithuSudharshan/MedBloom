@@ -15,14 +15,18 @@ export const AuthProvider = ({ children }) => {
         checkAuth()
     }, []);
 
+    useEffect(() => {
+        api.setLogout(logout);
+    }, []);
+
     const checkAuth = async () => {
         try {
             const response = await api.get("/user/context-auth-verify", {
                 withCredentials: true,
             })
+            console.log("Refresh response", response)
 
-            // If successful, set user
-            setUser(response.data.user)
+            if (response) setUser(response.data.user)
 
         } catch (error) {
             console.error("Auth check failed:", error)
@@ -33,6 +37,7 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
+    // USER LOGIN
     const login = async (payload) => {
         try {
             const res = await loginUser(payload)
@@ -46,7 +51,7 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
-    // LOGOUT
+    // USER LOGOUT
     const logout = async () => {
         try {
             await logoutUser()
@@ -54,10 +59,10 @@ export const AuthProvider = ({ children }) => {
             setUser(null);
             localStorage.clear();
             sessionStorage.clear();
-            window.location.href = '/login';
+            navigate('/login');
         }
     }
-
+    // ADMIN LOGIN
     const adminLogin = async (payload) => {
         try {
             const res = await loginAdmin(payload)
@@ -70,7 +75,7 @@ export const AuthProvider = ({ children }) => {
             };
         }
     }
-
+    // ADMIN LOGOUT
     const adminLogout = async () => {
         try {
             const res = await logoutAdmin()
