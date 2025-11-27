@@ -18,15 +18,14 @@ export const refreshToken = async (req, res) => {
         }
 
         let decoded;
-        try {
-            decoded = jwt.verify(refreshToken, ENV.JWT_REFERSH_TOKEN);
-            console.log("Decoded token:", decoded);
-        } catch (error) {
+        decoded = jwt.verify(refreshToken, ENV.JWT_REFERSH_TOKEN);
+        console.log("Decoded token:", decoded);
+
+        if (!decoded)
             return res.status(401).json({
                 success: false,
                 message: 'Invalid or expired refresh token'
             })
-        }
 
         // Find user and check if token exists in database
         const user = await User.findById(decoded.userId);

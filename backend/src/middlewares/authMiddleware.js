@@ -10,7 +10,7 @@ export const authenticateToken = async (req, res, next) => {
         const accessToken = req.cookies.accessToken
 
         const refreshToken = req.cookies.refreshToken
-        console.log(" Refresh function called ", refreshToken)
+        console.log(" Refresh function called at middleware ", refreshToken)
 
         if (accessToken) {
             try {
@@ -32,7 +32,7 @@ export const authenticateToken = async (req, res, next) => {
 
                 // Get user from database
                 const user = await User.findById(decoded.userId)
-                console.log("user : ", user)
+                console.log("user : ", user.name)
 
                 if (!user) {
                     return res.status(401).json({
@@ -47,6 +47,13 @@ export const authenticateToken = async (req, res, next) => {
             } catch (jwtError) {
                 console.error('JWT verification failed:', jwtError.message);
                 // Fall through to check Passport session
+                if (jwtError.name === 'TokenExpiredError') {
+                    return res.status(401).json({
+                        success: false,
+                        message: 'Access token expired',
+                        requiresRefresh: true
+                    });
+                }
             }
         }
 
