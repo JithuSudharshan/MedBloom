@@ -1,6 +1,7 @@
 import Button from './Button';
 
 const Navbar = () => {
+
     const navLinks = [
         { label: 'Home', href: '#', active: true },
         { label: 'About Us', href: '#about' },
@@ -12,7 +13,7 @@ const Navbar = () => {
     ];
 
     return (
-        <nav className="bg-white py-4 px-8 shadow-sm">
+        <nav className="bg-white py-4 mt-5 px-8">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
                 {/* Logo */}
                 <div className="text-2xl font-bold text-gray-900">
@@ -20,13 +21,13 @@ const Navbar = () => {
                 </div>
 
                 {/* Navigation Links */}
-                <div className="flex items-center gap-6">
+                <div className="flex items-center bg-[#DBFFFF] py-2 px-4 rounded-full  gap-6">
                     {navLinks.map((link, index) => (
                         <a
                             key={index}
                             href={link.href}
                             className={`text-sm font-medium transition-colors ${link.active
-                                ? 'text-white bg-teal-600 px-4 py-2 rounded-full'
+                                ? 'text-white bg-teal-600 px-3 py-1 rounded-full'
                                 : 'text-gray-700 hover:text-teal-600'
                                 }`}
                         >
@@ -36,7 +37,7 @@ const Navbar = () => {
                 </div>
 
                 {/* CTA Button */}
-                <Button variant="primary" size="md">
+                <Button variant="primary" size="sm">
                     Book Now
                 </Button>
             </div>
