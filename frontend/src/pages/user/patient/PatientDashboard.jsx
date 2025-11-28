@@ -9,6 +9,7 @@ import { showToast } from "../../../components/ui/Toast";
 import ProfileBanner from '../../../components/profile/ProfileBanner';
 import { useAuth } from '../../../context/AuthContext';
 import { loadPatientData } from '../../../api/patientApi';
+import Loader from '../../../components/ui/Loading';
 
 const dummyAppointments = [
     {
@@ -60,6 +61,7 @@ export default function PatientProfilePage() {
     const navigate = useNavigate();
     const { logout } = useAuth();
     const [patientDetails, setPatientDetails] = useState({});
+    const [loading, setloading] = useState(true)
 
 
     useEffect(() => {
@@ -69,6 +71,11 @@ export default function PatientProfilePage() {
 
     const fetchPatientDetails = async () => {
         try {
+            setloading(true)
+
+            //custome delay for show
+            await new Promise((resolve) => setTimeout(resolve, 5000))
+
             const response = await loadPatientData()
             if (response) {
                 setPatientDetails(response?.data?.details)
@@ -76,6 +83,8 @@ export default function PatientProfilePage() {
             }
         } catch (error) {
             console.log("error at fetch : ", error)
+        } finally {
+            setloading(false)
         }
     }
 
@@ -96,10 +105,6 @@ export default function PatientProfilePage() {
             setIsLoggingOut(false);
         }
     };
-
-
-
-
     return (
         <>
             <Navbar />
@@ -121,6 +126,8 @@ export default function PatientProfilePage() {
                 </div>
             </PatientProfileLayout>
             <Footer />
+            {loading && <Loader />}
+
         </>
     );
 }
