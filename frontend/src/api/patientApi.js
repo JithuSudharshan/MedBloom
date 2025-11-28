@@ -10,4 +10,14 @@ export const patientOnboarding = async (formData) => {
     }
 }
 
+export const patientChangePassword = async (payload) => {
+    try {
+        const response = await api.post("/patient/change-password", payload)
+        return response
+    } catch (error) {
+        console.log("Error while chnaging password:", error)
+        throw error
+    }
+}
+
 
