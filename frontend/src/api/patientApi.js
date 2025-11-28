@@ -15,7 +15,18 @@ export const patientChangePassword = async (payload) => {
         const response = await api.post("/patient/change-password", payload)
         return response
     } catch (error) {
-        console.log("Error while chnaging password:", error)
+        console.log("Error while changing password:", error)
+        throw error
+    }
+}
+
+export const loadPatientData = async () => {
+
+    try {
+        const response = await api.get("/patient/profile");
+        return response
+    } catch (error) {
+        console.log("Error while fetching patient data:", error)
         throw error
     }
 }

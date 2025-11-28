@@ -1,30 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import patientProfileConfig from "../../../config/patientProfileConfig";
 import PatientProfileLayout from "../../../components/profile/PatientProfileLayout";
 import Navbar from "../../../components/landing page/Navbar";
 import Footer from "../../../components/landing page/Footer";
 import Button from "../../../components/ui/Button";
-import { logoutUser } from "../../../api/authApi";
 import { showToast } from "../../../components/ui/Toast";
 import ProfileBanner from '../../../components/profile/ProfileBanner';
-
-const dummyPatient = {
-    fullName: "Akshay Shankar",
-    email: "akshayshankar@gmail.com",
-    phone: "+91 9656182621",
-    dob: "1990-05-25",
-    gender: "Male",
-    address: "123 Main Street, Apt 4B, Ernakulam, EKM 10001",
-    bloodType: "O+ve",
-    cholesterol: "120/80 mmHg",
-    height: "180 cm",
-    weight: "65Kg",
-    bloodPressure: "120/80 mmHg",
-    glucoseLevel: "120/80 mmHg",
-    allergies: "Penicillin, Peanuts",
-    medicalCondition: "Asthma, Hypertension",
-};
+import { useAuth } from '../../../context/AuthContext';
+import { loadPatientData } from '../../../api/patientApi';
 
 const dummyAppointments = [
     {
@@ -71,23 +55,42 @@ const dummyAppointments = [
     },
 ];
 
-
-
 export default function PatientProfilePage() {
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const navigate = useNavigate();
+    const { logout } = useAuth();
+    const [patientDetails, setPatientDetails] = useState({});
+
+
+    useEffect(() => {
+        fetchPatientDetails()
+    }, [])
+
+
+    const fetchPatientDetails = async () => {
+        try {
+            const response = await loadPatientData()
+            if (response) {
+                setPatientDetails(response?.data?.details)
+                console.log(patientDetails)
+            }
+        } catch (error) {
+            console.log("error at fetch : ", error)
+        }
+    }
 
     const handleLogout = async () => {
         setIsLoggingOut(true);
         try {
-            const res = await logoutUser();
+            const res = await logout();
+            console.log(res)
             if (!res?.data?.success) {
                 showToast.error(res.data.message);
             }
             navigate("/login");
             showToast.success(res.data.message);
         } catch (error) {
-            showToast.error("Something went wrong");
+            showToast.error("Something went wrong here");
             console.log(error);
         } finally {
             setIsLoggingOut(false);
@@ -102,11 +105,10 @@ export default function PatientProfilePage() {
             <Navbar />
             <ProfileBanner profileOwner={"Patient Profile"} profileDescription={"Manage your personal information and health records"} />
             <PatientProfileLayout
-                avatar={patientProfileConfig.avatar}
                 sidebarMenu={patientProfileConfig.sidebarMenu}
                 sections={patientProfileConfig.sections}
                 actions={patientProfileConfig.actions}
-                patient={dummyPatient}
+                patient={patientDetails}
                 appointments={dummyAppointments}
                 onLogout={handleLogout} // Prop for sidebar/logout button
                 isLoggingOut={isLoggingOut}

@@ -4,7 +4,6 @@ import PatientInformation from "./PatientInformation";
 import AppointmentsSection from "./appointments/AppointmentsSection";
 
 const PatientProfileLayout = ({
-    avatar,
     sidebarMenu,
     patient,
     appointments,
@@ -20,8 +19,8 @@ const PatientProfileLayout = ({
                 <aside>
                     <SidebarMenu
                         menu={sidebarMenu}
-                        src={avatar.src}
-                        alt={avatar.alt}
+                        src={patient?.avatar?.src}
+                        alt={patient?.avatar?.alt}
                         name={patient.fullName}
                         activeKey={activeKey}
                         onChange={setActiveKey}
