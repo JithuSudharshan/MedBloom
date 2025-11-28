@@ -1,6 +1,8 @@
 import { ENV } from "../../../config/env.js";
 import User from "../../../model/userModel.js";
-import bcrypt from 'bcrypt'
+import Patient from "../../../model/patientModel.js";
+import bcrypt from 'bcrypt';
+import { formatDOB, formatName } from '../../../utils/formatters.js'
 
 export const ChangePatientPassword = async (req, res) => {
     try {
@@ -35,7 +37,7 @@ export const ChangePatientPassword = async (req, res) => {
 
         await isExist.save()
 
-        res.status(200).json({ success: true, message: "Password change successful" })
+        res.status(200).json({ success: true, message: "Password changed. Please log in again." })
 
     } catch (error) {
         console.log("error in change password", error);
@@ -43,3 +45,53 @@ export const ChangePatientPassword = async (req, res) => {
     }
 
 }
+
+export const fetchUserDetails = async (req, res) => {
+
+    try {
+        const { email } = req.user
+
+        const isUser = await User.findOne({ email })
+
+        if (!isUser)
+            return res.status(400).json({ success: false, message: "User not found" })
+
+        const patient = await Patient.findOne({ user: isUser._id })
+
+        if (!patient)
+            return res.status(4000).json({ success: false, message: "User not found" })
+
+        const fullName = formatName(isUser.name)
+        const DOB = formatDOB(patient.dob)
+        const height = patient.height.toString().concat(" Cm")
+        const weight = patient.weight.toString().concat(" Kg")
+
+        res.status(200).json({
+            success: true,
+            details: {
+                fullName: fullName,
+                email: isUser.email,
+                phone: isUser.phone,
+                dob: DOB,
+                gender: patient.gender,
+                address: patient.address,
+                bloodType: patient.bloodType,
+                cholesterol: patient.cholesterol,
+                height: height,
+                weight: weight,
+                bloodPressure: patient.bloodPressure,
+                glucoseLevel: patient.glucoseLevel,
+                allergies: patient.allergies,
+                medicalCondition: patient.medicalCondition,
+                avatar: {
+                    src: patient.profile_url,
+                    alt: "profile picture"
+                }
+            }
+        });
+
+    } catch (error) {
+        console.log("Error while fetching user details: ", error)
+        res.status(500).json({ Success: false, message: "error while fetching user details" });
+    }
+};
