@@ -63,6 +63,6 @@ app.get('/', (req, res) => {
 app.use('/api/user', userRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/oauth', oauthRoutes)
-app.use('/api/patient', authenticateToken, authorizeRole("patient"), patientRoutes)
+app.use('/api/patient', authenticateToken({ sendRequiresRefresh: false }), authorizeRole("patient"), patientRoutes)
 
 export default app
