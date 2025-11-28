@@ -3,6 +3,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { showToast } from '../components/ui/Toast';
 import { patientChangePassword } from '../api/patientApi';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 
 const schema = yup.object({
@@ -33,6 +35,9 @@ const schema = yup.object({
 
 export default function useEnquiryForm() {
 
+    const navigate = useNavigate();
+    const { logout } = useAuth()
+
     const { register, handleSubmit, formState, reset, watch } = useForm({
         resolver: yupResolver(schema),
         mode: 'onChange',
@@ -42,6 +47,8 @@ export default function useEnquiryForm() {
             confirmPassword: ''
         }
     })
+
+
 
     const onSubmit = async (data, setLoading) => {
 
@@ -56,8 +63,19 @@ export default function useEnquiryForm() {
             const response = await patientChangePassword(payload);
 
             if (response) {
-                showToast.success('Password change successful');
-                reset()
+                try {
+                    reset()
+                    const res = await logout();
+                    console.log(res)
+                    if (!res?.data?.success) {
+                        showToast.error(res.data.message);
+                    }
+                    navigate("/login");
+                    showToast.success("Password changed. Please log in again.");
+                } catch (error) {
+                    showToast.error("Something went wrong here");
+                    console.log(error);
+                }
             }
 
         } catch (err) {

@@ -81,14 +81,14 @@ const PatientInformation = ({ patient }) => {
                     <div className="flex justify-end mt-4">
                         <Button
                             onClick={handleClose}
-                            className="bg-gray-300 text-gray-700 px-4 py-2 rounded-full mr-2"
+                            className="bg-gray-300 text-gray-700 px-2 py-2 rounded-xl mr-2"
                             variant='outline'
                         >
                             Cancel
                         </Button>
                         <Button
                             type="submit"
-                            className="bg-teal-600 text-white px-4 py-2 rounded-full hover:bg-teal-700"
+                            className="bg-teal-600 text-white px-4 py-2 rounded-xl hover:bg-teal-700"
                         >
                             {loading ? "Saving..." : "Save"}
                         </Button>

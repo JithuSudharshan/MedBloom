@@ -54,9 +54,10 @@ export const AuthProvider = ({ children }) => {
     // USER LOGOUT
     const logout = async () => {
         try {
-            await logoutUser()
+            const res = await logoutUser()
+            return res
         } finally {
-            setUser(null);
+            await setUser(null);
             localStorage.clear();
             sessionStorage.clear();
             navigate('/login');
