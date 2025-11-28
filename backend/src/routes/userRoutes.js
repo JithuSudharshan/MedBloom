@@ -17,7 +17,7 @@ router.post('/verify/resend-email', resendVerificationMail)
 router.post('/forgot-Password/send-verificationEmail', sendEmailForForgotPassword)
 router.get('/auth/refresh-Token', refreshToken)
 router.get('/verify-email/:id/:token', verifyUser)
-router.get('/context-auth-verify', authenticateToken, verifyToken)
+router.get('/context-auth-verify', authenticateToken({ sendRequiresRefresh: false }), verifyToken)
 router.get('/verify-email-forgotPassword/:id/:token', verifyEmailForForgotPassword)
 
 export default router;

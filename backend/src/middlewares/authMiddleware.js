@@ -4,78 +4,80 @@ import { ENV } from '../config/env.js';
 import Admin from '../model/adminModel.js';
 
 // Middleware that works with BOTH Passport session AND JWT
-export const authenticateToken = async (req, res, next) => {
-    try {
-        //1: Check for JWT in cookies (your OAuth sets this)
-        const accessToken = req.cookies.accessToken
-
-        const refreshToken = req.cookies.refreshToken
-        console.log(" Refresh function called at middleware ", refreshToken)
-
-        if (accessToken) {
+export const authenticateToken =
+    ({ sendRequiresRefresh } = { sendRequiresRefresh: true }) =>
+        async (req, res, next) => {
             try {
-                const decoded = jwt.verify(accessToken, ENV.JWT_ACCESS_SECRET);
+                //1: Check for JWT in cookies (your OAuth sets this)
+                const accessToken = req.cookies.accessToken
 
-                if (decoded.userRole === 'admin') {
-                    const admin = await Admin.findById(decoded.userId)
-                    if (!admin) {
-                        return res.status(401).json({
-                            success: false,
-                            message: 'admin not found',
-                            requiresRefresh: true
-                        });
+                const refreshToken = req.cookies.refreshToken
+                console.log(" Refresh function called at middleware ", refreshToken)
+
+                if (accessToken) {
+                    try {
+                        const decoded = jwt.verify(accessToken, ENV.JWT_ACCESS_SECRET);
+
+                        if (decoded.userRole === 'admin') {
+                            const admin = await Admin.findById(decoded.userId)
+                            if (!admin) {
+                                return res.status(401).json({
+                                    success: false,
+                                    message: 'admin not found',
+                                    requiresRefresh: true
+                                });
+                            }
+
+                            req.user = admin;
+                            return next();
+                        }
+
+                        // Get user from database
+                        const user = await User.findById(decoded.userId)
+                        console.log("user : ", user.name)
+
+                        if (!user) {
+                            return res.status(401).json({
+                                success: false,
+                                message: 'User not found',
+                                requiresRefresh: true
+                            })
+                        }
+
+                        req.user = user;
+                        return next();
+                    } catch (jwtError) {
+                        console.error('JWT verification failed:', jwtError.message);
+                        // Fall through to check Passport session
+                        if (jwtError.name === 'TokenExpiredError' && sendRequiresRefresh) {
+                            return res.status(401).json({
+                                success: false,
+                                message: 'Access token expired',
+                                requiresRefresh: true
+                            });
+                        }
                     }
+                }
 
-                    req.user = admin;
+                // Strategy 2: Check Passport session (fallback)
+                if (req.isAuthenticated && req.isAuthenticated() && req.user) {
                     return next();
                 }
 
-                // Get user from database
-                const user = await User.findById(decoded.userId)
-                console.log("user : ", user.name)
+                // Neither JWT nor session found
+                return res.status(401).json({
+                    success: false,
+                    message: 'Authentication required'
+                })
 
-                if (!user) {
-                    return res.status(401).json({
-                        success: false,
-                        message: 'User not found',
-                        requiresRefresh: true
-                    })
-                }
-
-                req.user = user;
-                return next();
-            } catch (jwtError) {
-                console.error('JWT verification failed:', jwtError.message);
-                // Fall through to check Passport session
-                if (jwtError.name === 'TokenExpiredError') {
-                    return res.status(401).json({
-                        success: false,
-                        message: 'Access token expired',
-                        requiresRefresh: true
-                    });
-                }
+            } catch (error) {
+                console.error('Authentication middleware error:', error);
+                return res.status(500).json({
+                    success: false,
+                    message: 'Authentication failed'
+                })
             }
         }
-
-        // Strategy 2: Check Passport session (fallback)
-        if (req.isAuthenticated && req.isAuthenticated() && req.user) {
-            return next();
-        }
-
-        // Neither JWT nor session found
-        return res.status(401).json({
-            success: false,
-            message: 'Authentication required'
-        })
-
-    } catch (error) {
-        console.error('Authentication middleware error:', error);
-        return res.status(500).json({
-            success: false,
-            message: 'Authentication failed'
-        })
-    }
-}
 
 // Optional: Role-based middleware
 export const authorizeRole = (...allowedRoles) => {
