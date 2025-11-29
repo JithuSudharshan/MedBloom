@@ -95,3 +95,37 @@ export const fetchUserDetails = async (req, res) => {
         res.status(500).json({ Success: false, message: "error while fetching user details" });
     }
 };
+
+export const updateProfilePicture = async (req, res) => {
+
+    try {
+        const { _id } = req.user
+        const profile_url = req.body.profile_url
+
+        if (!_id)
+            return res.status(404).json({ success: false, message: "user not found" })
+
+        if (!profile_url)
+            return res.status(400).json({ success: false, message: "Profile_url not found" })
+
+        const user = _id;
+        const patient = await Patient.findOne({ user })
+
+        if (!patient)
+            return res.status(404).json({ success: false, message: "Patient not found" })
+
+        patient.profile_url = profile_url;
+
+        await patient.save()
+
+        res.status(200).json({
+            success: true,
+            message: "Profile picture updated",
+            profile_url: patient.profile_url
+        })
+
+    } catch (error) {
+        console.log("Error in updating profile picture", error)
+        res.status(500).json({ success: false, message: "Internal server error" })
+    }
+};
