@@ -31,4 +31,14 @@ export const loadPatientData = async () => {
     }
 }
 
+export const updateProfilePicture = async (formData) => {
+    try {
+        const response = await api.post("/patient/profile-picture/update", formData)
+        return response
+    } catch (error) {
+        console.log("Error while updating profile pic:", error)
+        throw error
+    }
+}
+
 
