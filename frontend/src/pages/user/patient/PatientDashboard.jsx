@@ -74,7 +74,7 @@ export default function PatientProfilePage() {
             setloading(true)
 
             //custome delay for show
-            await new Promise((resolve) => setTimeout(resolve, 5000))
+            await new Promise((resolve) => setTimeout(resolve, 3700))
 
             const response = await loadPatientData()
             if (response) {
