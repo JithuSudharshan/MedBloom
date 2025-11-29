@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Loader from './ui/Loading';
 
 export const ProtectedRoute = ({ allowedRoles }) => {
     const { user, loading, isAuthenticated } = useAuth()
@@ -7,8 +8,8 @@ export const ProtectedRoute = ({ allowedRoles }) => {
     // Show loading spinner while checking auth
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+            <div>
+                <Loader />
             </div>
         )
     }
