@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SidebarMenu from "./SidebarMenu";
 import PatientInformation from "./PatientInformation";
 import AppointmentsSection from "./appointments/AppointmentsSection";
+import Modal from "./Modal";
+import AvatarCropper from "./AvatarCropper";
 
 const PatientProfileLayout = ({
     sidebarMenu,
@@ -11,6 +13,23 @@ const PatientProfileLayout = ({
     isLoggingOut,
 }) => {
     const [activeKey, setActiveKey] = useState("personal")
+    const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
+    const [localPatient, setLocalPatient] = useState(patient)
+
+    useEffect(() => {
+        setLocalPatient(patient)
+    }, [patient])
+
+
+    const handleAvatarSaved = (newAvatarUrl) => {
+        setLocalPatient((prev) => ({
+            ...prev,
+            avatar: { ...(prev?.avatar || {}), src: newAvatarUrl },
+        }));
+        setIsAvatarModalOpen(false);
+    };
+
+    console.log("src:", localPatient?.avatar?.src)
 
     return (
         <div className="min-h-screen max-w-7xl mx-auto w-full">
@@ -19,14 +38,16 @@ const PatientProfileLayout = ({
                 <aside>
                     <SidebarMenu
                         menu={sidebarMenu}
-                        src={patient?.avatar?.src}
-                        alt={patient?.avatar?.alt}
-                        name={patient.fullName}
+                        src={localPatient?.avatar?.src}
+                        alt={localPatient?.avatar?.alt}
+                        name={localPatient?.fullName}
                         activeKey={activeKey}
                         onChange={setActiveKey}
                         onLogout={onLogout}
                         isLoggingOut={isLoggingOut}
+                        onEditAvatar={() => setIsAvatarModalOpen(true)}
                     />
+
                 </aside>
 
                 {/* Main cards and dashboard content */}
@@ -35,6 +56,15 @@ const PatientProfileLayout = ({
                     {activeKey === "appointments" && <AppointmentsSection appointments={appointments} />}
                 </main>
             </div>
+            <Modal
+                isOpen={isAvatarModalOpen}
+                onClose={() => setIsAvatarModalOpen(false)}
+            >
+                <AvatarCropper
+                    onCancel={() => setIsAvatarModalOpen(false)}
+                    onSave={handleAvatarSaved}
+                />
+            </Modal>
         </div>
     );
 };
