@@ -137,10 +137,10 @@ const AvatarCropper = ({ onCancel, onSave }) => {
                     {/* Preview */}
                     <div className="flex flex-col items-center gap-2">
                         <span className="text-sm text-gray-500">Preview</span>
-                        <div className="w-32 h-32 rounded-full overflow-hidden border border-gray-200">
+                        <div className="w-50 h-50 rounded-full overflow-hidden border border-gray-200">
                             <canvas
                                 ref={previewCanvasRef}
-                                className="w-32 h-32"
+                                className="w-50 h-50"
                                 style={{ borderRadius: "9999px" }}
                             />
                         </div>
