@@ -16,6 +16,7 @@ import { ProtectedRoute } from "./components/ProtectedRoutes";
 import { PublicRoute } from "./components/PublicRoutes";
 import { Navigate } from "react-router-dom";
 import HomePage from "./pages/landing pages/HomePage";
+import EditPatientProfilePage from "./pages/user/patient/EditPatientProfilePage";
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
           <Route element={<ProtectedRoute allowedRoles={['patient']} />} >
             <Route path="/patient/dashboard" element={<PatientDashboard />} />
             <Route path="/patient/onboarding" element={<PatientOnboardingForm />} />
+            <Route path="/patient/edit-profile" element={<EditPatientProfilePage />} />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={['doctor']} />} >

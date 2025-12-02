@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import patientProfileConfig from "../../../config/patientProfileConfig";
-import PatientProfileLayout from "../../../components/profile/PatientProfileLayout";
+import ProfileLayout from "../../../components/profile/ProfileLayout";
 import Navbar from "../../../components/landing page/Navbar";
 import Footer from "../../../components/landing page/Footer";
 import Button from "../../../components/ui/Button";
@@ -109,11 +109,11 @@ export default function PatientProfilePage() {
         <>
             <Navbar />
             <ProfileBanner profileOwner={"Patient Profile"} profileDescription={"Manage your personal information and health records"} />
-            <PatientProfileLayout
+            <ProfileLayout
                 sidebarMenu={patientProfileConfig.sidebarMenu}
                 sections={patientProfileConfig.sections}
                 actions={patientProfileConfig.actions}
-                patient={patientDetails}
+                profileData={patientDetails}
                 appointments={dummyAppointments}
                 onLogout={handleLogout} // Prop for sidebar/logout button
                 isLoggingOut={isLoggingOut}
@@ -124,7 +124,7 @@ export default function PatientProfilePage() {
                         {isLoggingOut ? "Logging out..." : "Logout"}
                     </Button>
                 </div>
-            </PatientProfileLayout>
+            </ProfileLayout>
             <Footer />
             {loading && <Loader />}
 

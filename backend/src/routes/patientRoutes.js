@@ -3,7 +3,7 @@ import express from "express";
 import upload from "../config/multer.js";
 import { uploadToCloudinary } from "../middlewares/uploadToCloudinary.js";
 import { onboardPatient } from "../controller/userControllers/patientDashBoard/patientOnboarding.js";
-import { ChangePatientPassword, fetchUserDetails, updateProfilePicture } from "../controller/userControllers/patientDashBoard/patientProfileControllers.js";
+import { ChangePatientPassword, editProfile, fetchUserDetails, updateProfilePicture } from "../controller/userControllers/patientDashBoard/patientProfileControllers.js";
 
 const router = express.Router();
 
@@ -21,5 +21,10 @@ router.post('/profile-picture/update',
 
 router.get('/profile', fetchUserDetails)
 router.post("/change-password", ChangePatientPassword)
+
+router.patch("/edit-profile",
+    upload.none(),
+    editProfile
+);
 
 export default router;

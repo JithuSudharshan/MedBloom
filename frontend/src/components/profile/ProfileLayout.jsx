@@ -5,20 +5,20 @@ import AppointmentsSection from "./appointments/AppointmentsSection";
 import Modal from "./Modal";
 import AvatarCropper from "./AvatarCropper";
 
-const PatientProfileLayout = ({
+const ProfileLayout = ({
     sidebarMenu,
-    patient,
+    profileData,
     appointments,
     onLogout,
     isLoggingOut,
 }) => {
     const [activeKey, setActiveKey] = useState("personal")
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
-    const [localPatient, setLocalPatient] = useState(patient)
+    const [localPatient, setLocalPatient] = useState(profileData)
 
     useEffect(() => {
-        setLocalPatient(patient)
-    }, [patient])
+        setLocalPatient(profileData)
+    }, [profileData])
 
 
     const handleAvatarSaved = (newAvatarUrl) => {
@@ -69,4 +69,4 @@ const PatientProfileLayout = ({
     );
 };
 
-export default PatientProfileLayout;
+export default ProfileLayout;

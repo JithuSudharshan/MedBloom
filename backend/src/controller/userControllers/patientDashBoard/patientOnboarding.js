@@ -33,7 +33,6 @@ export const onboardPatient = async (req, res) => {
             return res.status(400).json({ success: false, message: "Fill mandatory fields" })
 
         const patient = await Patient.create({
-
             user,
             profile_url,
             emergencyNumber,
@@ -54,10 +53,8 @@ export const onboardPatient = async (req, res) => {
             Mental_Health_History
         })
 
-
         userDetails.isOnboarded = true;
         await userDetails.save()
-
 
         if (patient)
             return res.status(201).json({
@@ -65,11 +62,14 @@ export const onboardPatient = async (req, res) => {
                 message: "Patient onboarded successfully",
                 patient
             })
+
     } catch (error) {
+
         console.log("Error during patient onboarding : ", error)
         return res.status(500).json({
             success: false,
             message: error.message
         })
+
     }
 }

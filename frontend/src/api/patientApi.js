@@ -41,4 +41,15 @@ export const updateProfilePicture = async (formData) => {
     }
 }
 
+export const editPatientProfile = async (formData) => {
+
+    try {
+        const response = await api.patch("/patient/edit-profile", formData)
+        return response
+    } catch (error) {
+        console.log("Error while editing patien profile :", error)
+        throw error
+    }
+}
+
 

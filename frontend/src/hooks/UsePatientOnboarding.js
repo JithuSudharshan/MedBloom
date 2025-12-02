@@ -202,7 +202,6 @@ export const usePatientOnboarding = () => {
 
             console.log([...formData.entries()])
 
-            // API Call - Replace with your actual endpoint
             const response = await patientOnboarding(formData)
             console.log(response)
             if (!response?.data?.success) {
@@ -212,9 +211,9 @@ export const usePatientOnboarding = () => {
 
             showToast.success('Onboarding successful!');
 
-            // Reset form after successful submission
             reset();
             return
+
         } catch (error) {
             console.error('Onboarding error:', error)
             setSubmitError(error.message || 'An error occurred during submission')

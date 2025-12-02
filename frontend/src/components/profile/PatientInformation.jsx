@@ -5,10 +5,12 @@ import Modal from "../../components/profile/Modal";
 import PasswordInput from "../form/PasswordInput"
 import Button from '../landing page/Button';
 import UseChangePassword from '../../hooks/useChangePasssword'
+import { useNavigate } from 'react-router-dom';
 
 const PatientInformation = ({ patient }) => {
     const [openModal, setOpenModal] = useState(false);
     const [loading, setLoading] = useState(false)
+    const navigate = useNavigate()
 
     const handleClick = () => {
         setOpenModal(true);
@@ -17,6 +19,10 @@ const PatientInformation = ({ patient }) => {
     const handleClose = () => {
         setOpenModal(false);
     };
+
+    const handleEditProfile = () => {
+        navigate('/patient/edit-profile')
+    }
 
     const {
         register,
@@ -45,7 +51,7 @@ const PatientInformation = ({ patient }) => {
             <div>
                 <h2 className="text-2xl font-semibold text-teal-700 mb-8">Medical Information</h2>
                 <MedicalGrid patient={patient} />
-                <button className="mt-20 bg-teal-600 text-white px-5 py-2 text-sm rounded-full hover:bg-teal-700 transition float-right">
+                <button onClick={handleEditProfile} className="mt-20 bg-teal-600 text-white px-5 py-2 text-sm rounded-full hover:bg-teal-700 transition float-right">
                     Edit Profile
                 </button>
             </div>
