@@ -17,6 +17,8 @@ import { PublicRoute } from "./components/PublicRoutes";
 import { Navigate } from "react-router-dom";
 import HomePage from "./pages/landing pages/HomePage";
 import EditPatientProfilePage from "./pages/user/patient/EditPatientProfilePage";
+import DoctorBasicOnboardingForm from "./pages/user/doctor/onboarding/DoctorBasicOnboardingForm";
+import DoctorProfessionalOnboarding from './pages/user/doctor/onboarding/DoctorProfessionalOnboarding'
 
 function App() {
   return (
@@ -49,6 +51,8 @@ function App() {
 
           <Route element={<ProtectedRoute allowedRoles={['doctor']} />} >
             <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+            <Route path="/doctor/basic-onboarding" element={<DoctorBasicOnboardingForm />} />
+            <Route path="/doctor/proffesional-onboarding" element={<DoctorProfessionalOnboarding />} />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={['admin']} />} >
