@@ -36,11 +36,11 @@ const patientSchema = new mongoose.Schema({
         type: String // Consider more specific type if you need numeric
     },
     height: {
-        type: Number,
+        type: String,
         required: true
     },
     weight: {
-        type: Number,
+        type: String,
         required: true
     },
     bloodPressure: {

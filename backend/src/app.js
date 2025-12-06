@@ -10,8 +10,10 @@ import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import oauthRoutes from "./routes/oauthRoutes.js";
 import patientRoutes from './routes/patientRoutes.js';
+import doctorRoutes from "./routes/doctorRoutes.js";
 import "./config/passport.js";
 import { authenticateToken, authorizeRole } from './middlewares/authMiddleware.js';
+import { handleError } from './middlewares/errorHandlingMiddleware.js';
 
 export const app = express()
 
@@ -64,5 +66,8 @@ app.use('/api/user', userRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/oauth', oauthRoutes)
 app.use('/api/patient', authenticateToken({ sendRequiresRefresh: false }), authorizeRole("patient"), patientRoutes)
+app.use('/api/doctor', authenticateToken({ sendRequiresRefresh: false }), authorizeRole("doctor"), doctorRoutes)
+
+app.use(handleError)
 
 export default app
