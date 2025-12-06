@@ -52,7 +52,7 @@ const ProfileLayout = ({
 
                 {/* Main cards and dashboard content */}
                 <main className="flex-1 mt-15">
-                    {activeKey === "personal" && <PatientInformation patient={patient} />}
+                    {activeKey === "personal" && <PatientInformation patient={profileData} />}
                     {activeKey === "appointments" && <AppointmentsSection appointments={appointments} />}
                 </main>
             </div>

@@ -60,7 +60,7 @@ export default function DcotorProfilePage() {
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const navigate = useNavigate();
     const { logout } = useAuth();
-    const [docotorDetails, setDoctorDetails] = useState({});
+    const [doctorDetails, setDoctorDetails] = useState({});
     const [loading, setloading] = useState(true)
 
 
@@ -115,7 +115,7 @@ export default function DcotorProfilePage() {
                 actions={doctorProfileConfig.actions}
                 profileData={doctorDetails}
                 appointments={dummyAppointments}
-                onLogout={handleLogout} // Prop for sidebar/logout button
+                onLogout={handleLogout}
                 isLoggingOut={isLoggingOut}
             >
                 {/* Slot: Pass dashboard-specific content for greeting/etc */}

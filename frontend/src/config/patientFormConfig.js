@@ -3,7 +3,7 @@ export const genderOptions = [
   { label: "Female", value: "female" },
   { label: "Male", value: "male" },
   { label: "Intersex", value: "intersex" },
-  { label: "Prefer not to say / other", value: "other" },
+  { label: "Prefer not to say / other", value: "other" }
 ];
 
 export const drinkingOptions = [
@@ -11,7 +11,7 @@ export const drinkingOptions = [
   { label: "Quit drinking", value: "Quit drinking" },
   { label: "Occasionally (social/rarely)", value: "Occasionally (social/rarely)" },
   { label: "Yes, regularly", value: "Yes, regularly" },
-  { label: "Yes, but not regularly", value: "Yes, but not regularly" },
+  { label: "Yes, but not regularly", value: "Yes, but not regularly" }
 ];
 
 export const smokingOptions = [
@@ -19,7 +19,7 @@ export const smokingOptions = [
   { label: "Former smoker", value: "Former smoker" },
   { label: "Occasionally (social/rarely)", value: "Occasionally (social/rarely)" },
   { label: "Yes, daily", value: "Yes, daily" },
-  { label: "Yes, but not daily", value: "Yes, but not daily" },
+  { label: "Yes, but not daily", value: "Yes, but not daily" }
 ];
 
 export const bloodGroupOptions = [
@@ -31,7 +31,7 @@ export const bloodGroupOptions = [
   { label: "O+", value: "O+" },
   { label: "O-", value: "O-" },
   { label: "AB+", value: "AB+" },
-  { label: "AB-", value: "AB-" },
+  { label: "AB-", value: "AB-" }
 ];
 
 // left column field config
@@ -40,21 +40,21 @@ export const basicFields = [
     type: "file",
     name: "profilePicture",
     label: "Profile Picture",
-    showIn: ["onboarding"], // only onboarding
+    showIn: ["onboarding"] // only onboarding
   },
   {
     type: "radio",
     name: "smoking",
     label: "Do you smoke?",
     options: smokingOptions,
-    showIn: ["onboarding", "edit"],
+    showIn: ["onboarding", "edit"]
   },
   {
     type: "radio",
     name: "drinking",
     label: "Do you drink?",
     options: drinkingOptions,
-    showIn: ["onboarding", "edit"],
+    showIn: ["onboarding", "edit"]
   },
   {
     type: "input",
@@ -62,20 +62,20 @@ export const basicFields = [
     label: "Emergency contact Number",
     inputType: "tel",
     placeholder: "Enter an emergency phone number",
-    showIn: ["onboarding", "edit"],
+    showIn: ["onboarding", "edit"]
   },
   {
     type: "date",
     name: "dateOfBirth",
     label: "Date Of Birth",
-    showIn: ["onboarding", "edit"],
+    showIn: ["onboarding", "edit"]
   },
   {
     type: "radio",
     name: "gender",
     label: "Gender",
     options: genderOptions,
-    showIn: ["onboarding", "edit"],
+    showIn: ["onboarding", "edit"]
   },
   {
     type: "textarea",
@@ -83,8 +83,8 @@ export const basicFields = [
     label: "Address",
     rows: 4,
     placeholder: "Enter your residential address",
-    showIn: ["onboarding", "edit"],
-  },
+    showIn: ["onboarding", "edit"]
+  }
 ];
 
 // right column field config
@@ -95,7 +95,7 @@ export const medicalFields = [
     label: "Blood Type",
     options: bloodGroupOptions,
     placeholder: "Select blood type",
-    showIn: ["onboarding", "edit"],
+    showIn: ["onboarding", "edit"]
   },
   {
     type: "input",
@@ -103,7 +103,7 @@ export const medicalFields = [
     label: "Cholesterol",
     inputType: "text",
     placeholder: "e.g., 120/80 mmHg",
-    showIn: ["onboarding", "edit"],
+    showIn: ["onboarding", "edit"]
   },
   {
     type: "input",
@@ -111,7 +111,7 @@ export const medicalFields = [
     label: "Height",
     inputType: "text",
     placeholder: "e.g., 180 cm",
-    showIn: ["onboarding", "edit"],
+    showIn: ["onboarding", "edit"]
   },
   {
     type: "input",
@@ -119,7 +119,7 @@ export const medicalFields = [
     label: "Weight",
     inputType: "text",
     placeholder: "e.g., 65 Kg",
-    showIn: ["onboarding", "edit"],
+    showIn: ["onboarding", "edit"]
   },
   {
     type: "input",
@@ -127,7 +127,7 @@ export const medicalFields = [
     label: "Blood Pressure",
     inputType: "text",
     placeholder: "e.g., 120/80 mmHg",
-    showIn: ["onboarding", "edit"],
+    showIn: ["onboarding", "edit"]
   },
   {
     type: "input",
@@ -135,7 +135,7 @@ export const medicalFields = [
     label: "Glucose level",
     inputType: "text",
     placeholder: "e.g., 120 mg/dL",
-    showIn: ["onboarding", "edit"],
+    showIn: ["onboarding", "edit"]
   },
   {
     type: "textarea",
@@ -143,7 +143,7 @@ export const medicalFields = [
     label: "Allergies",
     rows: 3,
     placeholder: "e.g., Penicillin, Peanuts",
-    showIn: ["onboarding", "edit"],
+    showIn: ["onboarding", "edit"]
   },
   {
     type: "textarea",
@@ -160,7 +160,7 @@ export const medicalFields = [
     rows: 4,
     placeholder:
       "List any food (e.g., lactose, gluten) or drug intolerances and reactions.",
-    showIn: ["onboarding", "edit"],
+    showIn: ["onboarding", "edit"]
   },
   {
     type: "textarea",
@@ -169,6 +169,6 @@ export const medicalFields = [
     rows: 4,
     placeholder:
       "Describe any mental health diagnoses, therapy, or medications.",
-    showIn: ["onboarding", "edit"],
-  },
+    showIn: ["onboarding", "edit"]
+  }
 ];

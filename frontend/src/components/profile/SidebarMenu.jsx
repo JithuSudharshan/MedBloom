@@ -16,7 +16,7 @@ const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, isLo
                      w-9 h-9 rounded-full bg-white shadow-md border border-gray-200
                      hover:bg-gray-100 transition"
                 >
-                    {/* simple pencil icon using SVG; replace with lucide/heroicons if you use them */}
+                    {/*pencil icon using SVG*/}
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="w-4 h-4 text-gray-700"
