@@ -54,9 +54,24 @@ passport.use(
 
                     // Link Google account
                     user.googleId = profile.id;
-                    user.authMethod = user.authMethod === 'local' ? 'both' : 'google';
+
+                    // Set auth method properly
+                    if (user.authMethod === 'local') {
+                        user.authMethod = 'both';
+                    } else {
+                        user.authMethod = 'google';
+                    }
+
                     user.isVerified = true;
-                    user.profilePicture = user.profilePicture || profile.photos[0]?.value;
+
+                    // Update profile image only if default image is used
+                    const defaultProfile =
+                        "https://media.istockphoto.com/id/1451587807/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-vector.jpg?s=612x612&w=0&k=20&c=yDJ4ITX1cHMh25Lt1vI1zBn2cAKKAlByHBvPJ8gEiIg=";
+
+                    if (user.profile_url === defaultProfile && profile.photos?.length > 0) {
+                        user.profile_url = profile.photos[0].value;
+                    }
+
 
                     // Assign role if not set
                     if (!user.role && requestedRole) {
@@ -80,10 +95,10 @@ passport.use(
                     googleId: profile.id,
                     email: email,
                     name: profile.displayName,
-                    profilePicture: profile.photos[0]?.value,
+                    profile_url: profile.photos[0]?.value,
                     authMethod: 'google',
                     isVerified: true,
-                    role: requestedRole  // SET ROLE HERE
+                    role: requestedRole
                 });
 
                 console.log('New user created with role:', user.role);
