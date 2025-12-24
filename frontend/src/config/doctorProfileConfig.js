@@ -39,7 +39,7 @@ const doctorProfileConfig = {
                 { label: "Phone Number", key: "phone" },
                 { label: "Date Of Birth", key: "dob" },
                 { label: "Gender", key: "gender" },
-                { label: "Address", key: "address" },
+                { label: "Clinic Address", key: "address" },
             ]
         },
         {

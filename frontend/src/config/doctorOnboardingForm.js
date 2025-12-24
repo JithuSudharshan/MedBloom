@@ -14,7 +14,7 @@ export const basicFields = [
     {
         type: "input",
         name: "displayName",
-        label: "Full Name",
+        label: "Display Name",
         inputType: "text",
         placeholder: "Dr. Jayalekshmi Vasudev",
         showIn: ["onboarding", "edit"]
@@ -32,13 +32,13 @@ export const basicFields = [
         label: "Contact Number",
         inputType: "tel",
         placeholder: "Enter a phone number",
-        showIn: ["onboarding", "edit", "edit"]
+        showIn: ["onboarding", "edit"]
     },
     {
         type: "date",
         name: "dateOfBirth",
         label: "Date Of Birth",
-        showIn: ["onboarding", "edit"]
+        showIn: ["onboarding"]
     },
     {
         type: "input",
@@ -56,6 +56,17 @@ export const basicFields = [
         placeholder: "Tell us about yourself...",
         showIn: ["onboarding", "edit"]
     },
+    {
+        type: "select",
+        name: "consultationMode",
+        label: "Consultation Mode",
+        options: [
+            { label: "Online", value: "online" },
+            { label: "Offline", value: "offline" },
+            { label: "Both", value: "both" },
+        ],
+        showIn: ["edit"]
+    }
 ];
 
 export const professionalFields = [
@@ -66,11 +77,15 @@ export const professionalFields = [
         showIn: ["onboarding"]
     },
     {
-        type: "input",
+        type: "select",
         name: "primarySpecialization",
         label: "Primary Specialization",
-        inputType: "text",
-        placeholder: "e.g., Cardiology",
+        options: [
+            { label: "cardiology", value: "1" },
+            { label: "orthology", value: "2" },
+            { label: "gynocology", value: "3" },
+            { label: "ophthalmology", value: "4" },
+        ],
         showIn: ["onboarding"]
     },
     {
@@ -79,6 +94,24 @@ export const professionalFields = [
         label: "Sub Specializations (if any)",
         inputType: "text",
         placeholder: "e.g., Interventional Cardiology",
+        showIn: ["onboarding"]
+    },
+    {
+        type: "select",
+        name: "yearOfExperience",
+        label: "Years of experience",
+        options: [
+            { label: "1", value: "1" },
+            { label: "2", value: "2" },
+            { label: "3", value: "3" },
+            { label: "4", value: "4" },
+            { label: "5", value: "5" },
+            { label: "6", value: "6" },
+            { label: "7", value: "7" },
+            { label: "8", value: "8" },
+            { label: "9", value: "9" },
+            { label: "10+", value: "10+" },
+        ],
         showIn: ["onboarding"]
     },
     {
@@ -111,7 +144,7 @@ export const professionalFields = [
         label: "Clinic Address",
         rows: 4,
         placeholder: "Enter clinic address",
-        showIn: ["onboarding"]
+        showIn: ["onboarding", "edit"]
     },
     {
         type: "select",
@@ -122,6 +155,6 @@ export const professionalFields = [
             { label: "Offline", value: "offline" },
             { label: "Both", value: "both" },
         ],
-        showIn: ["onboarding"]
+        showIn: ["onboarding", "edit"]
     }
 ];
