@@ -10,20 +10,14 @@ export const patientOnboarding = async (formData) => {
     }
 }
 
-export const patientChangePassword = async (payload) => {
-    try {
-        const response = await api.post("/patient/change-password", payload)
-        return response
-    } catch (error) {
-        console.log("Error while changing password:", error)
-        throw error
-    }
-}
-
-export const loadPatientData = async () => {
+export const loadPatientData = async (purpose) => {
 
     try {
-        const response = await api.get("/patient/profile");
+        const response = await api.get(`/patient/profile`, {
+            params: {
+                purpose: `${purpose}`
+            }
+        });
         return response
     } catch (error) {
         console.log("Error while fetching patient data:", error)
@@ -31,9 +25,9 @@ export const loadPatientData = async () => {
     }
 }
 
-export const updateProfilePicture = async (formData) => {
+export const updatePatientAvatar = async (formData) => {
     try {
-        const response = await api.post("/patient/profile-picture/update", formData)
+        const response = await api.post("/patient/avatar/update", formData)
         return response
     } catch (error) {
         console.log("Error while updating profile pic:", error)
