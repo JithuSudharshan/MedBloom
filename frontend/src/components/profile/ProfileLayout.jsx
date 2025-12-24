@@ -4,43 +4,49 @@ import PatientInformation from "./PatientInformation";
 import AppointmentsSection from "./appointments/AppointmentsSection";
 import Modal from "./Modal";
 import AvatarCropper from "./AvatarCropper";
+import DoctorInformation from "./DoctorInformation";
+import NotificationsPage from "./NotificationsPage";
 
 const ProfileLayout = ({
+    user,
     sidebarMenu,
     profileData,
     appointments,
     onLogout,
     isLoggingOut,
+    isActive
 }) => {
-    const [activeKey, setActiveKey] = useState("personal")
+    const [activeKey, setActiveKey] = useState(isActive)
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
-    const [localPatient, setLocalPatient] = useState(profileData)
+    const [localUser, setLocalUser] = useState(profileData)
 
     useEffect(() => {
-        setLocalPatient(profileData)
+        setLocalUser(profileData)
     }, [profileData])
 
 
     const handleAvatarSaved = (newAvatarUrl) => {
-        setLocalPatient((prev) => ({
+        setLocalUser((prev) => ({
             ...prev,
             avatar: { ...(prev?.avatar || {}), src: newAvatarUrl },
         }));
         setIsAvatarModalOpen(false);
     };
 
-    console.log("src:", localPatient?.avatar?.src)
+
+    console.log("src:", localUser?.avatar?.src)
 
     return (
         <div className="min-h-screen max-w-7xl mx-auto w-full">
             <div className="flex gap-10 py-10">
+
                 {/* Sidebar */}
                 <aside>
                     <SidebarMenu
                         menu={sidebarMenu}
-                        src={localPatient?.avatar?.src}
-                        alt={localPatient?.avatar?.alt}
-                        name={localPatient?.fullName}
+                        src={localUser?.avatar?.src}
+                        alt={localUser?.avatar?.alt}
+                        name={localUser?.fullName}
                         activeKey={activeKey}
                         onChange={setActiveKey}
                         onLogout={onLogout}
@@ -52,15 +58,28 @@ const ProfileLayout = ({
 
                 {/* Main cards and dashboard content */}
                 <main className="flex-1 mt-15">
-                    {activeKey === "personal" && <PatientInformation patient={profileData} />}
+                    {activeKey === "personal" && (
+                        <>
+                            {user === "patient" && (
+                                <PatientInformation patient={localUser} />
+                            )}
+                            {user === "doctor" && (
+                                <DoctorInformation doctor={localUser} />
+                            )}
+                        </>
+                    )}
                     {activeKey === "appointments" && <AppointmentsSection appointments={appointments} />}
+                    {activeKey === "notifications" && (<NotificationsPage profileTitle="Doctor Profile" />)}
+
                 </main>
             </div>
+
             <Modal
                 isOpen={isAvatarModalOpen}
                 onClose={() => setIsAvatarModalOpen(false)}
             >
                 <AvatarCropper
+                    user={user}
                     onCancel={() => setIsAvatarModalOpen(false)}
                     onSave={handleAvatarSaved}
                 />
