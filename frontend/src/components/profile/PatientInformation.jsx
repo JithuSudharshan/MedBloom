@@ -7,7 +7,7 @@ import Button from '../landing page/Button';
 import UseChangePassword from '../../hooks/useChangePasssword'
 import { useNavigate } from 'react-router-dom';
 
-const PatientInformation = ({ patient }) => {
+const PatientInformation = ({ patient, isAdmin = false }) => {
     const [openModal, setOpenModal] = useState(false);
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
@@ -21,7 +21,10 @@ const PatientInformation = ({ patient }) => {
     };
 
     const handleEditProfile = () => {
-        navigate('/patient/edit-profile')
+        isAdmin ?
+            navigate(`/admin/patient/${patient._id}/edit`)
+            :
+            navigate('/patient/edit-profile')
     }
 
     const {
@@ -42,15 +45,22 @@ const PatientInformation = ({ patient }) => {
                 <ProfileRow label="Date Of Birth" value={patient?.dob} />
                 <ProfileRow label="Gender" value={patient?.gender} />
                 <ProfileRow label="Address" value={patient?.address} />
-                <button onClick={handleClick} className="mt-8 bg-teal-600 text-white px-5 py-2 text-sm rounded-full hover:bg-teal-700 transition">
-                    Change Password
-                </button>
+
+                {patient.authMethod !== "google" && !isAdmin ? (
+                    <button onClick={handleClick} className="mt-8 bg-teal-600 text-white px-5 py-2 text-sm rounded-full hover:bg-teal-700 transition">
+                        Change Password
+                    </button>
+                )
+                    :
+                    <></>
+                }
+
             </div>
 
             {/* RIGHT COLUMN */}
             <div>
                 <h2 className="text-2xl font-semibold text-teal-700 mb-8">Medical Information</h2>
-                <MedicalGrid patient={patient} />
+                <MedicalGrid userDetails={patient} user={"patient"} />
                 <button onClick={handleEditProfile} className="mt-20 bg-teal-600 text-white px-5 py-2 text-sm rounded-full hover:bg-teal-700 transition float-right">
                     Edit Profile
                 </button>
