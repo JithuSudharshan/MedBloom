@@ -63,3 +63,4 @@ export const createPassword = async (req, res) => {
         })
     }
 }
+
