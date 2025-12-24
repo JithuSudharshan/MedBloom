@@ -1,11 +1,12 @@
 import React, { useState, useRef, useCallback } from "react";
 import ReactCrop, { centerCrop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-import { updateProfilePicture } from "../../api/patientApi";
+import { updatePatientAvatar } from "../../api/patientApi";
 import { showToast } from "../ui/Toast";
 import Button from "../landing page/Button";
+import { updateDoctorAvatar } from "../../api/doctorApi";
 
-const AvatarCropper = ({ onCancel, onSave }) => {
+const AvatarCropper = ({ onCancel, onSave, user }) => {
     const [upImg, setUpImg] = useState(null);
     const imgRef = useRef(null);
     const previewCanvasRef = useRef(null);
@@ -91,13 +92,20 @@ const AvatarCropper = ({ onCancel, onSave }) => {
         const formData = new FormData();
         formData.append("image", blob, "avatar.jpg")
 
-        const res = await updateProfilePicture(formData)
+        let res;
+
+        if (user === "patient") {
+            res = await updatePatientAvatar(formData)
+        } else if (user === "doctor") {
+            res = await updateDoctorAvatar(formData)
+        }
+
 
         if (!res?.data?.success) {
             return showToast.error("Something went wrong,Please try again")
         }
 
-        showToast.success("Profile picture Updated..!")
+        showToast.success("Avatar update Successful..!")
 
         onSave(res?.data?.profile_url);
         setIsSaving(false);
