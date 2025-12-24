@@ -60,6 +60,7 @@ export const doctorProffesionalOnboarding = async (req, res) => {
             consultationMode,
             consultationFeesOnline,
             consultationFeesOffline,
+            yearOfExperience
         } = req.body
 
         if (
@@ -68,8 +69,9 @@ export const doctorProffesionalOnboarding = async (req, res) => {
             !issuingCouncil ||
             !licenseNumber ||
             !clinicAddress ||
-            !consultationMode
-        ) return res.status(400).json({ success: false, message: "Must enter mandatory field!" })
+            !consultationMode ||
+            !yearOfExperience
+        ) return res.status(400).json({ success: false, message: "Should enter mandatory field!" })
 
         if (consultationMode === "both" && (!consultationFeesOnline || !consultationFeesOffline)) {
             return res.status(400).json({
@@ -110,16 +112,28 @@ export const doctorProffesionalOnboarding = async (req, res) => {
                         offline: consultationFeesOffline || null,
                     },
                     certificateUrl: certificate,
-                    onboardingStep: "completed"
+                    onboardingStep: "completed",
+                    yearOfExperience: Number(yearOfExperience) || null
                 },
             },
             { new: true }
         );
-
         if (!doctor)
             return res.status(400).json({
                 success: false,
                 message: "Docotor credentials are not authenticated"
+            })
+
+        const user = await User.findOneAndUpdate({ _id: userId }, {
+            $set: {
+                isOnboarded: true
+            }
+        })
+
+        if (!user)
+            return res.status(400).json({
+                success: false,
+                message: "user credentials are not authenticated"
             })
 
         return res.status(200).json({
