@@ -1,0 +1,297 @@
+import { useEffect, useState } from "react";
+import DoctorApprovalList from "../DoctorApprovalList";
+import ListDoctorsForAdmin from "./doctorProfile/ListDoctorsForAdmin";
+import SidebarMenu from "../SidebarMenu";
+import adminPic from '../../../assets/images/admin.jpg'
+import AdminDoctorDetails from "./doctorProfile/AdminDoctorDetails";
+import Modal from "../Modal";
+import ConfirmDialog from "../../ui/ConfirmDialogue";
+import { showToast } from "../../ui/Toast";
+import { blockDoctor, fetchApprovedList, fetchPatientsList, unblockDoctor } from "../../../api/adminApi";
+import ListPatientsForAdmin from "./patientProfile/ListPatientsForAdmin";
+import { useNavigate } from "react-router-dom";
+
+
+const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
+    const [activeKey, setActiveKey] = useState("doctors");
+    const [openApproval, setOpenApproval] = useState(false);
+
+    const [doctorPage, setDoctorPage] = useState(1);
+    const [patientPage, setPatientPage] = useState(1);
+    const [totalPatientPages, setTotalPatientPages] = useState(1)
+    const [totalDoctorPages, setTotalDoctorPages] = useState(1)
+
+    const [doctors, setDoctors] = useState([])
+    const [patients, setPatients] = useState([])
+
+    const [totalCount, setTotalcount] = useState(0)
+    const [pendingCount, setPendingCount] = useState(0)
+
+    const [selectedDoctorId, setSelectedDoctorId] = useState(null);
+    const [viewMode, setViewMode] = useState("list"); // "list" | "detail"
+    const [detailSource, setDetailSource] = useState(null); // "approved" | "pending"
+
+    const [isBlockModalOpen, setIsBlockModalOpen] = useState(false)
+    const [isUnblockModalOpen, setIsUnblockModalOpen] = useState(false)
+
+    const navigate = useNavigate()
+
+
+
+    const [loading, setLoading] = useState(false)
+
+    const fetchApprovedDoctors = async (pageNumber = 1) => {
+        try {
+            setLoading(true);
+
+            const res = await fetchApprovedList({
+                params: { page: pageNumber, limit: 5 }
+            })
+
+            if (!res.data?.success) {
+                showToast.error("Something went wrong while fetching data")
+            }
+            const {
+                doctors,
+                page,
+                totalPages,
+                totalNoOfDoctors,
+                totalPending
+            } = res?.data?.data;
+
+            setDoctors(doctors);
+            setDoctorPage(page);
+            setTotalDoctorPages(totalPages);
+            setTotalcount(totalNoOfDoctors)
+            setPendingCount(totalPending)
+        } catch (err) {
+            console.error("Failed to load pending doctors:", err);
+            showToast.error("Something  wrong while fetching data")
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchPatients = async (pageNumber = 1) => {
+        try {
+            setLoading(true);
+
+            const res = await fetchPatientsList({
+                params: { page: pageNumber, limit: 15 }
+            })
+
+            if (!res.data?.success) {
+                showToast.error("Something went wrong while fetching data")
+            }
+            const {
+                patients,
+                page,
+                totalPages
+            } = res?.data?.data;
+
+            setPatients(patients);
+            setPatientPage(page);
+            setTotalPatientPages(totalPages);
+        } catch (err) {
+            console.error("Failed to load total patints:", err);
+            showToast.error("Something  wrong while fetching data")
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (activeKey === "doctors") {
+            fetchApprovedDoctors(doctorPage);
+        }
+    }, [activeKey, doctorPage]);
+
+    useEffect(() => {
+        if (activeKey === "patients") {
+            fetchPatients(patientPage);
+        }
+    }, [activeKey, patientPage]);
+
+    const handleViewApprovedDoctor = (doctor) => {
+        setSelectedDoctorId(doctor._id)
+        setDetailSource("approved")
+        setViewMode("detail")
+    };
+
+    const handleViewPendingDoctor = (doctor) => {
+        setSelectedDoctorId(doctor._id)
+        setDetailSource("pending")
+        setViewMode("detail")
+    };
+
+    const handleBackFromDetail = () => {
+        setViewMode("list");
+        setSelectedDoctorId(null);
+
+        if (detailSource === "pending") setOpenApproval(true);
+    };
+
+    const handleOpenApproval = () => setOpenApproval(true);
+    const handleCloseApproval = () => setOpenApproval(false);
+
+    const handleConfirmBlock = async () => {
+        try {
+            if (!selectedDoctorId) return;
+            const response = await blockDoctor(selectedDoctorId)
+            if (!response.data.success) {
+                showToast.error(response.data.message || "Failed to block doctor. Please try again.")
+                return;
+            }
+            await fetchApprovedDoctors(doctorPage)
+
+            showToast.success("Doctor blocked successfully.")
+
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setIsBlockModalOpen(false)
+        }
+    }
+
+    const handleConfirmUnblock = async () => {
+        try {
+            if (!selectedDoctorId) return;
+
+            const response = await unblockDoctor(selectedDoctorId)
+
+            if (!response.data.success) {
+                showToast.error(response.data.message || "Failed to unblock doctor. Please try again.")
+                return;
+            }
+            await fetchApprovedDoctors(patientPage)
+
+            showToast.success("Doctor unblocked successfully.")
+
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setIsUnblockModalOpen(false)
+        }
+    }
+
+    const openBlockModal = (doctorId) => {
+        setSelectedDoctorId(doctorId);
+        setIsBlockModalOpen(true);
+    };
+
+    const openUnblockModal = (doctorId) => {
+        setSelectedDoctorId(doctorId);
+        setIsUnblockModalOpen(true);
+    };
+
+    const handleViewPatient = (patient) => {
+        navigate(`/admin/patients/${patient._id}`);
+    };
+
+
+    return (
+        <div className="min-h-screen max-w-7xl mx-auto w-full">
+            <div className="flex gap-10 py-10">
+                <aside>
+                    <SidebarMenu
+                        isAdmin={true}
+                        menu={sidebarMenu}
+                        src={adminPic}
+                        alt={"admin Photo"}
+                        name={"Admin"}
+                        activeKey={activeKey}
+                        onChange={setActiveKey}
+                        onLogout={onLogout}
+                        isLoggingOut={isLoggingOut}
+                    />
+                </aside>
+
+                <main className="flex-1 mt-15">
+                    {activeKey === "doctors" && (
+                        openApproval ? (
+                            <DoctorApprovalList
+                                onBack={handleCloseApproval}
+                                viewDetails={handleViewPendingDoctor}
+                            />
+                        ) : (
+                            <ListDoctorsForAdmin
+                                doctors={doctors}
+                                page={doctorPage}
+                                totalPages={totalDoctorPages}
+                                totalCount={totalCount}
+                                pendingCount={pendingCount}
+                                setPage={setDoctorPage}
+                                handleOpenApproval={handleOpenApproval}
+                                viewDetails={handleViewApprovedDoctor}
+                                onOpenBlock={openBlockModal}
+                                onOpenUnblock={openUnblockModal}
+                            />
+                        )
+                    )}
+                    {activeKey === "doctors" && viewMode === "detail" && (
+                        <AdminDoctorDetails
+                            doctorId={selectedDoctorId}
+                            mode={detailSource === "pending" ? "pending" : "approved"}
+                            onBack={handleBackFromDetail}
+                        />
+                    )}
+                    {activeKey === "patients" && (
+                        <ListPatientsForAdmin
+                            onViewPatient={handleViewPatient}
+                            patients={patients}
+                            page={patientPage}
+                        />
+                    )}
+
+                </main>
+            </div>
+
+            { /*--------------------- Confirmation modals for blocking & unblocking doctor---------------------*/}
+
+            {/* Block modal */}
+            <Modal
+                isOpen={isBlockModalOpen}
+                onClose={() => {
+                    setIsBlockModalOpen(false);
+                    setSelectedDoctorId(null);
+                }}
+            >
+                <ConfirmDialog
+                    title="Block this doctor?"
+                    message="Are you sure you want to block this user? They will no longer be available for new appointments."
+                    confirmLabel="Yes, block"
+                    cancelLabel="No, cancel"
+                    onConfirm={handleConfirmBlock}
+                    onCancel={() => {
+                        setIsBlockModalOpen(false);
+                        setSelectedDoctorId(null);
+                    }}
+                />
+            </Modal>
+
+            {/* Unblock modal */}
+            <Modal
+                isOpen={isUnblockModalOpen}
+                onClose={() => {
+                    setIsUnblockModalOpen(false);
+                    setSelectedDoctorId(null);
+                }}
+            >
+                <ConfirmDialog
+                    title="Unblock this doctor?"
+                    message="Are you sure you want to unblock this doctor? They will become available for new appointments again."
+                    confirmLabel="Yes, unblock"
+                    cancelLabel="No, keep blocked"
+                    onConfirm={handleConfirmUnblock}
+                    onCancel={() => {
+                        setIsUnblockModalOpen(false);
+                        setSelectedDoctorId(null);
+                    }}
+                />
+            </Modal>
+
+        </div>
+    );
+};
+
+export default AdminProfileLayout;
