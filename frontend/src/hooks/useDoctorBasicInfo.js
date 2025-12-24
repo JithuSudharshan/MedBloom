@@ -127,7 +127,7 @@ export const useDoctorBasicInfo = () => {
                 return;
             }
 
-            navigate('/doctor/dashboard')
+            navigate("/doctor/proffesional-onboarding")
             showToast.success('Onboarding successful!');
 
             reset();
