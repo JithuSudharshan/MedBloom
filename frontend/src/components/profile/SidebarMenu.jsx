@@ -1,4 +1,5 @@
-const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, isLoggingOut, onEditAvatar, }) => (
+
+const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, isLoggingOut, onEditAvatar, isAdmin = false }) => (
 
     <nav className="bg-white w-64 ml-10 rounded-3xl shadow-lg p-6 mt-15 flex flex-col gap-2">
 
@@ -9,7 +10,7 @@ const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, isLo
                     alt={alt}
                     className="rounded-full w-40 h-40 object-cover shadow"
                 />
-                <button
+                {!isAdmin && (<button
                     type="button"
                     onClick={onEditAvatar}
                     className="absolute bottom-1 right-1 flex items-center justify-center
@@ -27,7 +28,7 @@ const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, isLo
                     >
                         <path d="M16.862 3.487a2.25 2.25 0 013.182 3.182L8.25 18.463 4.5 19.5l1.037-3.75L16.862 3.487z" />
                     </svg>
-                </button>
+                </button>)}
             </div>
             <div className="font-medium text-lg text-gray-700">{name}</div>
         </div>
