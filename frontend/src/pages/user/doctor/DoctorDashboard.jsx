@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PatientProfileLayout from "../../../components/profile/ProfileLayout";
+import ProfileLayout from "../../../components/profile/ProfileLayout";
 import Navbar from "../../../components/landing page/Navbar";
 import Footer from "../../../components/landing page/Footer";
 import Button from "../../../components/ui/Button";
@@ -10,6 +10,7 @@ import { useAuth } from '../../../context/AuthContext';
 import Loader from '../../../components/ui/Loading';
 import doctorProfileConfig from '../../../config/doctorProfileConfig';
 import { loadDoctorData } from '../../../api/doctorApi';
+import IsonboardedWarning from '../../../components/profile/IsonboardedWarning';
 
 const dummyAppointments = [
     {
@@ -73,14 +74,12 @@ export default function DcotorProfilePage() {
         try {
             setloading(true)
 
-            //custome delay for show
-            // await new Promise((resolve) => setTimeout(resolve, 3700))
-
             const response = await loadDoctorData()
             if (response) {
                 setDoctorDetails(response?.data?.details)
-                console.log(docotorDetails)
+                console.log(doctorDetails)
             }
+
         } catch (error) {
             console.log("error at fetch : ", error)
         } finally {
@@ -105,11 +104,18 @@ export default function DcotorProfilePage() {
             setIsLoggingOut(false);
         }
     };
+
+    const handleNavigate = () => {
+        navigate("/doctor/basic-onboarding")
+    }
     return (
         <>
             <Navbar />
             <ProfileBanner profileOwner={"Doctor Profile"} profileDescription={"Manage your personal information and bussiness records"} />
-            <PatientProfileLayout
+            {!doctorDetails.isOnboarded && < IsonboardedWarning onClick={handleNavigate} />}
+            <ProfileLayout
+                user={"doctor"}
+                isActive={"dashboard"}
                 sidebarMenu={doctorProfileConfig.sidebarMenu}
                 sections={doctorProfileConfig.sections}
                 actions={doctorProfileConfig.actions}
@@ -124,7 +130,7 @@ export default function DcotorProfilePage() {
                         {isLoggingOut ? "Logging out..." : "Logout"}
                     </Button>
                 </div>
-            </PatientProfileLayout>
+            </ProfileLayout>
             <Footer />
             {loading && <Loader />}
 
