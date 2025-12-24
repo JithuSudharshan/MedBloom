@@ -1,78 +1,53 @@
-import { ENV } from "../../../config/env.js";
 import User from "../../../model/userModel.js";
 import Patient from "../../../model/patientModel.js";
-import bcrypt from 'bcrypt';
 import { formatDOB, formatName } from '../../../utils/formatters.js'
 
-export const ChangePatientPassword = async (req, res) => {
-    try {
-        const { confirmPassword, currentPassword, newPassword } = req.body
-
-        const userId = req.user._id;
-
-        if (!confirmPassword || !currentPassword || !newPassword)
-            return res.status(400).json({ success: false, message: "All fileds are mandatory" })
-
-        if (currentPassword === newPassword)
-            return res.status(400).json({
-                success: false, message: "New password must be different from current password"
-            });
-
-        if (newPassword !== confirmPassword)
-            return res.status(400).json({ success: false, message: "Passwords do not match. Please try again." })
-
-        const isExist = await User.findOne({ _id: userId }).select('+passwordHash')
-
-        if (!isExist)
-            return res.status(400).json({ succes: false, message: "Credentials doesn't match" })
-
-        const isPasswordValid = await bcrypt.compare(currentPassword, isExist.passwordHash);
-
-        if (!isPasswordValid)
-            return res.status(400).json({ success: false, message: "Enter a valid Current password" })
-
-        const hashedPassord = await bcrypt.hash(newPassword, ENV.SALTROUND)
-
-        isExist.passwordHash = hashedPassord
-
-        await isExist.save()
-
-        res.status(200).json({ success: true, message: "Password changed. Please log in again." })
-
-    } catch (error) {
-        console.log("error in change password", error);
-        res.status(500).json({ success: false, message: "Internal server error" });
-    }
-
-}
 
 export const fetchUserDetails = async (req, res) => {
 
     try {
         const { email } = req.user
+        const purpose = req.query.purpose
+
+        if (!purpose)
+            return res.status(400).json({ success: false, message: "Invalid url" })
 
         const isUser = await User.findOne({ email })
 
         if (!isUser)
             return res.status(400).json({ success: false, message: "User not found" })
 
+        const fullName = formatName(isUser.name)
+
         const patient = await Patient.findOne({ user: isUser._id })
 
         if (!patient)
-            return res.status(4000).json({ success: false, message: "User not found" })
+            return res.status(200).json({
+                success: true,
+                details: {
+                    fullName: fullName,
+                    email: isUser.email,
+                    phone: isUser.phone,
+                    isOnboarded: isUser.isOnboarded,
+                    avatar: {
+                        src: isUser.profile_url,
+                        alt: "profile picture"
+                    },
+                }
+            });
 
-        const fullName = formatName(isUser.name)
+
         const DOB = formatDOB(patient.dob)
-        const height = patient.height.toString().concat(" cm")
+        const height = purpose === "forEdit" ? patient.height.toString() : patient.height.toString().concat(" cm")
         const weight = patient.weight.toString().concat(" kg")
 
         res.status(200).json({
             success: true,
             details: {
-                fullName: fullName,
+                fullName: fullName || isUser.name,
                 email: isUser.email,
                 phone: isUser.phone,
-                dob: DOB,
+                dob: purpose === "forDashboard" ? DOB : patient.dob,
                 gender: patient.gender,
                 address: patient.address,
                 bloodType: patient.bloodType,
@@ -86,11 +61,12 @@ export const fetchUserDetails = async (req, res) => {
                 drinking: patient.smoking,
                 medicalCondition: patient.medicalCondition,
                 avatar: {
-                    src: patient.profile_url,
+                    src: patient.profile_url || isUser.profile_url,
                     alt: "profile picture"
                 },
                 Food_or_Drug_Intolerances: patient.Food_or_Drug_Intolerances,
-                Mental_Health_History: patient.Mental_Health_History
+                Mental_Health_History: patient.Mental_Health_History,
+                isOnboarded: isUser.isOnboarded
             }
         });
 
@@ -136,7 +112,6 @@ export const updateProfilePicture = async (req, res) => {
 
 export const editProfile = async (req, res) => {
     try {
-        console.log("req.body console", req.body)
         let {
             emergencyNumber,
             dateOfBirth,
