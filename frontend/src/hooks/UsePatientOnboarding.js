@@ -4,7 +4,6 @@ import * as yup from 'yup';
 import { useState } from 'react';
 import { patientOnboarding } from '../api/patientApi';
 import { showToast } from '../components/ui/Toast';
-import { useNavigate } from 'react-router-dom';
 
 // Yup Validation Schema
 const patientOnboardingSchema = yup.object().shape({
@@ -125,7 +124,6 @@ const patientOnboardingSchema = yup.object().shape({
 export const usePatientOnboarding = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState(null);
-    const navigate = useNavigate()
 
     const {
         register,
@@ -210,7 +208,7 @@ export const usePatientOnboarding = () => {
                 showToast.error(res?.data?.message || 'Submission failed,Try again');
                 return;
             }
-            navigate("/patient/dashboard")
+
             showToast.success('Onboarding successful!');
 
             reset();

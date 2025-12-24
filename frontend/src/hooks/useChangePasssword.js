@@ -2,9 +2,9 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { showToast } from '../components/ui/Toast';
+import { patientChangePassword } from '../api/patientApi';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { userChangePassword } from '../api/authApi';
 
 
 const schema = yup.object({
@@ -48,6 +48,8 @@ export default function useEnquiryForm() {
         }
     })
 
+
+
     const onSubmit = async (data, setLoading) => {
 
         try {
@@ -58,7 +60,7 @@ export default function useEnquiryForm() {
             }
             console.log(payload)
 
-            const response = await userChangePassword(payload);
+            const response = await patientChangePassword(payload);
 
             if (response) {
                 try {
