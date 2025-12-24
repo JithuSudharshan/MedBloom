@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react';
 import { editPatientProfile } from '../api/patientApi';
 import { showToast } from '../components/ui/Toast';
 import { useNavigate } from 'react-router-dom';
+import { admineditsPatientProfile } from '../api/adminApi';
 
 // Yup Validation Schema
-const patientOnboardingSchema = yup.object().shape({
+const patientEditSchema = yup.object().shape({
 
     // Basic Details
     emergencyNumber: yup
@@ -110,11 +111,13 @@ const patientOnboardingSchema = yup.object().shape({
 
 })
 
-export const useEditPatientProfile = (initialPatient) => {
+export const useEditPatientProfile = (initialPatient, { isAdmin = false, patientId }) => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState(null);
     const navigate = useNavigate();
+
+    console.log("inital patient", initialPatient)
 
     const buildDefaults = (p) => {
         const raw = p?.dateOfBirth || "";
@@ -160,7 +163,7 @@ export const useEditPatientProfile = (initialPatient) => {
         reset,
         formState: { errors, isValid, isDirty },
     } = useForm({
-        resolver: yupResolver(patientOnboardingSchema),
+        resolver: yupResolver(patientEditSchema),
         mode: 'onChange',
         defaultValues: buildDefaults(initialPatient)
     })
@@ -201,7 +204,11 @@ export const useEditPatientProfile = (initialPatient) => {
 
             console.log("Entered Value", [...formData.entries()])
 
-            const response = await editPatientProfile(formData)
+            const response = isAdmin
+                ?
+                await admineditsPatientProfile(formData, patientId)
+                :
+                await editPatientProfile(formData)
 
             console.log(response)
             if (!response?.data?.success) {
@@ -209,7 +216,10 @@ export const useEditPatientProfile = (initialPatient) => {
                 return;
             }
 
-            navigate('/patient/dashboard')
+            isAdmin ?
+                navigate("/admin/dashboard")
+                :
+                navigate('/patient/dashboard')
             showToast.success('Porfile edit Updated');
             reset();
             return

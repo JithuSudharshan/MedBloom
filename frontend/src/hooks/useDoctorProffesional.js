@@ -22,6 +22,10 @@ const doctorProfessionalInfoSchema = yup.object().shape({
                 value.type
             );
         }),
+    yearOfExperience: yup
+        .string()
+        .oneOf(["1", "2", "3", "4", "5", "6", "7", "8", "9", "10+"])
+        .required("Year of experince  is required"),
     primarySpecialization: yup
         .string()
         .trim()
@@ -104,6 +108,7 @@ export const useDoctorProfessionalInfo = () => {
             consultationMode: "",
             consultationFeesOnline: "",
             consultationFeesOffline: "",
+            yearOfExperience: ""
         }
     });
 
@@ -126,6 +131,7 @@ export const useDoctorProfessionalInfo = () => {
             formData.append('consultationMode', data.consultationMode)
             formData.append('consultationFeesOnline', data.consultationFeesOnline)
             formData.append('consultationFeesOffline', data.consultationFeesOffline)
+            formData.append('yearOfExperience', data.yearOfExperience)
 
             // Append profile picture if exists
             if (data.certificate) {
