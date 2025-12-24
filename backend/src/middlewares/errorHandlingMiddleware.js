@@ -1,4 +1,14 @@
 export const handleError = (err, req, res, next) => {
-    if (err)
-        return res.status(500).json({ success: false, message: "Internal server error" })
-}
+    console.error(err);
+
+    if (res.headersSent) {
+        return next(err);
+    }
+    const status = err.statusCode || 500;
+    const message = err.message || 'Internal server error';
+
+    return res.status(status).json({
+        success: false,
+        message,
+    });
+};
