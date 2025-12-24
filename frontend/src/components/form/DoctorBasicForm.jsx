@@ -5,6 +5,7 @@ import TextArea from "../form/TextArea";
 import DatePicker from "../form/DatePicker";
 import FileUpload from "../form/FileUpload";
 import { basicFields } from "../../config/doctorOnboardingForm";
+import Select from "./Select";
 
 
 
@@ -14,6 +15,7 @@ export default function DoctorBasicForm({
     register,
     handleSubmit,
     onSubmit,
+    consultationMode,
     setValue,
     errors,
     isSubmitting,
@@ -79,6 +81,18 @@ export default function DoctorBasicForm({
                         error={errors[field.name]}
                     />
                 );
+            case "select":
+                return (
+                    <Select
+                        key={field.name}
+                        label={field.label}
+                        name={field.name}
+                        register={register}
+                        error={errors[field.name]}
+                        placeholder={field.placeholder}
+                        options={field.options}
+                    />
+                );
             default:
                 return null;
         }
@@ -93,6 +107,28 @@ export default function DoctorBasicForm({
 
             {submitError && (
                 <p className="mt-4 text-sm text-red-600">{submitError}</p>
+            )}
+
+            {(consultationMode === "online" || consultationMode === "both") && (
+                <Input
+                    label="Online Consultation Fee (₹)"
+                    name="consultationFeesOnline"
+                    register={register}
+                    error={errors.consultationFeesOnline}
+                    placeholder="e.g., 500"
+                    type="number"
+                />
+            )}
+
+            {(consultationMode === "offline" || consultationMode === "both") && (
+                <Input
+                    label="Offline Consultation Fee (₹)"
+                    name="consultationFeesOffline"
+                    register={register}
+                    error={errors.consultationFeesOffline}
+                    placeholder="e.g., 700"
+                    type="number"
+                />
             )}
 
             <div className="flex justify-end mt-10 gap-3">
