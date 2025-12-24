@@ -54,7 +54,7 @@ export const logoutUser = async () => {
 export const loginAdmin = async (payload) => {
     try {
 
-        const response = await api.post("admin/login", payload)
+        const response = await api.post("/user/admin/login", payload)
         return response
 
     } catch (error) {
@@ -108,6 +108,16 @@ export const UserEnquiry = async (payload) => {
         return response
     } catch (error) {
         console.log("Error submitting enquiry form", error)
+        throw error
+    }
+}
+
+export const userChangePassword = async (payload) => {
+    try {
+        const response = await api.post("/user/change-password", payload)
+        return response
+    } catch (error) {
+        console.log("Error while changing password:", error)
         throw error
     }
 }
