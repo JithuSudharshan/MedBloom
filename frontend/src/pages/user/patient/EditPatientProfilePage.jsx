@@ -3,8 +3,9 @@ import PatientForm from "../../../components/profile/PatientForm";
 import Loader from "../../../components/ui/Loading";
 import { useEditPatientProfile } from "../../../hooks/useEditPatientProfile";
 import { loadPatientData } from "../../../api/patientApi";
+import { loadPatientDataForAdmin } from "../../../api/adminApi";
 
-export default function EditPatientProfilePage() {
+export default function EditPatientProfilePage({ isAdmin = false, patientId }) {
 
     const [patient, setPatient] = useState(null)
     console.log("patient", patient)
@@ -16,11 +17,14 @@ export default function EditPatientProfilePage() {
         errors,
         onSubmit,
         isSubmitting,
-    } = useEditPatientProfile(patient);
+    } = useEditPatientProfile(patient, { isAdmin, patientId });
 
     useEffect(() => {
         const fetchPatient = async () => {
-            const response = await loadPatientData();
+            const response = isAdmin ?
+                await loadPatientDataForAdmin(patientId)
+                :
+                await loadPatientData("forEditing");
             setPatient(response?.data?.details);
         };
         fetchPatient();
@@ -36,6 +40,8 @@ export default function EditPatientProfilePage() {
 
             <PatientForm
                 mode="edit"
+                isAdmin={isAdmin}
+                patientId={patientId}
                 register={register}
                 handleSubmit={handleSubmit}
                 onSubmit={onSubmit}

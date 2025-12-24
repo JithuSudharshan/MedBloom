@@ -10,6 +10,7 @@ import ProfileBanner from '../../../components/profile/ProfileBanner';
 import { useAuth } from '../../../context/AuthContext';
 import { loadPatientData } from '../../../api/patientApi';
 import Loader from '../../../components/ui/Loading';
+import IsonboardedWarning from '../../../components/profile/IsonboardedWarning';
 
 const dummyAppointments = [
     {
@@ -76,7 +77,7 @@ export default function PatientProfilePage() {
             //custome delay for show
             await new Promise((resolve) => setTimeout(resolve, 1700))
 
-            const response = await loadPatientData()
+            const response = await loadPatientData("forDashboard")
             if (response) {
                 setPatientDetails(response?.data?.details)
                 console.log(patientDetails)
@@ -105,17 +106,24 @@ export default function PatientProfilePage() {
             setIsLoggingOut(false);
         }
     };
+
+    const handleCompleteOnboarding = () => {
+        navigate("/patient/onboarding")
+    }
     return (
         <>
             <Navbar />
             <ProfileBanner profileOwner={"Patient Profile"} profileDescription={"Manage your personal information and health records"} />
+            {!patientDetails.isOnboarded && <IsonboardedWarning onClick={handleCompleteOnboarding} />}
             <ProfileLayout
+                user={"patient"}
+                isActive={"personal"}
                 sidebarMenu={patientProfileConfig.sidebarMenu}
                 sections={patientProfileConfig.sections}
                 actions={patientProfileConfig.actions}
                 profileData={patientDetails}
                 appointments={dummyAppointments}
-                onLogout={handleLogout} // Prop for sidebar/logout button
+                onLogout={handleLogout}
                 isLoggingOut={isLoggingOut}
             >
                 {/* Slot: Pass dashboard-specific content for greeting/etc */}
