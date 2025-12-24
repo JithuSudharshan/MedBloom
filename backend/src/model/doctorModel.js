@@ -58,7 +58,7 @@ const DoctorSchema = new Schema(
         },
         certificateUrl: {
             type: String,
-            required: true,
+
         },
 
 
@@ -85,6 +85,10 @@ const DoctorSchema = new Schema(
         },
 
         rating: {
+            type: Number,
+            default: 0
+        },
+        yearOfExperience: {
             type: Number,
             default: 0
         },
