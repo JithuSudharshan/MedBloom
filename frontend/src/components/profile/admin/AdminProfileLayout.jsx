@@ -28,8 +28,6 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
     const [pendingCount, setPendingCount] = useState(0)
 
     const [selectedDoctorId, setSelectedDoctorId] = useState(null);
-    const [viewMode, setViewMode] = useState("list"); // "list" | "detail"
-    const [detailSource, setDetailSource] = useState(null); // "approved" | "pending"
 
     const [isBlockModalOpen, setIsBlockModalOpen] = useState(false)
     const [isUnblockModalOpen, setIsUnblockModalOpen] = useState(false)
@@ -113,22 +111,14 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
     }, [activeKey, patientPage]);
 
     const handleViewApprovedDoctor = (doctor) => {
-        setSelectedDoctorId(doctor._id)
-        setDetailSource("approved")
-        setViewMode("detail")
+        console.log("doctor details", doctor)
+        navigate(`/admin/doctors/${doctor._id}`)
     };
 
     const handleViewPendingDoctor = (doctor) => {
         setSelectedDoctorId(doctor._id)
         setDetailSource("pending")
         setViewMode("detail")
-    };
-
-    const handleBackFromDetail = () => {
-        setViewMode("list");
-        setSelectedDoctorId(null);
-
-        if (detailSource === "pending") setOpenApproval(true);
     };
 
     const handleOpenApproval = () => setOpenApproval(true);
@@ -227,13 +217,6 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                                 onOpenUnblock={openUnblockModal}
                             />
                         )
-                    )}
-                    {activeKey === "doctors" && viewMode === "detail" && (
-                        <AdminDoctorDetails
-                            doctorId={selectedDoctorId}
-                            mode={detailSource === "pending" ? "pending" : "approved"}
-                            onBack={handleBackFromDetail}
-                        />
                     )}
                     {activeKey === "patients" && (
                         <ListPatientsForAdmin
