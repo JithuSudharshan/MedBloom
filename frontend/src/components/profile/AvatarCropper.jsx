@@ -5,8 +5,9 @@ import { updatePatientAvatar } from "../../api/patientApi";
 import { showToast } from "../ui/Toast";
 import Button from "../landing page/Button";
 import { updateDoctorAvatar } from "../../api/doctorApi";
+import { updateDoctorAvatarForAdmin, updatePatientAavatarForAdmin } from "../../api/adminApi";
 
-const AvatarCropper = ({ onCancel, onSave, user }) => {
+const AvatarCropper = ({ onCancel, onSave, user, _id, role }) => {
     const [upImg, setUpImg] = useState(null);
     const imgRef = useRef(null);
     const previewCanvasRef = useRef(null);
@@ -83,8 +84,6 @@ const AvatarCropper = ({ onCancel, onSave, user }) => {
         setIsSaving(true);
 
         const canvas = previewCanvasRef.current;
-
-        // canvas -> Blob
         const blob = await new Promise((resolve) =>
             canvas.toBlob(resolve, "image/jpeg", 0.9)
         );
@@ -98,6 +97,12 @@ const AvatarCropper = ({ onCancel, onSave, user }) => {
             res = await updatePatientAvatar(formData)
         } else if (user === "doctor") {
             res = await updateDoctorAvatar(formData)
+        } else if (user === "admin" && role === "doctor") {
+            const id = _id
+            res = await updateDoctorAvatarForAdmin(formData, id)
+        } else if (user === "admin" && role === "patient") {
+            const id = _id
+            res = await updatePatientAavatarForAdmin(formData, id)
         }
 
 
