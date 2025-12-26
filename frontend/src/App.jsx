@@ -24,6 +24,7 @@ import AdminEditDoctorPage from './pages/admin/dashboard/AdminEditDoctorPage';
 import AdminPatientDetailsPage from './pages/admin/dashboard/AdminPatientDetailsPage';
 import AdminEditPatientPage from './pages/admin/dashboard/AdminEditPatientPage';
 import { NotificationProvider } from './context/NotificationContex';
+import AdminDoctorDetailsPage from './pages/admin/dashboard/AdminDoctorDetailsPage';
 
 const AppInner = () => {
   const { user } = useAuth(); // from AuthContext
@@ -63,6 +64,7 @@ const AppInner = () => {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/doctors/:doctorId/edit" element={<AdminEditDoctorPage />} />
           <Route path="/admin/patients/:patientId" element={<AdminPatientDetailsPage />} />
+          <Route path="/admin/doctors/:DoctorId" element={<AdminDoctorDetailsPage />} />
           <Route path="/admin/patient/:patientId/edit" element={<AdminEditPatientPage />} />
         </Route>
       </Routes>
