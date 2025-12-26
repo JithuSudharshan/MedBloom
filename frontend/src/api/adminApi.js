@@ -135,3 +135,22 @@ export const admineditsPatientProfile = async (formData, id) => {
         throw error
     }
 }
+
+export const updateDoctorAvatarForAdmin = async (formData, id) => {
+    try {
+        const response = await api.patch(`/admin/doctor/change-avatar/${id}`, formData)
+        return response
+    } catch (error) {
+        console.log("Error while updating doctor avatar", error)
+        throw error
+    }
+}
+export const updatePatientAavatarForAdmin = async (formData, id) => {
+    try {
+        const response = await api.patch(`/admin/patient/change-avatar/${id}`, formData)
+        return response
+    } catch (error) {
+        console.log("Error while updating patient avatar", error)
+        throw error
+    }
+}
