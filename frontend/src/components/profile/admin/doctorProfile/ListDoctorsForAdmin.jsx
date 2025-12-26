@@ -27,7 +27,6 @@ const StatCard = ({ label, value, actionLabel, onAction }) => {
 }
 
 const ListDoctorsForAdmin = ({
-
     handleOpenApproval,
     viewDetails,
     onOpenBlock,
@@ -40,7 +39,6 @@ const ListDoctorsForAdmin = ({
     pendingCount
 }) => {
     const [search, setSearch] = useState("");
-
 
     const filteredDoctors = doctors.filter((doc) =>
         doc.displayName.toLowerCase().includes(search.toLowerCase())
@@ -92,9 +90,7 @@ const ListDoctorsForAdmin = ({
                     />
                 ))}
             </div>
-
             <Pagination current={page} total={totalPages} onChange={setPage} />
-
         </div>
     );
 };
