@@ -69,7 +69,7 @@ app.use('/api/user', userRoutes)
 app.use('/api/oauth', oauthRoutes);
 app.use('/api/admin', authenticateToken({ sendRequiresRefresh: false }), authorizeRole("admin"), adminRoutes)
 app.use('/api/patient', authenticateToken({ sendRequiresRefresh: false }), authorizeRole("patient"), patientRoutes)
-app.use('/api/doctor', authenticateToken({ sendRequiresRefresh: false }), authorizeRole("doctor"), doctorRoutes)
+app.use('/api/doctor', authenticateToken({ sendRequiresRefresh: false }), authorizeRole("doctor", "admin"), doctorRoutes)
 app.use('/api/notification', authenticateToken({ sendRequiresRefresh: false }), authorizeRole('doctor'), notificationRoutes);
 
 app.use(handleError)

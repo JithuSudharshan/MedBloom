@@ -2,6 +2,7 @@ import Doctor from "../../../model/doctorModel.js";
 import User from "../../../model/userModel.js";
 import Notification from '../../../model/notificationSchema.js';
 import { getIO } from '../../../config/socket.IO.js';
+import Patient from "../../../model/patientModel.js";
 
 
 export const fetchPendingDoctorList = async (req, res) => {
@@ -421,3 +422,69 @@ export const unblockDoctorProfile = async (req, res) => {
         });
     }
 };
+
+export const changeDoctorAvatar = async (req, res) => {
+    try {
+        const { id } = req.params
+        const profile_url = req.body.profile_url
+
+        if (!id)
+            return res.status(404).json({ success: false, message: "user not found" })
+
+        if (!profile_url)
+            return res.status(400).json({ success: false, message: "Profile_url not found" })
+
+        const doctor = await Doctor.findOne({ _id: id })
+
+        if (!doctor)
+            return res.status(404).json({ success: false, message: "Doctor not found" })
+
+        doctor.profilePicture = profile_url;
+
+        await doctor.save()
+
+        res.status(200).json({
+            success: true,
+            message: "Avatar updated",
+            profile_url: doctor.profilePicture
+        })
+    } catch (error) {
+        console.log("Error while Updating Dr Avatar", error)
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        })
+    }
+}
+
+export const changePatientAvatar = async (req, res) => {
+    try {
+        const { id } = req.params
+        const profile_url = req.body.profile_url
+
+        if (!id)
+            return res.status(404).json({ success: false, message: "user not found" })
+
+        if (!profile_url)
+            return res.status(400).json({ success: false, message: "Profile_url not found" })
+
+        const patient = await Patient.findOne({ _id: id })
+
+        if (!patient)
+            return res.status(404).json({ success: false, message: "Patient not found" })
+
+        patient.profile_url = profile_url;
+
+        await patient.save()
+
+        res.status(200).json({
+            success: true,
+            message: "Profile picture updated",
+            profile_url: patient.profile_url
+        })
+
+    } catch (error) {
+        console.log("Error in updating profile picture", error)
+        res.status(500).json({ success: false, message: "Internal server error" })
+    }
+}

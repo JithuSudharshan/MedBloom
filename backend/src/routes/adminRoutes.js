@@ -10,7 +10,9 @@ import {
     fetchPendingDoctorList,
     editDoctorsProfile,
     blockDoctorProfile,
-    unblockDoctorProfile
+    unblockDoctorProfile,
+    changeDoctorAvatar,
+    changePatientAvatar
 } from '../controller/adminControllers/adminDashboard/adminDashboardController.js';
 import {
     editPatientsProfile,
@@ -18,6 +20,7 @@ import {
     fetchPatientPorfile,
     fetchTotlPatients
 } from '../controller/adminControllers/adminDashboard/adminPatientControllers.js';
+import { uploadToCloudinary } from '../middlewares/uploadToCloudinary.js';
 
 const router = express.Router()
 
@@ -41,6 +44,20 @@ router.patch(
     upload.none(),
     editDoctorsProfile
 );
+
+router.patch(
+    "/doctor/change-avatar/:id",
+    upload.single("image"),
+    uploadToCloudinary,
+    changeDoctorAvatar
+)
+
+router.patch(
+    "/patient/change-avatar/:id",
+    upload.single("image"),
+    uploadToCloudinary,
+    changePatientAvatar
+)
 
 export default router;
 
