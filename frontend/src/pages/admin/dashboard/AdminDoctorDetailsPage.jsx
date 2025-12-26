@@ -1,0 +1,21 @@
+import { useNavigate, useParams } from "react-router-dom";
+import Navbar from "../../../components/landing page/Navbar";
+import ProfileBanner from "../../../components/profile/ProfileBanner";
+import AdminDoctorDetails from "../../../components/profile/admin/doctorProfile/AdminDoctorDetails";
+
+const AdminDoctorDetailsPage = () => {
+    const { DoctorId } = useParams();
+    const navigate = useNavigate()
+    console.log("doctor id as param", DoctorId)
+    return (
+        <>
+            <Navbar />
+            <ProfileBanner profileOwner={"Admin Profile"} profileDescription={"Manage the patients information and records"} />
+            <div className="min-h-screen max-w-7xl mx-auto w-full">
+                <AdminDoctorDetails doctorId={DoctorId} onBack={() => navigate("/admin/dashboard")} />
+            </div>
+
+        </>
+    )
+};
+export default AdminDoctorDetailsPage   
