@@ -17,18 +17,18 @@ export default function EditPatientProfilePage({ isAdmin = false, patientId }) {
         errors,
         onSubmit,
         isSubmitting,
-    } = useEditPatientProfile(patient, { isAdmin, patientId });
+    } = useEditPatientProfile(patient, { isAdmin, patientId })
 
     useEffect(() => {
         const fetchPatient = async () => {
             const response = isAdmin ?
                 await loadPatientDataForAdmin(patientId)
                 :
-                await loadPatientData("forEditing");
-            setPatient(response?.data?.details);
-        };
-        fetchPatient();
-    }, []);
+                await loadPatientData("forEditing")
+            setPatient(response?.data?.details)
+        }
+        fetchPatient()
+    }, [])
 
     if (patient === null) return <Loader />
 
