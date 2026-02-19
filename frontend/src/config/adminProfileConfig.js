@@ -8,6 +8,7 @@ import Logout from '../assets/icons/Profile_Icons/Logout.svg?react'
 import dashboard from "../assets/icons/Profile_Icons/dashboard.svg?react"
 import patients from "../assets/icons/Profile_Icons/patients.svg?react"
 import Publications from "../assets/icons/Profile_Icons/Publications.svg?react"
+import department_icon from "../assets/icons/Profile_Icons/departments.svg?react"
 
 
 const adminProfileConfig = {
@@ -22,6 +23,7 @@ const adminProfileConfig = {
         { key: "appointments", label: "Appointments", icon: Appointment },
         { key: "publications", label: "Publications", icon: Publications },
         { key: "notifications", label: "Notification", icon: Notification_icon },
+        { key: "departments", label: "Departments", icon: department_icon },
         { key: "transactions", label: "Transaction", icon: Transaction },
         { key: "revenue", label: "Revenue", icon: Wallet },
         { key: "logout", label: "Logout", icon: Logout }

@@ -12,6 +12,7 @@ import Avilability from "../assets/icons/Profile_Icons/Availability.svg?react"
 import Publications from "../assets/icons/Profile_Icons/Publications.svg?react"
 
 
+
 const doctorProfileConfig = {
     avatar: {
         src: avatar,

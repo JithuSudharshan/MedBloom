@@ -65,6 +65,14 @@ export const basicFields = [
     showIn: ["onboarding", "edit"]
   },
   {
+    type: "input",
+    name: "phone",
+    label: "Personal Number",
+    inputType: "tel",
+    placeholder: "Enter an emergency phone number",
+    showIn: ["edit"]
+  },
+  {
     type: "date",
     name: "dateOfBirth",
     label: "Date Of Birth",
