@@ -96,6 +96,7 @@ export const useEditDoctorProfile = (initialDoctor, { isAdmin = false, doctorId 
         handleSubmit,
         setValue,
         watch,
+        control,
         reset,
         formState: { errors, isValid, isDirty },
     } = useForm({
@@ -127,13 +128,10 @@ export const useEditDoctorProfile = (initialDoctor, { isAdmin = false, doctorId 
             formData.append('consultationFeesOnline', data.consultationFeesOnline || '')
             formData.append('consultationFeesOffline', data.consultationFeesOffline || '')
 
-            console.log("Entered Value", [...formData.entries()])
-
             const response = isAdmin ?
                 await adminEditsDoctorProfile(formData, doctorId) :
                 await editDoctorProfile(formData)
 
-            console.log(response)
             if (!response?.data?.success) {
                 showToast.error(response?.data?.message || 'Submission failed,Try again');
                 return;
@@ -167,11 +165,12 @@ export const useEditDoctorProfile = (initialDoctor, { isAdmin = false, doctorId 
         onSubmit,
         setValue,
         watch,
+        control,
         reset,
         errors,
         isValid,
         isDirty,
         isSubmitting,
-        submitError,
+        submitError
     }
 }

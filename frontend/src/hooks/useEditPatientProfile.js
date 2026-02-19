@@ -16,13 +16,16 @@ const patientEditSchema = yup.object().shape({
         .required('Emergency contact is required')
         .matches(/^[0-9+\-\s()]+$/, 'Please enter a valid phone number')
         .min(10, 'Phone number must be at least 10 digits'),
-
+    phone: yup
+        .string()
+        .required('Emergency contact is required')
+        .matches(/^[0-9+\-\s()]+$/, 'Please enter a valid phone number')
+        .min(10, 'Phone number must be at least 10 digits'),
     dateOfBirth: yup.object().shape({
         month: yup.string().required('Month is required'),
         day: yup.string().required('Day is required'),
         year: yup.string().required('Year is required'),
     }),
-
     gender: yup
         .string()
         .required('Please select a gender')
@@ -129,7 +132,8 @@ export const useEditPatientProfile = (initialPatient, { isAdmin = false, patient
         return {
             fullName: p?.fullName || "",
             email: p?.email || "",
-            emergencyNumber: p?.phone || "",
+            emergencyNumber: p?.emergencyNumber || "",
+            phone: p?.phone || "",
             dateOfBirth:
                 {
                     year,
@@ -186,6 +190,7 @@ export const useEditPatientProfile = (initialPatient, { isAdmin = false, patient
 
             // Append all text fields
             formData.append('emergencyNumber', data.emergencyNumber)
+            formData.append('phone', data.phone)
             formData.append('dateOfBirth', formattedDOB)
             formData.append('gender', data.gender)
             formData.append('address', data.address)
@@ -201,8 +206,6 @@ export const useEditPatientProfile = (initialPatient, { isAdmin = false, patient
             formData.append('drinking', data.drinking)
             formData.append('Food_or_Drug_Intolerances', data.Food_or_Drug_Intolerances || '')
             formData.append('Mental_Health_History', data.Mental_Health_History || '')
-
-            console.log("Entered Value", [...formData.entries()])
 
             const response = isAdmin
                 ?
@@ -225,7 +228,6 @@ export const useEditPatientProfile = (initialPatient, { isAdmin = false, patient
             return
 
         } catch (error) {
-
             console.error('Onboarding error:', error)
             setSubmitError(error.message || 'An error occurred during submission')
             throw error;
