@@ -25,6 +25,10 @@ import AdminPatientDetailsPage from './pages/admin/dashboard/AdminPatientDetails
 import AdminEditPatientPage from './pages/admin/dashboard/AdminEditPatientPage';
 import { NotificationProvider } from './context/NotificationContex';
 import AdminDoctorDetailsPage from './pages/admin/dashboard/AdminDoctorDetailsPage';
+import ApplicationReviewPage from './pages/admin/dashboard/ApplicationReviewPage';
+import AboutUsPage from './pages/landing pages/AboutUsPage';
+import ServicesPage from './pages/landing pages/ServicesPage';
+import FindDoctorsPage from './pages/landing pages/FindDoctorsPage';
 
 const AppInner = () => {
   const { user } = useAuth(); // from AuthContext
@@ -32,7 +36,6 @@ const AppInner = () => {
   return (
     <NotificationProvider user={user}>
       <Toaster position="top-right" richColors />
-
       <Routes>
         <Route path="/" element={<Navigate to="/homePage" replace />} />
 
@@ -42,6 +45,9 @@ const AppInner = () => {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/homePage" element={<HomePage />} />
+          <Route path="/aboutUs" element={<AboutUsPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/doctors" element={<FindDoctorsPage />} />
         </Route>
 
         <Route path="/verify/email/link" element={<VerifyEmail />} />
@@ -66,6 +72,7 @@ const AppInner = () => {
           <Route path="/admin/patients/:patientId" element={<AdminPatientDetailsPage />} />
           <Route path="/admin/doctors/:DoctorId" element={<AdminDoctorDetailsPage />} />
           <Route path="/admin/patient/:patientId/edit" element={<AdminEditPatientPage />} />
+          <Route path="/admin/doctor/review/:doctorId" element={<ApplicationReviewPage />} />
         </Route>
       </Routes>
     </NotificationProvider>
