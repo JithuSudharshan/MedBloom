@@ -81,23 +81,23 @@ const MedicalGrid = ({ userDetails, user, showBio }) => (
                         }
                     />
 
-                    <MedicalItem
+                    {(userDetails?.consultationMode === "both" || userDetails?.consultationMode === "online") && (<MedicalItem
                         label="Online Consultation Fee"
                         value={
                             userDetails?.consultationFeesOnline
                                 ? `₹ ${userDetails.consultationFeesOnline}`
                                 : "-"
                         }
-                    />
+                    />)}
 
-                    <MedicalItem
+                    {(userDetails?.consultationMode === "both" || userDetails?.consultationMode === "offline") && (<MedicalItem
                         label="Offline Consultation Fee"
                         value={
                             userDetails?.consultationFeesOffline
                                 ? `₹ ${userDetails.consultationFeesOffline}`
                                 : "-"
                         }
-                    />
+                    />)}
                 </div>
             </div>
         )}

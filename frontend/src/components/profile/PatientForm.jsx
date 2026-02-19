@@ -3,9 +3,11 @@ import Button from "../landing page/Button";
 import RadioGroup from "../form/RadioGroup";
 import TextArea from "../form/TextArea";
 import Select from "../form/Select";
-import DatePicker from "../form/DatePicker";
 import FileUpload from "../form/FileUpload";
 import { basicFields, medicalFields } from "../../config/patientFormConfig";
+import DateInput from "../form/DatePicker";
+import { date } from "yup";
+
 
 export default function PatientForm({
     mode = "onboarding",
@@ -81,10 +83,11 @@ export default function PatientForm({
                 )
             case "date":
                 return (
-                    <DatePicker
+                    <DateInput
                         key={field.name}
                         label={field.label}
                         name={field.name}
+                        setValue={setValue}
                         register={register}
                         error={errors[field.name]}
                     />

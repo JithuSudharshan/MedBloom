@@ -11,6 +11,7 @@ import Loader from '../../../components/ui/Loading';
 import AdminProfileLayout from '../../../components/profile/admin/AdminProfileLayout';
 
 export default function PatientProfilePage() {
+
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -36,9 +37,12 @@ export default function PatientProfilePage() {
       setloading(false)
     }
   };
+
+
+
   return (
     <>
-      <Navbar />
+      <Navbar current={"admin"} />
       <ProfileBanner profileOwner={"Admin Profile"} profileDescription={"Manage your personal information and health records"} />
       <AdminProfileLayout
         sidebarMenu={adminProfileConfig.sidebarMenu}
@@ -53,9 +57,7 @@ export default function PatientProfilePage() {
           </Button>
         </div>
       </AdminProfileLayout>
-      <Footer />
       {loading && <Loader />}
-
     </>
   );
 }

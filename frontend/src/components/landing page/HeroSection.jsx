@@ -1,4 +1,4 @@
-const HeroSection = ({ imgSrc }) => {
+const HeroSection = ({ imgSrc, title, para, ratingCard }) => {
     return (
         <section className="bg-white py-10 md:py-16">
             <div className="max-w-7xl mx-auto">
@@ -22,7 +22,7 @@ const HeroSection = ({ imgSrc }) => {
                                text-[80px] md:text-[120px] lg:text-[150px]"
                     style={{ color: "#003B46" }}
                 >
-                    MEDBLOOM
+                    {title}
                 </h1>
 
                 {/* HERO GRADIENT BOX */}
@@ -40,10 +40,7 @@ const HeroSection = ({ imgSrc }) => {
                     {/* LEFT DESCRIPTION */}
                     <div className="absolute left-10 top-1/2 -translate-y-1/2 max-w-xs text-white">
                         <p className="text-sm md:text-base leading-relaxed">
-                            Modern healthcare without unnecessary waiting,
-                            confusion, or wasted time – delivering easy, advanced
-                            access to top doctors and a smooth booking experience
-                            you'll rely on.
+                            {para}
                         </p>
                     </div>
 
@@ -62,7 +59,7 @@ const HeroSection = ({ imgSrc }) => {
                     />
 
                     {/* RATING CARD */}
-                    <div
+                    {ratingCard && <div
                         className="
                             absolute bottom-6 right-6 md:bottom-10 md:right-10 
                             bg-white rounded-3xl p-5 shadow-xl
@@ -87,7 +84,7 @@ const HeroSection = ({ imgSrc }) => {
                         <p className="text-xs text-gray-500 leading-tight">
                             on over 1,500 verified reviews on Google
                         </p>
-                    </div>
+                    </div>}
                 </div>
             </div>
         </section>

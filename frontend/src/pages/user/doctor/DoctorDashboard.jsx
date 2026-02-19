@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProfileLayout from "../../../components/profile/ProfileLayout";
 import Navbar from "../../../components/landing page/Navbar";
-import Footer from "../../../components/landing page/Footer";
 import Button from "../../../components/ui/Button";
 import { showToast } from "../../../components/ui/Toast";
 import ProfileBanner from '../../../components/profile/ProfileBanner';
@@ -110,7 +109,7 @@ export default function DcotorProfilePage() {
     }
     return (
         <>
-            <Navbar />
+            <Navbar current={"login"} />
             <ProfileBanner profileOwner={"Doctor Profile"} profileDescription={"Manage your personal information and bussiness records"} />
             {!doctorDetails.isOnboarded && < IsonboardedWarning onClick={handleNavigate} />}
             <ProfileLayout
@@ -131,7 +130,6 @@ export default function DcotorProfilePage() {
                     </Button>
                 </div>
             </ProfileLayout>
-            <Footer />
             {loading && <Loader />}
 
         </>

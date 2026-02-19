@@ -11,8 +11,11 @@ const AdminDoctorDetailsPage = () => {
         <>
             <Navbar />
             <ProfileBanner profileOwner={"Admin Profile"} profileDescription={"Manage the patients information and records"} />
-            <div className="min-h-screen max-w-7xl mx-auto w-full">
-                <AdminDoctorDetails doctorId={DoctorId} onBack={() => navigate("/admin/dashboard")} />
+            <div className="min-h-screen mt-15 mb-15 max-w-7xl mx-auto w-full">
+                <AdminDoctorDetails
+                    doctorId={DoctorId}
+                    onBack={() => navigate("/admin/dashboard")}
+                />
             </div>
 
         </>

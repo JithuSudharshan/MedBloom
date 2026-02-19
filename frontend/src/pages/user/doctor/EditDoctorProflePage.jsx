@@ -8,11 +8,11 @@ import { loadDoctorDataForAdmin } from "../../../api/adminApi";
 export default function EditDoctorProfilePage({ isAdmin = false, doctorId }) {
 
     const [doctor, setDoctor] = useState(null)
-    console.log("doctor", doctor)
 
     const {
         register,
         handleSubmit,
+        control,
         setValue,
         errors,
         onSubmit,
@@ -57,7 +57,7 @@ export default function EditDoctorProfilePage({ isAdmin = false, doctorId }) {
                 errors={errors}
                 isSubmitting={isSubmitting}
                 submitError={null}
-                consultationMode={doctor.consultationMode}
+                control={control}
             />
         </div>
     )

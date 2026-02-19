@@ -43,7 +43,7 @@ const DoctorInformation = ({ doctor, showActions = true, isAdmin = false }) => {
                 <ProfileRow label="Full name" value={doctor?.fullName || "-"} />
                 <ProfileRow label="Email Address" value={doctor?.email || "-"} />
                 <ProfileRow label="Phone Number" value={doctor?.phone || "-"} />
-                <ProfileRow label="Date Of Birth" value={doctor?.dob || "-"} />
+                <ProfileRow label="Date Of Birth" value={new Date(doctor?.dob).toLocaleDateString() || "-"} />
                 <ProfileRow label="Gender" value={doctor?.gender || "-"} />
                 <ProfileRow label="Clinic Address" value={doctor?.address || "-"} />
 
@@ -57,9 +57,9 @@ const DoctorInformation = ({ doctor, showActions = true, isAdmin = false }) => {
             {/* RIGHT COLUMN */}
             <div>
                 <MedicalGrid showBio={showActions} userDetails={doctor} user={"doctor"} />
-                (<button onClick={handleEditProfile} className="mt-20 bg-teal-600 text-white px-5 py-2 text-sm rounded-full hover:bg-teal-700 transition float-right">
+                <button onClick={handleEditProfile} className="mt-20 bg-teal-600 text-white px-5 py-2 text-sm rounded-full hover:bg-teal-700 transition float-right">
                     Edit Profile
-                </button>)
+                </button>
 
             </div>
 

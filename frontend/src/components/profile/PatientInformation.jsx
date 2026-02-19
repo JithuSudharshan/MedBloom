@@ -41,7 +41,12 @@ const PatientInformation = ({ patient, isAdmin = false }) => {
                 <h2 className="text-2xl font-semibold text-teal-700 mb-8">Basic Details</h2>
                 <ProfileRow label="Full name" value={patient?.fullName} />
                 <ProfileRow label="Email Address" value={patient?.email} />
-                <ProfileRow label="Phone Number" value={patient?.phone} />
+
+                <div className='flex gap-4'>
+                    <ProfileRow label="Personal Number" value={patient?.phone} />
+                    <ProfileRow label="Emergency Contact Number" value={patient?.emergencyNumber} />
+                </div>
+
                 <ProfileRow label="Date Of Birth" value={patient?.dob} />
                 <ProfileRow label="Gender" value={patient?.gender} />
                 <ProfileRow label="Address" value={patient?.address} />

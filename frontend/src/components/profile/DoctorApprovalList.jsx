@@ -5,7 +5,7 @@ import { DoctorApprovalCard } from "./DoctorApprovalCard";
 import { acceptDoctor, fetchDoctorsList, rejectDoctor } from "../../api/adminApi";
 import { showToast } from "../ui/Toast";
 import Loader from "../ui/Loading";
-import Modal from "./Modal";
+import { useNavigate } from "react-router-dom";
 
 const DoctorApprovalList = ({ onBack }) => {
     const [doctors, setDoctors] = useState([]);
@@ -14,6 +14,7 @@ const DoctorApprovalList = ({ onBack }) => {
     const [loading, setLoading] = useState(false);
     const [isApproving, setIsApproving] = useState(false)
     const [isRejecting, setIsRejecteing] = useState(false)
+    const navigate = useNavigate()
 
     const fetchPendingDoctors = async (pageNumber = 1) => {
         try {
@@ -90,6 +91,12 @@ const DoctorApprovalList = ({ onBack }) => {
 
     };
 
+    const handleReviewApplication = (doctor) => {
+        navigate(`/admin/doctor/review/${doctor._id}`)
+    }
+
+    if (doctors === null) return <Loader />
+
     return (
         <div className="space-y-6">
             {/* Header row with back + filter */}
@@ -122,14 +129,13 @@ const DoctorApprovalList = ({ onBack }) => {
                         doctor={doctor}
                         onApprove={() => handleApprove(doctor._id)}
                         onReject={() => handleReject(doctor._id)}
+                        viewDetails={handleReviewApplication}
                     />
                 ))}
             </div>
 
             <Pagination current={page} total={totalPages} onChange={setPage} />
-            <Modal>
 
-            </Modal>
         </div>
     );
 };

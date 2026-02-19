@@ -3,13 +3,15 @@ import DoctorApprovalList from "../DoctorApprovalList";
 import ListDoctorsForAdmin from "./doctorProfile/ListDoctorsForAdmin";
 import SidebarMenu from "../SidebarMenu";
 import adminPic from '../../../assets/images/admin.jpg'
-import AdminDoctorDetails from "./doctorProfile/AdminDoctorDetails";
 import Modal from "../Modal";
 import ConfirmDialog from "../../ui/ConfirmDialogue";
 import { showToast } from "../../ui/Toast";
-import { blockDoctor, fetchApprovedList, fetchPatientsList, unblockDoctor } from "../../../api/adminApi";
+import { blockDoctor, fetchApprovedList, fetchDataForTable, fetchPatientsList, unblockDoctor } from "../../../api/adminApi";
 import ListPatientsForAdmin from "./patientProfile/ListPatientsForAdmin";
 import { useNavigate } from "react-router-dom";
+import ListOfDepartments from "./ListOfDepartments.jsx";
+import AddDepartmentForm from "./AddDepartmentForm";
+import { useDepartmentForm } from "../../../hooks/useDepartmentForm.js"
 
 
 const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
@@ -28,15 +30,31 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
     const [pendingCount, setPendingCount] = useState(0)
 
     const [selectedDoctorId, setSelectedDoctorId] = useState(null);
+    const [selectedDepartment, setSelectedDepartment] = useState(null);
+
+    console.log("selectedDepartment : ", selectedDepartment)
 
     const [isBlockModalOpen, setIsBlockModalOpen] = useState(false)
     const [isUnblockModalOpen, setIsUnblockModalOpen] = useState(false)
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+
 
     const navigate = useNavigate()
 
-
-
     const [loading, setLoading] = useState(false)
+
+    const [departmentData, setDepartmentData] = useState(null)
+
+
+    useEffect(() => {
+        const getData = async () => {
+            const fetchedData = await fetchDataForTable();
+            console.log("fetcghed data", fetchedData.data.departments)
+            setDepartmentData(fetchedData.data.departments);
+        };
+        getData();
+    }, []);
 
     const fetchApprovedDoctors = async (pageNumber = 1) => {
         try {
@@ -178,6 +196,39 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
         navigate(`/admin/patients/${patient._id}`);
     };
 
+    const handleAddDpt = () => {
+        setIsAddModalOpen(true)
+    };
+
+    const handleEditDepartment = (departmentId) => {
+        setSelectedDepartment(departmentId);
+        setIsEditModalOpen(true);
+    }
+
+    const {
+        register,
+        handleSubmit,
+        onSubmit,
+        setValue,
+        reset,
+        errors,
+        isSubmitting,
+        submitError,
+    } = useDepartmentForm();
+
+    useEffect(() => {
+        if (isEditModalOpen && selectedDepartment) {
+            reset(selectedDepartment);
+        } else {
+            reset({
+                departmentName: "",
+                departmentDescription: "",
+                status: ""
+            });
+        }
+    }, [isEditModalOpen, selectedDepartment, reset]);
+
+
 
     return (
         <div className="min-h-screen max-w-7xl mx-auto w-full">
@@ -223,6 +274,13 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                             onViewPatient={handleViewPatient}
                             patients={patients}
                             page={patientPage}
+                        />
+                    )}
+                    {activeKey === "departments" && (
+                        <ListOfDepartments
+                            data={departmentData}
+                            openModalForAdding={handleAddDpt}
+                            openModalForEditing={handleEditDepartment}
                         />
                     )}
 
@@ -273,8 +331,56 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                 />
             </Modal>
 
+            {/* Add New department */}
+            <Modal
+                isOpen={isAddModalOpen}
+                onClose={() => {
+                    setIsAddModalOpen(false)
+                    reset({});
+                }
+                }
+            >
+                <AddDepartmentForm
+                    cardTitle="Add new Department"
+                    setDepartmentData={setDepartmentData}
+                    setIsModalOpen={setIsAddModalOpen}
+                    mode="addDepartment"
+                    register={register}
+                    handleSubmit={handleSubmit}
+                    onSubmit={onSubmit}
+                    errors={errors}
+                    isSubmitting={isSubmitting}
+                    submitError={submitError}
+                />
+            </Modal>
+
+
+            {/* Edit department */}
+            <Modal
+                isOpen={isEditModalOpen}
+                onClose={() => {
+                    setIsEditModalOpen(false)
+                    setSelectedDepartment(null)
+                }
+                }
+            >
+                <AddDepartmentForm
+                    cardTitle="Edit Department"
+                    setDepartmentData={setDepartmentData}
+                    setIsModalOpen={setIsEditModalOpen}
+                    department_id={selectedDepartment?.id}
+                    mode="edit"
+                    register={register}
+                    handleSubmit={handleSubmit}
+                    onSubmit={onSubmit}
+                    setValue={setValue}
+                    errors={errors}
+                    isSubmitting={isSubmitting}
+                    submitError={submitError}
+                />
+            </Modal>
+
         </div>
     );
 };
-
 export default AdminProfileLayout;

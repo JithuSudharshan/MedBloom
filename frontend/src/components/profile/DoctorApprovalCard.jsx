@@ -1,4 +1,4 @@
-export const DoctorApprovalCard = ({ doctor, onApprove, onReject, isApproving, isRejecting }) => (
+export const DoctorApprovalCard = ({ doctor, onApprove, onReject, isApproving, isRejecting, viewDetails }) => (
 
     <div className="flex items-center justify-between rounded-2xl bg-white shadow-sm border border-slate-100 px-6 py-4 mb-4">
         {/* Left: avatar + info */}
@@ -32,8 +32,8 @@ export const DoctorApprovalCard = ({ doctor, onApprove, onReject, isApproving, i
                         Email :{" "}
                         <span className="font-medium text-slate-800">{doctor.user.email}</span>
                     </p>
-                    <button className="mt-1 text-xs font-medium text-teal-600 hover:text-teal-700" onClick={""}>
-                        View details
+                    <button className="mt-1 text-xs ml-20 font-medium text-teal-600 hover:text-teal-700" onClick={() => viewDetails(doctor)}>
+                        Review Application
                     </button>
                 </div>
             </div>

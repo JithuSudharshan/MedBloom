@@ -1,15 +1,15 @@
 import Button from './Button';
 
-const Navbar = () => {
+const Navbar = ({ current }) => {
 
     const navLinks = [
-        { label: 'Home', href: '#', active: true },
-        { label: 'About Us', href: '#about' },
-        { label: 'Services', href: '#services' },
-        { label: 'Find Doctors', href: '#doctors' },
-        { label: 'Login', href: '/login' },
-        { label: 'Admin', href: '/admin/login' },
-        { label: 'Articles', href: '#articles' }
+        { label: 'Home', href: '/homePage', active: current === "home" && true },
+        { label: 'About Us', href: '/aboutUs', active: current === "aboutUs" && true },
+        { label: 'Services', href: '/services', active: current === "services" && true },
+        { label: 'Find Doctors', href: '/doctors', active: current === "findDoctors" && true },
+        { label: 'Login', href: '/login', active: current === "login" && true },
+        { label: 'Admin', href: '/admin/login', active: current === "adminLogin" && true },
+        { label: 'Articles', href: '/articles', active: current === "articles" && true }
     ];
 
     return (

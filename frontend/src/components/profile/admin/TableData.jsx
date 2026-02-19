@@ -1,9 +1,10 @@
-// components/admin/DataTable.jsx
 const DataTable = ({ columns, rows, onRowClick }) => {
+
     return (
         <div className="border border-slate-200 rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
+
                     <thead className="bg-slate-50">
                         <tr>
                             {columns.map((col) => (
@@ -16,6 +17,7 @@ const DataTable = ({ columns, rows, onRowClick }) => {
                             ))}
                         </tr>
                     </thead>
+
                     <tbody>
                         {rows.length === 0 ? (
                             <tr>
@@ -47,6 +49,7 @@ const DataTable = ({ columns, rows, onRowClick }) => {
                             ))
                         )}
                     </tbody>
+
                 </table>
             </div>
         </div>

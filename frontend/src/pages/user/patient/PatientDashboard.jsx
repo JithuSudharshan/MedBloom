@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import patientProfileConfig from "../../../config/patientProfileConfig";
 import ProfileLayout from "../../../components/profile/ProfileLayout";
 import Navbar from "../../../components/landing page/Navbar";
-import Footer from "../../../components/landing page/Footer";
 import Button from "../../../components/ui/Button";
 import { showToast } from "../../../components/ui/Toast";
 import ProfileBanner from '../../../components/profile/ProfileBanner';
@@ -112,7 +111,7 @@ export default function PatientProfilePage() {
     }
     return (
         <>
-            <Navbar />
+            <Navbar current={"login"} />
             <ProfileBanner profileOwner={"Patient Profile"} profileDescription={"Manage your personal information and health records"} />
             {!patientDetails.isOnboarded && <IsonboardedWarning onClick={handleCompleteOnboarding} />}
             <ProfileLayout
@@ -133,7 +132,6 @@ export default function PatientProfilePage() {
                     </Button>
                 </div>
             </ProfileLayout>
-            <Footer />
             {loading && <Loader />}
 
         </>
