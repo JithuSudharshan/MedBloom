@@ -15,6 +15,7 @@ import { resendVerificationMail, verifyEmailForForgotPassword, verifyUser } from
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 import { verifyToken } from "../controller/userControllers/Oauth/OauthController.js";
 import { saveEnquiry } from "../controller/userControllers/userAuth/enquiryContoller.js";
+import { fetchDoctorData } from "../controller/userControllers/landingPages/landingPageControllers.js";
 
 const router = express.Router()
 
@@ -32,6 +33,6 @@ router.get('/auth/refresh-Token', refreshToken)
 router.get('/verify-email/:id/:token', verifyUser)
 router.get('/context-auth-verify', authenticateToken({ sendRequiresRefresh: false }), verifyToken)
 router.get('/verify-email-forgotPassword/:id/:token', verifyEmailForForgotPassword)
-
+router.get("/doctorsData", fetchDoctorData);
 
 export default router;

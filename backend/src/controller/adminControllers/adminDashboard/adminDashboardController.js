@@ -3,6 +3,7 @@ import User from "../../../model/userModel.js";
 import Notification from '../../../model/notificationSchema.js';
 import { getIO } from '../../../config/socket.IO.js';
 import Patient from "../../../model/patientModel.js";
+import Department from "../../../model/departmentModel.js";
 
 
 export const fetchPendingDoctorList = async (req, res) => {
@@ -488,3 +489,178 @@ export const changePatientAvatar = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal server error" })
     }
 }
+
+export const sendDoctorDetailsForReview = async (req, res) => {
+    try {
+        const { doctorId } = req.params
+
+        const doctor = await Doctor.findById({ _id: doctorId })
+        if (!doctor)
+            return res.status(400).json({ success: false, message: "User not found" })
+
+        const user = await User.findOne({ _id: doctor.user })
+        if (!user)
+            return res.status(400).json({ success: false, message: "User not found" })
+
+        res.status(200).json({
+            success: true,
+            message: "Sending doctor details for admin review",
+            details: {
+                profilePicture: doctor.profilePicture,
+                displayName: doctor.displayName,
+                gender: doctor.gender,
+                contactNumber: doctor.contactNumber,
+                dob: doctor.dateOfBirth,
+                clinicLocation: doctor.location,
+                bio: doctor.shortBio,
+                ConsultationMode: doctor.consultationMode,
+                certificate: doctor.certificateUrl,
+                specialization: doctor.primarySpecialization,
+                subSpecialization: doctor.subSpecializations,
+                experience: doctor.yearOfExperience,
+                registrationNumber: doctor.medicalRegistrationNumber,
+                issuingCouncil: doctor.issuingCouncil,
+                licenseNumber: doctor.licenseNumber,
+                clinicAddress: doctor.clinicAddress,
+                consultationMode: doctor.consultationMode,
+                consultationFee: doctor.consultationFees,
+            }
+        });
+
+    } catch (error) {
+        console.log("Error while doctor details", error)
+        res.status(500).json({ success: false, message: "Internal server error" })
+    }
+}
+
+export const addNewDepartment = async (req, res) => {
+    try {
+
+        const { departmentName, status, departmentDescription } = req.body
+
+        if (!departmentName || !status || !departmentDescription)
+            return res.status(400).json({ success: false, message: "All fields are mandatory" })
+
+        const isExisting = await Department.findOne({ departmentName })
+
+        if (isExisting)
+            return res.status(400).json({ success: false, message: `${departmentName} department already exist` })
+
+        const department = await Department.create({
+            departmentName,
+            status,
+            departmentDescription
+        })
+
+        if (!department)
+            return res.status(400).json({ success: false, message: "something went wrong while creating new department" })
+
+
+        const formattedData = await Department.find({}).select('-__v');
+
+        console.log("formattedData", formattedData)
+
+        if (!formattedData)
+            return res.status(400).json({ success: false, message: "Failed to fetch data" })
+
+        res.status(200).json({
+            success: true,
+            message: "New department Added Successfully",
+            latestData: formattedData
+        })
+
+    } catch (error) {
+        console.log("Error while Adding new Department", error)
+        res.status(500).json({ success: false, message: "Internal server error" })
+    }
+}
+
+export const fetchDataForDepartmentTable = async (req, res) => {
+
+    try {
+        const departments = await Department.find();
+        const formattedData = departments.map((dept) => ({
+            id: dept._id,
+            departmentName: dept.departmentName,
+            departmentDescription: dept.departmentDescription,
+            doctorCount: dept.doctors.length,
+            status: dept.status
+        }));
+
+        if (!formattedData)
+            return res.status(400).json({ success: false, message: "Failed to fetch data" })
+
+        res.status(200).json({
+            success: true,
+            message: "succesfully fetched department data for displaying in the frontend",
+            departments: formattedData
+        })
+
+    } catch (error) {
+        console.error("Error while fetching departments:", error);
+        res.status(500).json({ success: false, message: "Internal server error" })
+    }
+};
+
+export const editDepartmentInfo = async (req, res) => {
+    try {
+
+        const {
+            id,
+            departmentDescription,
+            departmentName,
+            status
+        } = req.body
+
+        console.log("id : ", id)
+        console.log("departmentDescription : ", departmentDescription)
+        console.log("departmentName : ", departmentName)
+        console.log("status : ", status)
+
+        if (
+            !id ||
+            !departmentDescription ||
+            !departmentName ||
+            !status
+        )
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required"
+            })
+
+        const department = await Department.findById(id)
+
+        if (!department)
+            return res.status(400).json({
+                success: false,
+                message: "No Record of department found"
+            })
+
+        department.departmentName = departmentName || department.departmentName
+        department.departmentDescription = departmentDescription || department.departmentDescription
+        department.status = status || department.status
+
+        const updatedDepartment = await department.save()
+
+        if (!updatedDepartment)
+            return status(400).json({ success: false, message: "something went wrong while updating info" })
+
+        const formattedData = await Department.find({}).select('-__v');
+
+        console.log("formattedData", formattedData)
+
+        res.status(200).json({
+            success: true,
+            message: "Department updated successfully",
+            data: updatedDepartment,
+            latestData: formattedData
+        });
+
+    } catch (error) {
+        console.error("Error while editing department info:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+};

@@ -58,7 +58,7 @@ export const fetchUserDetails = async (req, res) => {
                 glucoseLevel: patient.glucoseLevel,
                 allergies: patient.allergies,
                 smoking: patient.smoking,
-                drinking: patient.smoking,
+                drinking: patient.drinking,
                 medicalCondition: patient.medicalCondition,
                 avatar: {
                     src: patient.profile_url || isUser.profile_url,
@@ -66,7 +66,9 @@ export const fetchUserDetails = async (req, res) => {
                 },
                 Food_or_Drug_Intolerances: patient.Food_or_Drug_Intolerances,
                 Mental_Health_History: patient.Mental_Health_History,
-                isOnboarded: isUser.isOnboarded
+                isOnboarded: isUser.isOnboarded,
+                phone: isUser.phone,
+                emergencyNumber: patient.emergencyNumber
             }
         });
 
@@ -114,6 +116,7 @@ export const editProfile = async (req, res) => {
     try {
         let {
             emergencyNumber,
+            phone,
             dateOfBirth,
             gender,
             address,
@@ -182,8 +185,11 @@ export const editProfile = async (req, res) => {
         patient.drinking = drinking || patient.drinking
         patient.Food_or_Drug_Intolerances = Food_or_Drug_Intolerances || patient.Food_or_Drug_Intolerances
         patient.Mental_Health_History = Mental_Health_History || patient.Mental_Health_History
+        userDetails.phone = phone || userDetails.phone
+
 
         await patient.save()
+        await userDetails.save();
 
         return res.status(200).json({
             success: true,

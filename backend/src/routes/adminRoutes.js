@@ -12,7 +12,11 @@ import {
     blockDoctorProfile,
     unblockDoctorProfile,
     changeDoctorAvatar,
-    changePatientAvatar
+    changePatientAvatar,
+    sendDoctorDetailsForReview,
+    addNewDepartment,
+    fetchDataForDepartmentTable,
+    editDepartmentInfo
 } from '../controller/adminControllers/adminDashboard/adminDashboardController.js';
 import {
     editPatientsProfile,
@@ -38,6 +42,10 @@ router.get("/patients", fetchTotlPatients)
 router.get("/patient/:id/profile", fetchPatientPorfile)
 router.get("/patient/:id/edit", fetchPatientDetailsToEdit)
 router.patch('/patient/:id/edit-profile', upload.none(), editPatientsProfile)
+router.get("/doctor/review/details/:doctorId", sendDoctorDetailsForReview)
+router.post("/departemnts/add-new", addNewDepartment)
+router.get("/department/table-info", fetchDataForDepartmentTable)
+router.post("/department/edit-info", editDepartmentInfo)
 
 router.patch(
     "/doctors/:id/edit-profile",

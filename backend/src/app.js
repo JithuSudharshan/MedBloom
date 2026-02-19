@@ -11,14 +11,13 @@ import adminRoutes from "./routes/adminRoutes.js";
 import oauthRoutes from "./routes/oauthRoutes.js";
 import patientRoutes from './routes/patientRoutes.js';
 import doctorRoutes from "./routes/doctorRoutes.js";
-import notificationRoutes from './routes/notificationRoutes.js'
+import notificationRoutes from './routes/notificationRoutes.js';
 import "./config/passport.js";
 import { authenticateToken, authorizeRole } from './middlewares/authMiddleware.js';
 import { handleError } from './middlewares/errorHandlingMiddleware.js';
 
 export const app = express()
 
-//Socket
 
 // Middlewares
 app.use(cookieParser())
