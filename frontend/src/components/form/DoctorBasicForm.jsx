@@ -6,6 +6,7 @@ import DatePicker from "../form/DatePicker";
 import FileUpload from "../form/FileUpload";
 import { basicFields } from "../../config/doctorOnboardingForm";
 import Select from "./Select";
+import { useWatch } from "react-hook-form";
 
 
 
@@ -15,12 +16,17 @@ export default function DoctorBasicForm({
     register,
     handleSubmit,
     onSubmit,
-    consultationMode,
+    control,
     setValue,
     errors,
     isSubmitting,
     submitError,
 }) {
+    const watchedConsultationMode = useWatch({
+        control,
+        name: "consultationMode"
+    });
+
     const renderField = (field) => {
         if (!field.showIn.includes(mode)) return null;
 
@@ -109,7 +115,7 @@ export default function DoctorBasicForm({
                 <p className="mt-4 text-sm text-red-600">{submitError}</p>
             )}
 
-            {(consultationMode === "online" || consultationMode === "both") && (
+            {(watchedConsultationMode === "online" || watchedConsultationMode === "both") && (
                 <Input
                     label="Online Consultation Fee (₹)"
                     name="consultationFeesOnline"
@@ -120,7 +126,7 @@ export default function DoctorBasicForm({
                 />
             )}
 
-            {(consultationMode === "offline" || consultationMode === "both") && (
+            {(watchedConsultationMode === "offline" || watchedConsultationMode === "both") && (
                 <Input
                     label="Offline Consultation Fee (₹)"
                     name="consultationFeesOffline"
