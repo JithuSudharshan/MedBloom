@@ -93,7 +93,6 @@ export const updateNewPassword = async (payload) => {
     try {
 
         const response = await api.post("/user/create-new-password", payload)
-        console.log(response)
         return response
 
     } catch (error) {

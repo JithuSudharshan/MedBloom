@@ -154,3 +154,45 @@ export const updatePatientAavatarForAdmin = async (formData, id) => {
         throw error
     }
 }
+
+export const FetchDoctorInfoForReview = async (doctorId) => {
+    try {
+        const response = await api.get(`/admin/doctor/review/details/${doctorId}`)
+        return response
+    } catch (error) {
+        console.log("Error while fetching Dr data", error)
+        throw error
+    }
+}
+
+export const addNewDepartment = async (data) => {
+    try {
+        const response = await api.post("/admin/departemnts/add-new", data)
+        return response
+    } catch (error) {
+        console.log("Error while Adding new department", error)
+        throw error
+    }
+}
+
+export const fetchDataForTable = async () => {
+    try {
+        const response = await api.get("/admin/department/table-info")
+        return response
+
+    } catch (error) {
+        console.log("Error while fetching department details", error)
+        throw error
+    }
+}
+
+export const editDepartmentInfo = async (data) => {
+    try {
+        const response = await api.post("/admin/department/edit-info", data)
+        return response
+
+    } catch (error) {
+        console.log("Error while editing department details", error)
+        throw error
+    }
+}
