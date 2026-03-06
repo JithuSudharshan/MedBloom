@@ -12,10 +12,13 @@ import { useNavigate } from "react-router-dom";
 import ListOfDepartments from "./ListOfDepartments.jsx";
 import AddDepartmentForm from "./AddDepartmentForm";
 import { useDepartmentForm } from "../../../hooks/useDepartmentForm.js"
+import ServiceOverview from "./dashboard/ServiceOverview.jsx";
+import AppointmentsSection from "../appointments/AppointmentsSection.jsx";
+import NotificationsPage from "../NotificationsPage.jsx";
 
 
-const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
-    const [activeKey, setActiveKey] = useState("doctors");
+const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut, appointments }) => {
+    const [activeKey, setActiveKey] = useState("dashboard");
     const [openApproval, setOpenApproval] = useState(false);
 
     const [doctorPage, setDoctorPage] = useState(1);
@@ -248,6 +251,9 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                 </aside>
 
                 <main className="flex-1 mt-15">
+                    {activeKey === "dashboard" && (
+                        <ServiceOverview />
+                    )}
                     {activeKey === "doctors" && (
                         openApproval ? (
                             <DoctorApprovalList
@@ -276,6 +282,8 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                             page={patientPage}
                         />
                     )}
+                    {activeKey === "appointments" && <AppointmentsSection appointments={appointments} />}
+
                     {activeKey === "departments" && (
                         <ListOfDepartments
                             data={departmentData}
@@ -283,6 +291,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                             openModalForEditing={handleEditDepartment}
                         />
                     )}
+                    {activeKey === "notifications" && (<NotificationsPage />)}
 
                 </main>
             </div>
