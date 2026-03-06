@@ -2,10 +2,14 @@ import React, { useState, useRef, useCallback } from "react";
 import ReactCrop, { centerCrop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import { updatePatientAvatar } from "../../api/patientApi";
-import { showToast } from "../ui/Toast";
-import Button from "../landing page/Button";
 import { updateDoctorAvatar } from "../../api/doctorApi";
 import { updateDoctorAvatarForAdmin, updatePatientAavatarForAdmin } from "../../api/adminApi";
+import Button from "../landing page/Button";
+import { showToast } from "../ui/Toast";
+
+const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "webp"];
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
 const AvatarCropper = ({ onCancel, onSave, user, _id, role }) => {
     const [upImg, setUpImg] = useState(null);
@@ -16,124 +20,164 @@ const AvatarCropper = ({ onCancel, onSave, user, _id, role }) => {
     const [isSaving, setIsSaving] = useState(false);
 
     const onSelectFile = (e) => {
-        if (e.target.files && e.target.files.length > 0) {
-            const reader = new FileReader();
-            reader.addEventListener("load", () => setUpImg(reader.result.toString()));
-            reader.readAsDataURL(e.target.files[0]);
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const extension = file.name.split(".").pop().toLowerCase();
+
+        if (!ALLOWED_EXTENSIONS.includes(extension)) {
+            showToast.error("Invalid file extension. Allowed: jpg, jpeg, png, webp");
+            e.target.value = "";
+            return;
         }
+
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            showToast.error("Only JPG, PNG and WEBP images are allowed");
+            e.target.value = "";
+            return;
+        }
+
+        if (file.size > MAX_FILE_SIZE) {
+            showToast.error("Image must be less than 2MB");
+            e.target.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.addEventListener("load", () => setUpImg(reader.result.toString()));
+        reader.readAsDataURL(file);
     };
 
     const onImageLoad = (e) => {
         const { width, height } = e.currentTarget;
+
         const initialCrop = centerCrop(
             makeAspectCrop(
                 { unit: "%", width: 70 },
-                1, // 1:1 aspect ratio
+                1,
                 width,
                 height
             ),
             width,
             height
-        )
-        setCrop(initialCrop)
+        );
+
+        setCrop(initialCrop);
     };
 
-    const generateCanvas = useCallback(
-        (image, crop) => {
-            if (!crop || !previewCanvasRef.current || !image) return;
-            const canvas = previewCanvasRef.current;
-            const scaleX = image.naturalWidth / image.width;
-            const scaleY = image.naturalHeight / image.height;
-            const pixelRatio = window.devicePixelRatio || 1;
+    const generateCanvas = useCallback((image, crop) => {
+        if (!crop || !previewCanvasRef.current || !image) return;
 
-            canvas.width = crop.width * pixelRatio;
-            canvas.height = crop.height * pixelRatio;
-            const ctx = canvas.getContext("2d");
+        const canvas = previewCanvasRef.current;
+        const ctx = canvas.getContext("2d");
 
-            ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-            ctx.imageSmoothingQuality = "high";
+        const scaleX = image.naturalWidth / image.width;
+        const scaleY = image.naturalHeight / image.height;
+        const pixelRatio = window.devicePixelRatio || 1;
 
-            ctx.beginPath();
-            ctx.arc(
-                crop.width / 2,
-                crop.height / 2,
-                Math.min(crop.width, crop.height) / 2,
-                0,
-                2 * Math.PI
-            );
-            ctx.closePath();
-            ctx.clip();
+        canvas.width = crop.width * pixelRatio;
+        canvas.height = crop.height * pixelRatio;
 
-            ctx.drawImage(
-                image,
-                crop.x * scaleX,
-                crop.y * scaleY,
-                crop.width * scaleX,
-                crop.height * scaleY,
-                0,
-                0,
-                crop.width,
-                crop.height
-            )
-        },
-        []
-    );
+        ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        ctx.imageSmoothingQuality = "high";
+
+        ctx.beginPath();
+        ctx.arc(
+            crop.width / 2,
+            crop.height / 2,
+            Math.min(crop.width, crop.height) / 2,
+            0,
+            2 * Math.PI
+        );
+        ctx.closePath();
+        ctx.clip();
+
+        ctx.drawImage(
+            image,
+            crop.x * scaleX,
+            crop.y * scaleY,
+            crop.width * scaleX,
+            crop.height * scaleY,
+            0,
+            0,
+            crop.width,
+            crop.height
+        );
+    }, []);
 
     const handleSave = async () => {
         if (!completedCrop || !previewCanvasRef.current) return;
+
         setIsSaving(true);
 
         const canvas = previewCanvasRef.current;
+
         const blob = await new Promise((resolve) =>
             canvas.toBlob(resolve, "image/jpeg", 0.9)
         );
 
         const formData = new FormData();
-        formData.append("image", blob, "avatar.jpg")
+        formData.append("image", blob, "avatar.jpg");
 
         let res;
 
-        if (user === "patient") {
-            res = await updatePatientAvatar(formData)
-        } else if (user === "doctor") {
-            res = await updateDoctorAvatar(formData)
-        } else if (user === "admin" && role === "doctor") {
-            const id = _id
-            res = await updateDoctorAvatarForAdmin(formData, id)
-        } else if (user === "admin" && role === "patient") {
-            const id = _id
-            res = await updatePatientAavatarForAdmin(formData, id)
+        try {
+            if (user === "patient") {
+                res = await updatePatientAvatar(formData);
+            } else if (user === "doctor") {
+                res = await updateDoctorAvatar(formData);
+            } else if (user === "admin" && role === "doctor") {
+                res = await updateDoctorAvatarForAdmin(formData, _id);
+            } else if (user === "admin" && role === "patient") {
+                res = await updatePatientAavatarForAdmin(formData, _id);
+            }
+
+            if (!res?.data?.success) {
+                showToast.error("Something went wrong, please try again");
+                return;
+            }
+
+            showToast.success("Avatar updated successfully!");
+
+            onSave(res?.data?.profile_url);
+
+        } catch (error) {
+            console.error(error);
+            showToast.error("Avatar upload failed");
+        } finally {
+            setIsSaving(false);
         }
-
-
-        if (!res?.data?.success) {
-            return showToast.error("Something went wrong,Please try again")
-        }
-
-        showToast.success("Avatar update Successful..!")
-
-        onSave(res?.data?.profile_url);
-        setIsSaving(false);
     };
 
     return (
         <div className="space-y-4">
+
             <h2 className="text-lg font-semibold text-gray-800">
                 Update profile picture
             </h2>
 
             <Button>
-                <input type="file" accept="image/*" onChange={onSelectFile} />
+                <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.webp"
+                    onChange={onSelectFile}
+                />
             </Button>
 
-
             {upImg && (
-                <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex flex-col md:flex-row gap-6">
+
+                    {/* Crop area */}
                     <div className="max-w-sm">
                         <ReactCrop
                             crop={crop}
-                            onChange={(_, percentCrop) => setCrop(percentCrop)}
-                            onComplete={(c) => setCompletedCrop(c)}
+                            onChange={(c) => setCrop(c)}
+                            onComplete={(c) => {
+                                setCompletedCrop(c);
+                                if (imgRef.current) {
+                                    generateCanvas(imgRef.current, c);
+                                }
+                            }}
                             aspect={1}
                             circularCrop
                             keepSelection
@@ -150,45 +194,42 @@ const AvatarCropper = ({ onCancel, onSave, user, _id, role }) => {
                     {/* Preview */}
                     <div className="flex flex-col items-center gap-2">
                         <span className="text-sm text-gray-500">Preview</span>
-                        <div className="w-50 h-50 rounded-full overflow-hidden border border-gray-200">
+
+                        <div className="w-40 h-40 rounded-full overflow-hidden border border-gray-200">
                             <canvas
                                 ref={previewCanvasRef}
-                                className="w-50 h-50"
+                                className="w-full h-full"
                                 style={{ borderRadius: "9999px" }}
                             />
                         </div>
                     </div>
+
                 </div>
             )}
 
-            {/* Actions */}
             <div className="flex justify-end gap-3 pt-4">
+
                 <button
                     type="button"
-                    className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
                     onClick={onCancel}
+                    className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                     Cancel
                 </button>
+
                 <button
                     type="button"
                     disabled={!completedCrop || isSaving}
-                    onClick={() => {
-                        if (imgRef.current && completedCrop) {
-                            generateCanvas(imgRef.current, completedCrop);
-                            handleSave();
-                        }
-                    }}
+                    onClick={handleSave}
                     className="px-4 py-2 text-sm rounded-lg bg-teal-600 text-white disabled:bg-gray-300 hover:bg-teal-700"
                 >
                     {isSaving ? "Saving..." : "Save"}
                 </button>
+
             </div>
 
-            {/* hidden canvas only used for generating the cropped dataURL */}
-            <canvas ref={previewCanvasRef} className="hidden" />
         </div>
-    )
-}
+    );
+};
 
 export default AvatarCropper;
