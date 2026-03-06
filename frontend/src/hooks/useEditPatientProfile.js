@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { editPatientProfile } from '../api/patientApi';
 import { showToast } from '../components/ui/Toast';
 import { useNavigate } from 'react-router-dom';
-import { admineditsPatientProfile } from '../api/adminApi';
+import { adminEditsPatientProfile } from '../api/adminApi';
 
 // Yup Validation Schema
 const patientEditSchema = yup.object().shape({
@@ -21,11 +21,6 @@ const patientEditSchema = yup.object().shape({
         .required('Emergency contact is required')
         .matches(/^[0-9+\-\s()]+$/, 'Please enter a valid phone number')
         .min(10, 'Phone number must be at least 10 digits'),
-    dateOfBirth: yup.object().shape({
-        month: yup.string().required('Month is required'),
-        day: yup.string().required('Day is required'),
-        year: yup.string().required('Year is required'),
-    }),
     gender: yup
         .string()
         .required('Please select a gender')
@@ -46,29 +41,29 @@ const patientEditSchema = yup.object().shape({
     cholesterol: yup
         .string()
         .nullable()
-        .matches(/^\d+\/\d+\s*mmHg$|^$/, 'Format should be like: 120/80 mmHg'),
+        .matches(/^\d+\/\d+$|^$/, 'Format should be like: 120/80'),
 
     height: yup
         .string()
         .nullable()
-        .required('heigth is required')
-        .matches(/^\d+(\.\d+)?\s*(cm|ft|in)?$|^$/, 'Format should be like: 180 cm'),
+        .required('Height is required')
+        .matches(/^\d+(\.\d+)?$|^$/, 'Format should be like: 180'),
 
     weight: yup
         .string()
         .nullable()
-        .required('Weigth type is required')
-        .matches(/^\d+(\.\d+)?\s*(kg|lbs)?$|^$/, 'Format should be like: 65 Kg'),
+        .required('Weight is required')
+        .matches(/^\d+(\.\d+)?$|^$/, 'Format should be like: 65'),
 
     bloodPressure: yup
         .string()
         .nullable()
-        .matches(/^\d+\/\d+\s*mmHg$|^$/, 'Format should be like: 120/80 mmHg'),
+        .matches(/^\d+\/\d+$|^$/, 'Format should be like: 120/80'),
 
     glucoseLevel: yup
         .string()
         .nullable()
-        .matches(/^\d+(\.\d+)?\s*(mg\/dL|mmol\/L)?$|^$/, 'Format should be like: 100 mg/dL'),
+        .matches(/^\d+(\.\d+)?$|^$/, 'Format should be like: 100'),
 
     allergies: yup
         .string()
@@ -123,24 +118,12 @@ export const useEditPatientProfile = (initialPatient, { isAdmin = false, patient
     console.log("inital patient", initialPatient)
 
     const buildDefaults = (p) => {
-        const raw = p?.dateOfBirth || "";
-
-        const year = raw ? raw.slice(0, 4) : "";
-        const month = raw ? raw.slice(5, 7) : "";
-        const day = raw ? raw.slice(8, 10) : "";
 
         return {
             fullName: p?.fullName || "",
             email: p?.email || "",
             emergencyNumber: p?.emergencyNumber || "",
             phone: p?.phone || "",
-            dateOfBirth:
-                {
-                    year,
-                    month,
-                    day
-                }
-                || { year: "", month: "", day: "" },
             gender: p?.gender || "",
             address: p?.address || "",
             bloodType: p?.bloodType || "",
@@ -184,14 +167,11 @@ export const useEditPatientProfile = (initialPatient, { isAdmin = false, patient
 
         try {
 
-            const formattedDOB = `${data.dateOfBirth.year}-${String(data.dateOfBirth.month).padStart(2, '0')}-${String(data.dateOfBirth.day).padStart(2, '0')}`;
-
             const formData = new FormData();
 
             // Append all text fields
             formData.append('emergencyNumber', data.emergencyNumber)
             formData.append('phone', data.phone)
-            formData.append('dateOfBirth', formattedDOB)
             formData.append('gender', data.gender)
             formData.append('address', data.address)
             formData.append('bloodType', data.bloodType)
@@ -209,7 +189,7 @@ export const useEditPatientProfile = (initialPatient, { isAdmin = false, patient
 
             const response = isAdmin
                 ?
-                await admineditsPatientProfile(formData, patientId)
+                await adminEditsPatientProfile(formData, patientId)
                 :
                 await editPatientProfile(formData)
 

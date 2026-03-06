@@ -1,5 +1,5 @@
 
-const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, isLoggingOut, onEditAvatar, isAdmin = false }) => (
+const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, onEditAvatar, isAdmin = false }) => (
 
     <nav className="bg-white w-64 ml-10 rounded-3xl shadow-lg p-6 mt-15 flex flex-col gap-2">
 

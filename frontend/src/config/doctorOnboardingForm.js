@@ -81,10 +81,10 @@ export const professionalFields = [
         name: "primarySpecialization",
         label: "Primary Specialization",
         options: [
-            { label: "cardiology", value: "1" },
-            { label: "orthology", value: "2" },
-            { label: "gynocology", value: "3" },
-            { label: "ophthalmology", value: "4" },
+            { label: "cardiology", value: "cardiology" },
+            { label: "orthology", value: "orthology" },
+            { label: "gynocology", value: "gynocology" },
+            { label: "ophthalmology", value: "ophthalmology" },
         ],
         showIn: ["onboarding"]
     },

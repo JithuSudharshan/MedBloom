@@ -6,6 +6,7 @@ export default function DoctorOnboardingForm() {
         register,
         handleSubmit,
         onSubmit,
+        control,
         setValue,
         errors,
         isSubmitting,
@@ -62,6 +63,7 @@ export default function DoctorOnboardingForm() {
                     handleSubmit={handleSubmit}
                     onSubmit={onSubmit}
                     setValue={setValue}
+                    control={control}
                     errors={errors}
                     isSubmitting={isSubmitting}
                     submitError={submitError}

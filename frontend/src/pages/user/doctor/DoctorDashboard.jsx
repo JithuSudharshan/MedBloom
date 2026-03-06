@@ -40,20 +40,7 @@ const dummyAppointments = [
         dateTimeLabel: "2023-11-10 at 10:00 AM",
         status: "Cancelled",
     },
-    {
-        id: 5,
-        doctorName: "Dr. Arjun Menon",
-        speciality: "Cardiology",
-        dateTimeLabel: "2023-11-10 at 10:00 AM",
-        status: "Completed",
-    },
-    {
-        id: 6,
-        doctorName: "Dr. Arjun Menon",
-        speciality: "Cardiology",
-        dateTimeLabel: "2023-11-10 at 10:00 AM",
-        status: "Cancelled",
-    },
+
 ];
 
 export default function DcotorProfilePage() {
@@ -76,7 +63,6 @@ export default function DcotorProfilePage() {
             const response = await loadDoctorData()
             if (response) {
                 setDoctorDetails(response?.data?.details)
-                console.log(doctorDetails)
             }
 
         } catch (error) {

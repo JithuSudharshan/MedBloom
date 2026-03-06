@@ -23,7 +23,6 @@ export const smokingOptions = [
 ];
 
 export const bloodGroupOptions = [
-  { label: "Select blood group", value: "" },
   { label: "A+", value: "A+" },
   { label: "A-", value: "A-" },
   { label: "B+", value: "B+" },
@@ -58,25 +57,26 @@ export const basicFields = [
   },
   {
     type: "input",
-    name: "emergencyNumber",
-    label: "Emergency contact Number",
+    name: "phone",
+    label: "Personal Number",
     inputType: "tel",
     placeholder: "Enter an emergency phone number",
     showIn: ["onboarding", "edit"]
   },
   {
     type: "input",
-    name: "phone",
-    label: "Personal Number",
+    name: "emergencyNumber",
+    label: "Emergency contact Number",
     inputType: "tel",
     placeholder: "Enter an emergency phone number",
-    showIn: ["edit"]
+    showIn: ["onboarding", "edit"]
   },
+
   {
     type: "date",
     name: "dateOfBirth",
-    label: "Date Of Birth",
-    showIn: ["onboarding", "edit"]
+    label: "Date of Birth",
+    showIn: ["onboarding"]
   },
   {
     type: "radio",
@@ -110,7 +110,7 @@ export const medicalFields = [
     name: "cholesterol",
     label: "Cholesterol",
     inputType: "text",
-    placeholder: "e.g., 120/80 mmHg",
+    placeholder: "e.g., 120/80 (in mmHg)",
     showIn: ["onboarding", "edit"]
   },
   {
@@ -118,7 +118,7 @@ export const medicalFields = [
     name: "height",
     label: "Height",
     inputType: "text",
-    placeholder: "e.g., 180 cm",
+    placeholder: "e.g., 180 (in cm)",
     showIn: ["onboarding", "edit"]
   },
   {
@@ -126,7 +126,7 @@ export const medicalFields = [
     name: "weight",
     label: "Weight",
     inputType: "text",
-    placeholder: "e.g., 65 Kg",
+    placeholder: "e.g., 65 (in kg)",
     showIn: ["onboarding", "edit"]
   },
   {
@@ -134,7 +134,7 @@ export const medicalFields = [
     name: "bloodPressure",
     label: "Blood Pressure",
     inputType: "text",
-    placeholder: "e.g., 120/80 mmHg",
+    placeholder: "e.g., 120/80 (in mmHg)",
     showIn: ["onboarding", "edit"]
   },
   {
@@ -142,7 +142,7 @@ export const medicalFields = [
     name: "glucoseLevel",
     label: "Glucose level",
     inputType: "text",
-    placeholder: "e.g., 120 mg/dL",
+    placeholder: "e.g., 120 (in mg/dL)",
     showIn: ["onboarding", "edit"]
   },
   {

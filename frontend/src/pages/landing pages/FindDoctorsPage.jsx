@@ -32,7 +32,7 @@ const FindDoctorsPage = () => {
         fetchDoctorsDetails()
     }, [])
 
-    if (doctors.length === 0) return <Loader />
+    if (!doctors.length === 0) return <Loader />
 
     return (
         <div className="min-h-screen bg-white">

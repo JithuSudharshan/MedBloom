@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import adminProfileConfig from "../../../config/adminProfileConfig";
 import Navbar from "../../../components/landing page/Navbar";
-import Footer from "../../../components/landing page/Footer";
 import Button from "../../../components/ui/Button";
 import { showToast } from "../../../components/ui/Toast";
 import ProfileBanner from '../../../components/profile/ProfileBanner';
@@ -38,15 +37,44 @@ export default function PatientProfilePage() {
     }
   };
 
-
+  const dummyAppointments = [
+    {
+      id: 1,
+      doctorName: "Dr. Arjun Menon",
+      speciality: "Cardiology",
+      dateTimeLabel: "2023-11-10 at 10:00 AM",
+      status: "Upcoming",
+    },
+    {
+      id: 2,
+      doctorName: "Dr. Arjun Menon",
+      speciality: "Cardiology",
+      dateTimeLabel: "2023-11-10 at 10:00 AM",
+      status: "Upcoming",
+    },
+    {
+      id: 3,
+      doctorName: "Dr. Arjun Menon",
+      speciality: "Cardiology",
+      dateTimeLabel: "2023-11-10 at 10:00 AM",
+      status: "Completed",
+    },
+    {
+      id: 4,
+      doctorName: "Dr. Arjun Menon",
+      speciality: "Cardiology",
+      dateTimeLabel: "2023-11-10 at 10:00 AM",
+      status: "Cancelled",
+    }
+  ];
 
   return (
     <>
-      <Navbar current={"admin"} />
+      <Navbar current={"adminLogin"} />
       <ProfileBanner profileOwner={"Admin Profile"} profileDescription={"Manage your personal information and health records"} />
       <AdminProfileLayout
         sidebarMenu={adminProfileConfig.sidebarMenu}
-        appointments={[]}
+        appointments={dummyAppointments}
         onLogout={handleLogout}
         isLoggingOut={isLoggingOut}
       >

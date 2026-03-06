@@ -9,14 +9,14 @@ export default function DateInput({
     error,
 }) {
     return (
-        <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">
+        <div className="flex flex-col gap-1 mb-5">
+            <label className="text-sm text-teal-700 mb-2 font-medium block">
                 {label}
             </label>
 
             <input
                 type="date"
-                // ⚠️ DO NOT bind value to form state
+
                 {...register(`${name}._raw`)}
                 onChange={(e) => {
                     const value = e.target.value;
@@ -24,7 +24,7 @@ export default function DateInput({
 
                     const [year, month, day] = value.split("-");
 
-                    // ✅ store structured object
+
                     setValue(name, { year, month, day }, { shouldValidate: true });
                 }}
                 className="

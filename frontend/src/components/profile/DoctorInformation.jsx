@@ -34,7 +34,7 @@ const DoctorInformation = ({ doctor, showActions = true, isAdmin = false }) => {
 
     return (
         <div className={
-            `bg-white rounded-2xl p-10 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6 ` +
+            `bg-white rounded-2xl p-10 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6 h-full  ` +
             (showActions ? "shadow-xl" : "")
         } >
             {/* LEFT COLUMN */}
@@ -43,7 +43,7 @@ const DoctorInformation = ({ doctor, showActions = true, isAdmin = false }) => {
                 <ProfileRow label="Full name" value={doctor?.fullName || "-"} />
                 <ProfileRow label="Email Address" value={doctor?.email || "-"} />
                 <ProfileRow label="Phone Number" value={doctor?.phone || "-"} />
-                <ProfileRow label="Date Of Birth" value={new Date(doctor?.dob).toLocaleDateString() || "-"} />
+                <ProfileRow label="Date Of Birth" value={doctor?.dob || "-"} />
                 <ProfileRow label="Gender" value={doctor?.gender || "-"} />
                 <ProfileRow label="Clinic Address" value={doctor?.address || "-"} />
 

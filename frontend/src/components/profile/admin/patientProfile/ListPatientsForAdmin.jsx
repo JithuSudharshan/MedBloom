@@ -38,7 +38,6 @@ const ListPatientsForAdmin = ({ patients, page, setPage, totalPages, onViewPatie
     return (
         <section className='flex flex-col'>
             <DataTable columns={patientColumns} rows={patients} />
-            <Pagination current={page} total={totalPages} onChange={setPage} />
         </section>
     )
 }

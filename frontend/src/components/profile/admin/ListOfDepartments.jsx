@@ -48,13 +48,8 @@ const ListOfDepartments = ({ openModalForAdding, data, openModalForEditing }) =>
 
             {/* Table Section */}
             <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden px-4 pt-4 pb-8">
-
                 <DataTable columns={tableColumns} rows={data} />
-
-                <div className="mt-8">
-                    <Pagination current={1} total={5} onChange={(p) => console.log(p)} />
-                </div>
-
+                <Pagination />
             </div>
         </div>
     );

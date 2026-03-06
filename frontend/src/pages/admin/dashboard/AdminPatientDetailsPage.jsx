@@ -6,7 +6,7 @@ import AdminPatientDetails from "../../../components/profile/admin/patientProfil
 const AdminPatientDetailsPage = () => {
     const { patientId } = useParams();
     const navigate = useNavigate()
-    console.log(patientId)
+    console.log("patientId", patientId)
     return (
         <>
             <Navbar />

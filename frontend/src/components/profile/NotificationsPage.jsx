@@ -13,15 +13,14 @@ export default function NotificationsPage({ profileTitle = 'Doctor Profile' }) {
     };
 
     return (
-        <div className="flex gap-6">
-            <div className="flex-1">
-                <NotificationsPanel
-                    title="Notifications"
-                    subtitle="Recent Notifications"
-                    notifications={notifications}
-                    onItemClick={handleClick}
-                />
-            </div>
+        <div className="w-full h-full">
+            <NotificationsPanel
+                title="Notifications"
+                subtitle="Recent Notifications"
+                notifications={notifications}
+                onItemClick={handleClick}
+                className="w-full"
+            />
         </div>
     );
 }

@@ -72,6 +72,7 @@ export const useDoctorBasicInfo = () => {
         register,
         handleSubmit,
         setValue,
+        control,
         watch,
         reset,
         formState: { errors, isValid, isDirty },
@@ -128,7 +129,7 @@ export const useDoctorBasicInfo = () => {
             }
 
             navigate("/doctor/proffesional-onboarding")
-            showToast.success('Onboarding successful!');
+            showToast.success('basic Onboarding successful!');
 
             reset();
             return
@@ -149,6 +150,7 @@ export const useDoctorBasicInfo = () => {
         setValue,
         watch,
         reset,
+        control,
         errors,
         isValid,
         isDirty,

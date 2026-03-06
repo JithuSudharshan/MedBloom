@@ -34,8 +34,8 @@ export default function EditPatientProfilePage({ isAdmin = false, patientId }) {
 
     return (
         <div className="max-w-6xl mx-auto bg-white rounded-2xl mt-10 shadow-lg p-10">
-            <h2 className="text-2xl font-semibold text-teal-700 mb-6">
-                Edit Profile
+            <h2 className="text-4xl font-semibold text-teal-700 mb-6 mb-10">
+                Edit Patient Profile
             </h2>
 
             <PatientForm

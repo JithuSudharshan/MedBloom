@@ -90,7 +90,10 @@ const ListDoctorsForAdmin = ({
                     />
                 ))}
             </div>
-            <Pagination current={page} total={totalPages} onChange={setPage} />
+            <div>
+                <Pagination current={page} total={totalPages} onChange={setPage} />
+            </div>
+
         </div>
     );
 };

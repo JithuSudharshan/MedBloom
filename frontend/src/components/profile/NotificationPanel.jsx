@@ -1,7 +1,6 @@
 // components/notifications/NotificationsPanel.jsx
 import dayjs from 'dayjs';
 import { twMerge } from 'tailwind-merge';
-import { Pagination } from '../ui/Pagination';
 
 export default function NotificationsPanel({
     title = 'Notifications',
@@ -13,7 +12,7 @@ export default function NotificationsPanel({
     return (
         <div
             className={twMerge(
-                'bg-white rounded-[32px] shadow-lg p-8 flex flex-col gap-6 w-full',
+                'bg-white rounded-[32px] shadow-lg p-8 flex flex-col gap-6 w-full h-full',
                 className
             )}
         >
@@ -75,9 +74,6 @@ export default function NotificationsPanel({
                     </button>
                 ))}
             </div>
-
-            {/* Pagination */}
-            <Pagination />
         </div>
 
     );

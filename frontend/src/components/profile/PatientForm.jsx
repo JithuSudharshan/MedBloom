@@ -6,7 +6,6 @@ import Select from "../form/Select";
 import FileUpload from "../form/FileUpload";
 import { basicFields, medicalFields } from "../../config/patientFormConfig";
 import DateInput from "../form/DatePicker";
-import { date } from "yup";
 
 
 export default function PatientForm({

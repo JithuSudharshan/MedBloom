@@ -39,21 +39,7 @@ const dummyAppointments = [
         speciality: "Cardiology",
         dateTimeLabel: "2023-11-10 at 10:00 AM",
         status: "Cancelled",
-    },
-    {
-        id: 5,
-        doctorName: "Dr. Arjun Menon",
-        speciality: "Cardiology",
-        dateTimeLabel: "2023-11-10 at 10:00 AM",
-        status: "Completed",
-    },
-    {
-        id: 6,
-        doctorName: "Dr. Arjun Menon",
-        speciality: "Cardiology",
-        dateTimeLabel: "2023-11-10 at 10:00 AM",
-        status: "Cancelled",
-    },
+    }
 ];
 
 export default function PatientProfilePage() {
@@ -125,7 +111,6 @@ export default function PatientProfilePage() {
                 onLogout={handleLogout}
                 isLoggingOut={isLoggingOut}
             >
-                {/* Slot: Pass dashboard-specific content for greeting/etc */}
                 <div className="mb-6">
                     <Button onClick={handleLogout} variant="danger" size="sm">
                         {isLoggingOut ? "Logging out..." : "Logout"}
@@ -133,7 +118,6 @@ export default function PatientProfilePage() {
                 </div>
             </ProfileLayout>
             {loading && <Loader />}
-
         </>
     );
 }
