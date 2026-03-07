@@ -13,7 +13,7 @@ export default function AppointmentsSection({ appointments }) {
     })
 
     return (
-        <section className="bg-white rounded-3xl shadow-[0_32px_80px_rgba(16,24,40,0.12)] px-10 py-8">
+        <section className="bg-white rounded-3xl shadow-[0_32px_80px_rgba(16,24,40,0.12)] px-10 py-8 w-full">
             {/* Header */}
             <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-[20px] font-semibold text-[#006D6F]">

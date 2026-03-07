@@ -6,6 +6,7 @@ import Modal from "./Modal";
 import AvatarCropper from "./AvatarCropper";
 import DoctorInformation from "./DoctorInformation";
 import NotificationsPage from "./NotificationsPage";
+import DoctorOverview from "./doctorDasboard/DoctorOverview";
 
 const ProfileLayout = ({
     user,
@@ -33,12 +34,9 @@ const ProfileLayout = ({
         setIsAvatarModalOpen(false);
     };
 
-
-    console.log("src:", localUser?.avatar?.src)
-
     return (
         <div className="min-h-screen max-w-7xl mx-auto w-full">
-            <div className="flex gap-10 py-10">
+            <div className="flex gap-10 items-stretch max-w-7xl mx-auto">
 
                 {/* Sidebar */}
                 <aside>
@@ -57,7 +55,10 @@ const ProfileLayout = ({
                 </aside>
 
                 {/* Main cards and dashboard content */}
-                <main className="flex-1 mt-15">
+                <main className="flex-1 mt-15 flex">
+                    {activeKey === "dashboard" && (
+                        <DoctorOverview doctorName={localUser?.fullName} />
+                    )}
                     {activeKey === "personal" && (
                         <>
                             {user === "patient" && (

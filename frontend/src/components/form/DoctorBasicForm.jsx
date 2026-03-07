@@ -23,7 +23,7 @@ export default function DoctorBasicForm({
     submitError,
 }) {
     const watchedConsultationMode = useWatch({
-        control,
+        control: control || undefined,
         name: "consultationMode"
     });
 
@@ -84,6 +84,7 @@ export default function DoctorBasicForm({
                         label={field.label}
                         name={field.name}
                         register={register}
+                        setValue={setValue}
                         error={errors[field.name]}
                     />
                 );
