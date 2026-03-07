@@ -28,6 +28,7 @@ export const fetchUserDetails = async (req, res) => {
                     fullName: fullName,
                     email: isUser.email,
                     phone: isUser.phone,
+                    authMethod: isUser.authMethod,
                     isOnboarded: isUser.isOnboarded,
                     avatar: {
                         src: isUser.profile_url,
@@ -38,8 +39,6 @@ export const fetchUserDetails = async (req, res) => {
 
 
         const DOB = formatDOB(patient.dob)
-        const height = purpose === "forEdit" ? patient.height.toString() : patient.height.toString().concat(" cm")
-        const weight = patient.weight.toString().concat(" kg")
 
         res.status(200).json({
             success: true,
@@ -52,8 +51,8 @@ export const fetchUserDetails = async (req, res) => {
                 address: patient.address,
                 bloodType: patient.bloodType,
                 cholesterol: patient.cholesterol,
-                height: height,
-                weight: weight,
+                height: patient.height,
+                weight: patient.weight,
                 bloodPressure: patient.bloodPressure,
                 glucoseLevel: patient.glucoseLevel,
                 allergies: patient.allergies,
@@ -117,7 +116,6 @@ export const editProfile = async (req, res) => {
         let {
             emergencyNumber,
             phone,
-            dateOfBirth,
             gender,
             address,
             bloodType,
@@ -139,7 +137,6 @@ export const editProfile = async (req, res) => {
         if (
             !userId ||
             !emergencyNumber ||
-            !dateOfBirth ||
             !gender ||
             !address ||
             !smoking ||
@@ -164,19 +161,14 @@ export const editProfile = async (req, res) => {
                 .json({ success: false, message: "Patient not found" });
         }
 
-        height = height.split(" ")
-        weight = weight.split(" ")
 
         patient.emergencyNumber = emergencyNumber || patient.emergencyNumber;
-        patient.dob = dateOfBirth
-            ? new Date(dateOfBirth)
-            : patient.dob;
         patient.gender = gender || patient.gender
         patient.address = address || patient.address
         patient.bloodType = bloodType || patient.bloodType
         patient.cholesterol = cholesterol || patient.cholesterol
-        patient.height = Number(height[0]) || patient.height
-        patient.weight = Number(weight[0]) || patient.weight
+        patient.height = height || patient.height
+        patient.weight = weight || patient.weight
         patient.bloodPressure = bloodPressure || patient.bloodPressure
         patient.glucoseLevel = glucoseLevel || patient.glucoseLevel
         patient.allergies = allergies || patient.allergies

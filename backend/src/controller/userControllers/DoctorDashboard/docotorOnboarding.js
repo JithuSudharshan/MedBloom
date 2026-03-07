@@ -21,7 +21,7 @@ export const doctorBasicOnboarding = async (req, res) => {
         const doctor = await Doctor.create({
             user,
             contactNumber,
-            dateOfBirth,
+            dateOfBirth: new Date(dateOfBirth),
             gender,
             location,
             displayName,
@@ -113,7 +113,7 @@ export const doctorProffesionalOnboarding = async (req, res) => {
                     },
                     certificateUrl: certificate,
                     onboardingStep: "completed",
-                    yearOfExperience: Number(yearOfExperience) || null
+                    yearOfExperience: yearOfExperience || null
                 },
             },
             { new: true }

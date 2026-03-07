@@ -577,6 +577,7 @@ export const addNewDepartment = async (req, res) => {
 
 export const fetchDataForDepartmentTable = async (req, res) => {
 
+    const { page, } = req.params
     try {
         const departments = await Department.find();
         const formattedData = departments.map((dept) => ({

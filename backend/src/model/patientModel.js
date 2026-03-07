@@ -12,7 +12,8 @@ const patientSchema = new mongoose.Schema({
     },
     emergencyNumber: {
         type: String,
-        required: true
+        required: true,
+        match: [/^\+?[1-9]\d{1,14}$/, 'Please use a valid phone number']
     },
     dob: {
         type: Date,
@@ -33,7 +34,7 @@ const patientSchema = new mongoose.Schema({
         required: true
     },
     cholesterol: {
-        type: String // Consider more specific type if you need numeric
+        type: String
     },
     height: {
         type: String,
@@ -44,7 +45,7 @@ const patientSchema = new mongoose.Schema({
         required: true
     },
     bloodPressure: {
-        type: String // Store as string like "120/80 mmHg"
+        type: String
     },
     glucoseLevel: {
         type: String

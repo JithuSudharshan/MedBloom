@@ -126,7 +126,7 @@ export const loadPatientDataForAdmin = async (id) => {
     }
 }
 
-export const admineditsPatientProfile = async (formData, id) => {
+export const adminEditsPatientProfile = async (formData, id) => {
     try {
         const response = await api.patch(`/admin/patient/${id}/edit-profile`, formData)
         return response

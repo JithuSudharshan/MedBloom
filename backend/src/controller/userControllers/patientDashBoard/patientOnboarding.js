@@ -5,6 +5,7 @@ export const onboardPatient = async (req, res) => {
     try {
         const {
             emergencyNumber,
+            phone,
             dateOfBirth,
             gender,
             address,
@@ -29,7 +30,7 @@ export const onboardPatient = async (req, res) => {
 
         const userDetails = await User.findById({ _id: user })
 
-        if (!user || !emergencyNumber || !dateOfBirth || !gender || !address || !smoking || !drinking)
+        if (!user || !emergencyNumber || !phone || !dateOfBirth || !gender || !address || !smoking || !drinking)
             return res.status(400).json({ success: false, message: "Fill mandatory fields" })
 
         const patient = await Patient.create({
@@ -53,7 +54,9 @@ export const onboardPatient = async (req, res) => {
             Mental_Health_History
         })
 
+        userDetails.phone = phone;
         userDetails.isOnboarded = true;
+
         await userDetails.save()
 
         if (patient)

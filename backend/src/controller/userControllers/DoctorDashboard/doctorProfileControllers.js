@@ -1,5 +1,6 @@
 import Doctor from "../../../model/doctorModel.js";
 import User from "../../../model/userModel.js";
+import { formatDOB } from "../../../utils/formatters.js";
 
 
 export const fetchDoctorDetails = async (req, res) => {
@@ -33,14 +34,14 @@ export const fetchDoctorDetails = async (req, res) => {
 
         const details = {
             avatar: {
-                src: doctor.profilePicture,
+                src: doctor.profilePicture || user.profile_url,
                 alr: "Doctor avatar"
             },
             shortBio: doctor.shortBio,
             fullName: user.name,
             email: user.email,
             phone: doctor.contactNumber,
-            dob: doctor.dateOfBirth,
+            dob: formatDOB(doctor.dateOfBirth),
             gender: doctor.gender,
             address: doctor.clinicAddress,
             displayName: doctor.displayName,

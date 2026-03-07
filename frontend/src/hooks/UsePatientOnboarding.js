@@ -26,7 +26,15 @@ const patientOnboardingSchema = yup.object().shape({
         .string()
         .required('Emergency contact is required')
         .matches(/^[0-9+\-\s()]+$/, 'Please enter a valid phone number')
-        .min(10, 'Phone number must be at least 10 digits'),
+        .min(10, 'Phone number must be at least 10 digits')
+        .max(10, 'Phone number must be maximum 10 digits'),
+
+    phone: yup
+        .string()
+        .required('Emergency contact is required')
+        .matches(/^[0-9+\-\s()]+$/, 'Please enter a valid phone number')
+        .min(10, 'Phone number must be at least 10 digits')
+        .max(10, 'Phone number must be maximum 10 digits'),
 
     dateOfBirth: yup.object().shape({
         month: yup.string().required('Month is required'),
@@ -54,29 +62,29 @@ const patientOnboardingSchema = yup.object().shape({
     cholesterol: yup
         .string()
         .nullable()
-        .matches(/^\d+\/\d+\s*mmHg$|^$/, 'Format should be like: 120/80 mmHg'),
+        .matches(/^\d+\/\d+$|^$/, 'Format should be like: 120/80'),
 
     height: yup
         .string()
         .nullable()
-        .required('heigth is required')
-        .matches(/^\d+(\.\d+)?\s*(cm|ft|in)?$|^$/, 'Format should be like: 180 cm'),
+        .required('Height is required')
+        .matches(/^\d+(\.\d+)?$|^$/, 'Format should be like: 180'),
 
     weight: yup
         .string()
         .nullable()
-        .required('Weigth type is required')
-        .matches(/^\d+(\.\d+)?\s*(kg|lbs)?$|^$/, 'Format should be like: 65 Kg'),
+        .required('Weight is required')
+        .matches(/^\d+(\.\d+)?$|^$/, 'Format should be like: 65'),
 
     bloodPressure: yup
         .string()
         .nullable()
-        .matches(/^\d+\/\d+\s*mmHg$|^$/, 'Format should be like: 120/80 mmHg'),
+        .matches(/^\d+\/\d+$|^$/, 'Format should be like: 120/80'),
 
     glucoseLevel: yup
         .string()
         .nullable()
-        .matches(/^\d+(\.\d+)?\s*(mg\/dL|mmol\/L)?$|^$/, 'Format should be like: 100 mg/dL'),
+        .matches(/^\d+(\.\d+)?$|^$/, 'Format should be like: 100'),
 
     allergies: yup
         .string()
@@ -142,6 +150,7 @@ export const usePatientOnboarding = () => {
             fullName: '',
             email: '',
             emergencyNumber: '',
+            phone: '',
             dateOfBirth: {
                 month: '',
                 day: '',
@@ -179,6 +188,7 @@ export const usePatientOnboarding = () => {
 
             // Append all text fields
             formData.append('emergencyNumber', data.emergencyNumber)
+            formData.append('phone', data.phone)
             formData.append('dateOfBirth', formattedDOB)
             formData.append('gender', data.gender)
             formData.append('address', data.address)

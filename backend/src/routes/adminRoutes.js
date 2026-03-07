@@ -22,7 +22,7 @@ import {
     editPatientsProfile,
     fetchPatientDetailsToEdit,
     fetchPatientPorfile,
-    fetchTotlPatients
+    fetchTotalPatients
 } from '../controller/adminControllers/adminDashboard/adminPatientControllers.js';
 import { uploadToCloudinary } from '../middlewares/uploadToCloudinary.js';
 
@@ -38,7 +38,7 @@ router.get('/doctors/approved/:id/details', fetchApprovedDcotorsDetails);
 router.get('/doctor/:id/to-edit', fetchDoctorsDetailsToEdit);
 router.patch("/doctor/block/:id", blockDoctorProfile)
 router.patch("/doctor/unblock/:id", unblockDoctorProfile)
-router.get("/patients", fetchTotlPatients)
+router.get("/patients", fetchTotalPatients)
 router.get("/patient/:id/profile", fetchPatientPorfile)
 router.get("/patient/:id/edit", fetchPatientDetailsToEdit)
 router.patch('/patient/:id/edit-profile', upload.none(), editPatientsProfile)

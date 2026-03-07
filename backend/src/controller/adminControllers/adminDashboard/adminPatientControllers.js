@@ -3,7 +3,7 @@ import User from "../../../model/userModel.js";
 import { formatDOB, formatName } from "../../../utils/formatters.js";
 
 
-export const fetchTotlPatients = async (req, res) => {
+export const fetchTotalPatients = async (req, res) => {
     try {
         const page = parseInt(req.query.page || "1", 10);
         const limit = parseInt(req.query.limit || "15", 10);
@@ -60,7 +60,7 @@ export const fetchTotlPatients = async (req, res) => {
             message: error.message,
         });
     }
-}
+};
 
 export const fetchPatientPorfile = async (req, res) => {
     try {
