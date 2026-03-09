@@ -31,7 +31,7 @@ import ServicesPage from './pages/landing pages/ServicesPage';
 import FindDoctorsPage from './pages/landing pages/FindDoctorsPage';
 
 const AppInner = () => {
-  const { user } = useAuth(); // from AuthContext
+  const { user } = useAuth();
 
   return (
     <NotificationProvider user={user}>

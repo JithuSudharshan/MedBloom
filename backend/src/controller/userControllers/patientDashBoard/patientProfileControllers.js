@@ -45,6 +45,7 @@ export const fetchUserDetails = async (req, res) => {
             details: {
                 fullName: fullName || isUser.name,
                 email: isUser.email,
+                authMethod: isUser.authMethod,
                 phone: isUser.phone,
                 dob: purpose === "forDashboard" ? DOB : patient.dob,
                 gender: patient.gender,

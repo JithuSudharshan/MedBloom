@@ -34,7 +34,7 @@ const PatientInformation = ({ patient, isAdmin = false }) => {
         formState: { errors },
     } = UseChangePassword()
 
-    console.log("patient.authMethod", patient)
+    console.log("patient.authMethod", patient.authMethod)
 
     return (
         <div className="bg-white rounded-2xl shadow-xl p-10 grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-6">
@@ -53,14 +53,13 @@ const PatientInformation = ({ patient, isAdmin = false }) => {
                 <ProfileRow label="Gender" value={patient?.gender} />
                 <ProfileRow label="Address" value={patient?.address} />
 
-                {patient.authMethod !== "google" || !isAdmin ?
+                {patient.authMethod !== "google" && !isAdmin ?
                     <button onClick={handleClick} className="mt-8 bg-teal-600 text-white px-5 py-2 text-sm rounded-full hover:bg-teal-700 transition">
                         Change Password
                     </button>
                     :
                     <></>
                 }
-
             </div>
 
             {/* RIGHT COLUMN */}
