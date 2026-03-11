@@ -35,7 +35,7 @@ const ListDoctorsForAdmin = ({
     setPage,
     doctors,
     totalPages,
-    totalCount,
+    doctorsCount,
     pendingCount
 }) => {
     const [search, setSearch] = useState("");
@@ -53,7 +53,7 @@ const ListDoctorsForAdmin = ({
 
             {/* Stat cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <StatCard label="Total Doctors" value={totalCount} />
+                <StatCard label="Approved Doctors" value={doctorsCount} />
                 <StatCard label="To approve" value={pendingCount} actionLabel="View" onAction={handleOpenApproval} />
             </div>
 
@@ -62,10 +62,10 @@ const ListDoctorsForAdmin = ({
                 <div className="flex-1">
                     <input
                         type="text"
-                        placeholder="Search Doctor"
+                        placeholder="Search Doctors by name...."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                        className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                     />
                 </div>
 
@@ -73,9 +73,9 @@ const ListDoctorsForAdmin = ({
                     <span>Filter</span>
                 </button>
 
-                {/* <Button className="bg-teal-500 hover:bg-teal-600 text-white rounded-xl px-5 py-2.5 text-sm font-medium">
+                <Button className="bg-teal-500 hover:bg-teal-600 text-white rounded-xl px-5 py-2.5 text-sm font-medium">
                     Add Doctor
-                </Button> */}
+                </Button>
             </div>
 
             {/* Doctor list */}

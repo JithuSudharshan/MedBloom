@@ -70,6 +70,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut, appointments 
             if (!res.data?.success) {
                 showToast.error("Something went wrong while fetching data")
             }
+
             const {
                 doctors,
                 page,
@@ -265,7 +266,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut, appointments 
                                 doctors={doctors}
                                 page={doctorPage}
                                 totalPages={totalDoctorPages}
-                                totalCount={totalCount}
+                                doctorsCount={totalCount}
                                 pendingCount={pendingCount}
                                 setPage={setDoctorPage}
                                 handleOpenApproval={handleOpenApproval}
