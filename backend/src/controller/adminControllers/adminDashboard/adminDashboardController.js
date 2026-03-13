@@ -120,7 +120,7 @@ export const rejectDoctor = async (req, res) => {
 export const fetchApprovedDoctorList = async (req, res) => {
     try {
         const page = parseInt(req.query.page || "1", 10);
-        const limit = parseInt(req.query.limit || "5", 5);
+        const limit = parseInt(req.query.limit || "5", 10);
         const skip = (page - 1) * limit;
 
         const filter = { status: { $in: ["approved", "blocked"] } };

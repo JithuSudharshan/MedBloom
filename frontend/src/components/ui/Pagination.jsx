@@ -35,8 +35,8 @@ export const Pagination = ({ current = 1, total = 1, onChange = () => { } }) => 
                     key={page}
                     onClick={() => onChange(page)}
                     className={`h-8 w-8 rounded-full text-sm font-medium ${page === current
-                            ? "bg-teal-500 text-white"
-                            : "text-slate-600 hover:bg-slate-100"
+                        ? "bg-teal-500 text-white"
+                        : "text-slate-600 hover:bg-slate-100"
                         }`}
                 >
                     {page}
@@ -51,7 +51,6 @@ export const Pagination = ({ current = 1, total = 1, onChange = () => { } }) => 
             >
                 Next
             </button>
-
         </div>
     );
 };

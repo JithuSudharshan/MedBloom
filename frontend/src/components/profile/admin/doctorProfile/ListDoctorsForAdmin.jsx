@@ -44,6 +44,8 @@ const ListDoctorsForAdmin = ({
         doc.displayName.toLowerCase().includes(search.toLowerCase())
     );
 
+    console.log("totalPages", totalPages)
+
     return (
         <div className="space-y-8">
             {/* Header */}
