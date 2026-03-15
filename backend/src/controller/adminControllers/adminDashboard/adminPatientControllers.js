@@ -40,7 +40,7 @@ export const fetchTotalPatients = async (req, res) => {
             };
         });
 
-        console.log("fetched patients", users)
+        console.log("fetched patients", patients)
 
         const totalPages = Math.max(1, Math.ceil(totalPatients / limit));
 

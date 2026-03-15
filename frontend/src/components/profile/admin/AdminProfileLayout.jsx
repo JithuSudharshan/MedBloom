@@ -106,9 +106,11 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut, appointments 
             const {
                 patients,
                 page,
-                totalPages
+                totalPages,
+                totalPatients
             } = res?.data?.data;
 
+            setTotalcount(totalPatients)
             setPatients(patients);
             setPatientPage(page);
             setTotalPatientPages(totalPages);
@@ -280,7 +282,10 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut, appointments 
                         <ListPatientsForAdmin
                             onViewPatient={handleViewPatient}
                             patients={patients}
+                            patientCount={totalCount}
+                            setPage={setPatientPage}
                             page={patientPage}
+                            totalPages={totalPatientPages}
                         />
                     )}
                     {activeKey === "appointments" && <AppointmentsSection appointments={appointments} />}

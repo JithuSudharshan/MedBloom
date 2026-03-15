@@ -1,8 +1,9 @@
 import React from 'react'
 import DataTable from '../TableData';
 import { Pagination } from '../../../ui/Pagination';
+import { PatientStats } from './PatientStats';
 
-const ListPatientsForAdmin = ({ patients, page, setPage, totalPages, onViewPatient }) => {
+const ListPatientsForAdmin = ({ patients, page, setPage, totalPages, onViewPatient, patientCount, newPatients = 780, activeVisit = 210 }) => {
     const patientColumns = [
         { key: "name", header: "Name" },
         { key: "email", header: "Email" },
@@ -36,8 +37,12 @@ const ListPatientsForAdmin = ({ patients, page, setPage, totalPages, onViewPatie
         },
     ]
     return (
-        <section className='flex flex-col'>
+        <section className='max-w-7xl mx-auto px-6'>
+            <PatientStats patientCount={patientCount} newPatients={newPatients} activeVisit={activeVisit} />
             <DataTable columns={patientColumns} rows={patients} />
+            <div>
+                <Pagination current={page} total={totalPages} onChange={setPage} />
+            </div>
         </section>
     )
 }
