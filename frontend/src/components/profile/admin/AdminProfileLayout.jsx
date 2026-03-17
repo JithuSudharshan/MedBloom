@@ -6,7 +6,14 @@ import adminPic from '../../../assets/images/admin.jpg'
 import Modal from "../Modal";
 import ConfirmDialog from "../../ui/ConfirmDialogue";
 import { showToast } from "../../ui/Toast";
-import { blockDoctor, fetchApprovedList, fetchDataForTable, fetchPatientsList, unblockDoctor } from "../../../api/adminApi";
+import {
+    blockDoctor,
+    fetchAppointmentsForAdmin,
+    fetchApprovedList,
+    fetchDataForTable,
+    fetchPatientsList,
+    unblockDoctor
+} from "../../../api/adminApi";
 import ListPatientsForAdmin from "./patientProfile/ListPatientsForAdmin";
 import { useNavigate } from "react-router-dom";
 import ListOfDepartments from "./ListOfDepartments.jsx";
@@ -15,27 +22,29 @@ import { useDepartmentForm } from "../../../hooks/useDepartmentForm.js"
 import ServiceOverview from "./dashboard/ServiceOverview.jsx";
 import AppointmentsSection from "../appointments/AppointmentsSection.jsx";
 import NotificationsPage from "../NotificationsPage.jsx";
+import Loader from "../../ui/Loading.jsx";
 
 
-const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut, appointments }) => {
+const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
     const [activeKey, setActiveKey] = useState("dashboard");
     const [openApproval, setOpenApproval] = useState(false);
 
     const [doctorPage, setDoctorPage] = useState(1);
     const [patientPage, setPatientPage] = useState(1);
+    const [appointmentPage, setAppointmentPage] = useState(1);
     const [totalPatientPages, setTotalPatientPages] = useState(1)
     const [totalDoctorPages, setTotalDoctorPages] = useState(1)
+    const [totalAppointmentPages, setTotalAppointmentPages] = useState(1)
 
     const [doctors, setDoctors] = useState([])
     const [patients, setPatients] = useState([])
+    const [appointments, setAppointments] = useState([])
 
     const [totalCount, setTotalcount] = useState(0)
     const [pendingCount, setPendingCount] = useState(0)
 
     const [selectedDoctorId, setSelectedDoctorId] = useState(null);
     const [selectedDepartment, setSelectedDepartment] = useState(null);
-
-    console.log("selectedDepartment : ", selectedDepartment)
 
     const [isBlockModalOpen, setIsBlockModalOpen] = useState(false)
     const [isUnblockModalOpen, setIsUnblockModalOpen] = useState(false)
@@ -80,7 +89,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut, appointments 
             } = res?.data?.data;
 
             setDoctors(doctors);
-            setDoctorPage(page);
+            setAppointmentPage(page);
             setTotalDoctorPages(totalPages);
             setTotalcount(totalNoOfDoctors)
             setPendingCount(totalPending)
@@ -121,6 +130,46 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut, appointments 
             setLoading(false);
         }
     };
+
+    const fetchAppointments = async (pageNumber = 1) => {
+        try {
+
+            setLoading(true);
+
+            const res = await fetchAppointmentsForAdmin({
+                params: { page: pageNumber, limit: 5 }
+            })
+
+            if (!res.data?.success) {
+                showToast.error("Something went wrong while fetching appointments")
+            }
+
+            const {
+                appointments,
+                page,
+                totalPages,
+                totalNoOfAppointments
+            } = res?.data?.data;
+
+            setAppointments(appointments);
+            setDoctorPage(page);
+            setTotalAppointmentPages(totalPages);
+            setTotalcount(totalNoOfAppointments);
+
+        } catch (err) {
+            console.error("Failed to fetch appoitments", err);
+            showToast.error("Something  wrong while fetching data")
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        if (activeKey === "appointments") {
+            fetchAppointments(appointmentPage);
+        }
+    }, [activeKey, appointmentPage]);
+
 
     useEffect(() => {
         if (activeKey === "doctors") {
@@ -234,8 +283,6 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut, appointments 
         }
     }, [isEditModalOpen, selectedDepartment, reset]);
 
-
-
     return (
         <div className="min-h-screen max-w-7xl mx-auto w-full">
             <div className="flex gap-10 py-10">
@@ -288,7 +335,12 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut, appointments 
                             totalPages={totalPatientPages}
                         />
                     )}
-                    {activeKey === "appointments" && <AppointmentsSection appointments={appointments} />}
+                    {activeKey === "appointments" && <AppointmentsSection
+                        appointments={appointments}
+                        page={appointmentPage}
+                        totalPages={totalAppointmentPages}
+                        setPage={setAppointmentPage}
+                    />}
 
                     {activeKey === "departments" && (
                         <ListOfDepartments
@@ -394,7 +446,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut, appointments 
                     submitError={submitError}
                 />
             </Modal>
-
+            {loading && <Loader />}
         </div>
     );
 };

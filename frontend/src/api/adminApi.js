@@ -196,3 +196,13 @@ export const editDepartmentInfo = async (data) => {
         throw error
     }
 }
+
+export const fetchAppointmentsForAdmin = async (config) => {
+    try {
+        const response = await api.get("/admin/appointments", config)
+        return response
+    } catch (error) {
+        console.log("Error while fetchings appoinments", error)
+        throw error
+    }
+}

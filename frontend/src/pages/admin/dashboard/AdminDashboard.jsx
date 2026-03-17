@@ -37,36 +37,7 @@ export default function PatientProfilePage() {
     }
   };
 
-  const dummyAppointments = [
-    {
-      id: 1,
-      doctorName: "Dr. Arjun Menon",
-      speciality: "Cardiology",
-      dateTimeLabel: "2023-11-10 at 10:00 AM",
-      status: "Upcoming",
-    },
-    {
-      id: 2,
-      doctorName: "Dr. Arjun Menon",
-      speciality: "Cardiology",
-      dateTimeLabel: "2023-11-10 at 10:00 AM",
-      status: "Upcoming",
-    },
-    {
-      id: 3,
-      doctorName: "Dr. Arjun Menon",
-      speciality: "Cardiology",
-      dateTimeLabel: "2023-11-10 at 10:00 AM",
-      status: "Completed",
-    },
-    {
-      id: 4,
-      doctorName: "Dr. Arjun Menon",
-      speciality: "Cardiology",
-      dateTimeLabel: "2023-11-10 at 10:00 AM",
-      status: "Cancelled",
-    }
-  ];
+
 
   return (
     <>
@@ -74,7 +45,6 @@ export default function PatientProfilePage() {
       <ProfileBanner profileOwner={"Admin Profile"} profileDescription={"Manage your personal information and health records"} />
       <AdminProfileLayout
         sidebarMenu={adminProfileConfig.sidebarMenu}
-        appointments={dummyAppointments}
         onLogout={handleLogout}
         isLoggingOut={isLoggingOut}
       >

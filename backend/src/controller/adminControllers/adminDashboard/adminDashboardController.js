@@ -665,3 +665,68 @@ export const editDepartmentInfo = async (req, res) => {
         })
     }
 };
+
+export const fetchAppointments = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page || "1", 10);
+        const limit = parseInt(req.query.limit || "5", 5);
+        const skip = (page - 1) * limit;
+
+        const filter = { status: "pending" }; // will cyhange according to appointmnet schema
+
+        //here comes the appointment mongoDb logic
+        const totalPages = 3
+
+        //Math.max(1, Math.ceil(total / limit));
+
+
+        const dummyAppointments = [
+            {
+                id: 1,
+                doctorName: "Dr. Arjun Menon",
+                speciality: "Cardiology",
+                dateTimeLabel: "2023-11-10 at 10:00 AM",
+                status: "Upcoming",
+            },
+            {
+                id: 2,
+                doctorName: "Dr. Arjun Menon",
+                speciality: "Cardiology",
+                dateTimeLabel: "2023-11-10 at 10:00 AM",
+                status: "Upcoming",
+            },
+            {
+                id: 3,
+                doctorName: "Dr. Arjun Menon",
+                speciality: "Cardiology",
+                dateTimeLabel: "2023-11-10 at 10:00 AM",
+                status: "Completed",
+            },
+            {
+                id: 4,
+                doctorName: "Dr. Arjun Menon",
+                speciality: "Cardiology",
+                dateTimeLabel: "2023-11-10 at 10:00 AM",
+                status: "Cancelled",
+            }
+        ];
+
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                appointments: dummyAppointments,
+                page,
+                totalPages,
+                totalCount: dummyAppointments.length
+            },
+        });
+
+    } catch (error) {
+        console.error("Error while fetching appointments:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
