@@ -59,3 +59,13 @@ export const editDoctorProfile = async (formData) => {
     }
 }
 
+export const fetchAppointmentsForDoctor = async (config) => {
+    try {
+        const response = api.get("/doctor/appointments", config)
+        return response
+    } catch (error) {
+        console.log("Error while fetching appointments", error)
+        throw error
+    }
+}
+

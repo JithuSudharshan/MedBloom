@@ -7,19 +7,79 @@ import AvatarCropper from "./AvatarCropper";
 import DoctorInformation from "./DoctorInformation";
 import NotificationsPage from "./NotificationsPage";
 import DoctorOverview from "./doctorDasboard/DoctorOverview";
+import { fetchAppointmentsForPatient } from "../../api/patientApi";
+import { showToast } from "../ui/Toast";
+import Loader from "../ui/Loading";
+import { fetchAppointmentsForDoctor } from "../../api/doctorApi";
 
 const ProfileLayout = ({
     user,
     sidebarMenu,
     profileData,
-    appointments,
     onLogout,
     isLoggingOut,
     isActive
 }) => {
+
+    console.log("Profile", profileData)
+
+    const [loading, setLoading] = useState(false)
+
     const [activeKey, setActiveKey] = useState(isActive)
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
     const [localUser, setLocalUser] = useState(profileData)
+
+    const [appointments, setAppointments] = useState([])
+    const [appointmentPage, setAppointmentPage] = useState(1);
+    const [totalAppointmentPages, setTotalAppointmentPages] = useState(1)
+
+    const [totalCount, setTotalcount] = useState(0)
+
+    const fetchAppointments = async (pageNumber = 1) => {
+        try {
+
+            setLoading(true);
+
+            const res = (user === "patient" ?
+
+                await fetchAppointmentsForPatient({
+                    params: { page: pageNumber, limit: 5 }
+                }) : await fetchAppointmentsForDoctor({
+                    params: { page: pageNumber, limit: 5 }
+                }))
+
+            if (!res.data?.success) {
+                showToast.error("Something went wrong while fetching appointments")
+            }
+
+            const {
+                appointments,
+                page,
+                totalPages,
+                totalNoOfAppointments
+            } = res?.data?.data;
+
+            setAppointments(appointments);
+            setAppointmentPage(page);
+            setTotalAppointmentPages(totalPages);
+            setTotalcount(totalNoOfAppointments);
+
+        } catch (err) {
+            console.error("Failed to fetch appointments", err);
+            showToast.error("Something  wrong while fetching data")
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        if (activeKey === "appointments") {
+            fetchAppointments(appointmentPage);
+        }
+    }, [activeKey, appointmentPage]);
+
+
+
 
     useEffect(() => {
         setLocalUser(profileData)
@@ -69,7 +129,14 @@ const ProfileLayout = ({
                             )}
                         </>
                     )}
-                    {activeKey === "appointments" && <AppointmentsSection appointments={appointments} />}
+                    {activeKey === "appointments" && <AppointmentsSection
+                        appointments={appointments}
+                        page={appointmentPage}
+                        totalPages={totalAppointmentPages}
+                        setPage={setAppointmentPage}
+                    />}
+
+
                     {activeKey === "notifications" && (<NotificationsPage profileTitle="Doctor Profile" />)}
 
                 </main>
@@ -85,6 +152,7 @@ const ProfileLayout = ({
                     onSave={handleAvatarSaved}
                 />
             </Modal>
+            {loading && <Loader />}
         </div>
     );
 };

@@ -53,27 +53,31 @@ export default function AppointmentsSection({
 
 
             {/* Tabs */}
-            <div className="mb-6 flex items-center justify-between gap-4">
-                <div className="flex gap-2 flex-wrap">
-                    {TABS.map((tab) => {
+            {appointments.length !== 0 &&
+                <div className="mb-6 flex items-center justify-between gap-4">
+                    <div className="flex gap-2 flex-wrap">
+                        {TABS.map((tab) => {
 
-                        const isActive = tab === activeTab;
+                            const isActive = tab === activeTab;
 
-                        return (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`rounded-md border px-4 py-2 text-[13px] font-medium transition ${isActive
-                                    ? "border-[#008C89] bg-[#008C89] text-white"
-                                    : "border-[#D1D5DB] bg-white text-[#4B5563] hover:bg-[#F3F4F6]"
-                                    }`}
-                            >
-                                {tab}
-                            </button>
-                        );
-                    })}
+                            return (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(tab)}
+                                    className={`rounded-md border px-4 py-2 text-[13px] font-medium transition ${isActive
+                                        ? "border-[#008C89] bg-[#008C89] text-white"
+                                        : "border-[#D1D5DB] bg-white text-[#4B5563] hover:bg-[#F3F4F6]"
+                                        }`}
+                                >
+                                    {tab}
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
+            }
+
+
 
             {/* Appointment List */}
             <div className="flex flex-col gap-5">
@@ -99,7 +103,6 @@ export default function AppointmentsSection({
                         />
                     ))
                 )}
-
             </div>
 
             {/* Pagination */}

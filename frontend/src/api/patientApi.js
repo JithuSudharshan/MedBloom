@@ -46,4 +46,14 @@ export const editPatientProfile = async (formData) => {
     }
 }
 
+export const fetchAppointmentsForPatient = async (config) => {
+    try {
+        const response = api.get("/patient/appointments", config)
+        return response
+    } catch (error) {
+        console.log("Error while fetching appointments", error)
+        throw error
+    }
+}
+
 
