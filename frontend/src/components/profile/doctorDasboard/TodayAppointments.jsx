@@ -1,13 +1,4 @@
-export default function TodayAppointments() {
-
-    const appointments = [
-        { name: "Rajesh kumar", time: "10:30 AM", type: "Online" },
-        { name: "Rajesh kumar", time: "10:30 AM", type: "Online" },
-        { name: "Rajesh kumar", time: "10:30 AM", type: "Online" },
-        { name: "Rajesh kumar", time: "10:30 AM", type: "Clinic" },
-        { name: "Rajesh kumar", time: "10:30 AM", type: "Clinic" },
-        { name: "Rajesh kumar", time: "10:30 AM", type: "Clinic" },
-    ];
+export default function TodayAppointments({ appointments }) {
 
     return (
         <div className="bg-white rounded-2xl shadow-md p-6">
@@ -18,7 +9,7 @@ export default function TodayAppointments() {
 
             <div className="space-y-3">
 
-                {appointments.map((item, index) => (
+                {appointments?.map((item, index) => (
                     <div key={index} className="flex items-center justify-between border-b pb-2">
 
                         <p className="text-gray-600 text-sm">

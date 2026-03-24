@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import MetricCard from "./MetricCard";
 
-export default function DashboardMetrics({ isDoctor, metrics }) {
-    // [
-    //         { label: "Total Appointments", value: 125 },
-    //         { label: "Total Consultations", value: 79 }
-    //     ]
+export default function DashboardMetrics({ metrics }) {
 
 
     return (
@@ -14,7 +10,7 @@ export default function DashboardMetrics({ isDoctor, metrics }) {
                 <MetricCard
                     key={index}
                     label={metric.label}
-                    value={metric.value}
+                    value={metric.value || 0}
                 />
             ))}
         </div>

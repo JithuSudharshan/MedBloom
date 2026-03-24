@@ -1,27 +1,6 @@
-export default function ReviewsList() {
+export default function ReviewsList({ reviews }) {
 
-    const reviews = [
-        {
-            name: "Akshay suresh",
-            avatar: "https://i.pravatar.cc/40",
-            comment: "Awesome experience.."
-        },
-        {
-            name: "Akshay suresh",
-            avatar: "https://i.pravatar.cc/41",
-            comment: "Awesome experience.."
-        },
-        {
-            name: "Akshay suresh",
-            avatar: "https://i.pravatar.cc/42",
-            comment: "Awesome experience.."
-        },
-        {
-            name: "Akshay suresh",
-            avatar: "https://i.pravatar.cc/43",
-            comment: "Awesome experience.."
-        }
-    ];
+
 
     return (
         <div className="bg-white rounded-2xl shadow-md p-6">
@@ -32,7 +11,7 @@ export default function ReviewsList() {
 
             <div className="space-y-3">
 
-                {reviews.map((review, index) => (
+                {reviews?.map((review, index) => (
                     <div
                         key={index}
                         className="border border-teal-200 rounded-lg p-3 flex gap-3"
@@ -46,11 +25,11 @@ export default function ReviewsList() {
 
                         <div>
                             <p className="text-sm font-medium text-gray-700">
-                                {review.name}
+                                {review?.name}
                             </p>
 
                             <p className="text-xs text-gray-500">
-                                {review.comment}
+                                {review?.comment}
                             </p>
                         </div>
 

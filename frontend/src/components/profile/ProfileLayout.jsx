@@ -10,7 +10,7 @@ import DoctorOverview from "./doctorDasboard/DoctorOverview";
 import { fetchAppointmentsForPatient } from "../../api/patientApi";
 import { showToast } from "../ui/Toast";
 import Loader from "../ui/Loading";
-import { fetchAppointmentsForDoctor } from "../../api/doctorApi";
+import { fetchAppointmentsForDoctor, fetchMetricsForDoctor } from "../../api/doctorApi";
 
 const ProfileLayout = ({
     user,
@@ -21,13 +21,12 @@ const ProfileLayout = ({
     isActive
 }) => {
 
-    console.log("Profile", profileData)
-
     const [loading, setLoading] = useState(false)
 
     const [activeKey, setActiveKey] = useState(isActive)
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
     const [localUser, setLocalUser] = useState(profileData)
+    const [dashboardMetrics, setDashboardMetrics] = useState([])
 
     const [appointments, setAppointments] = useState([])
     const [appointmentPage, setAppointmentPage] = useState(1);
@@ -72,6 +71,25 @@ const ProfileLayout = ({
         }
     }
 
+    const fetchMetrics = async () => {
+        try {
+            setLoading(true)
+            if (activeKey !== "dashboard") return;
+            const response = await fetchMetricsForDoctor()
+            if (!response.data.success) {
+                showToast.error(response.error.message || "Failed to fetch Dashboard Data")
+            }
+            setDashboardMetrics(response?.data)
+
+            console.log("dashboardMetrics", dashboardMetrics)
+
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     useEffect(() => {
         if (activeKey === "appointments") {
             fetchAppointments(appointmentPage);
@@ -79,11 +97,15 @@ const ProfileLayout = ({
     }, [activeKey, appointmentPage]);
 
 
-
-
     useEffect(() => {
         setLocalUser(profileData)
     }, [profileData])
+
+    useEffect(() => {
+        if (activeKey === "dashboard") {
+            fetchMetrics()
+        }
+    }, [activeKey])
 
 
     const handleAvatarSaved = (newAvatarUrl) => {
@@ -117,7 +139,13 @@ const ProfileLayout = ({
                 {/* Main cards and dashboard content */}
                 <main className="flex-1 mt-15 flex">
                     {activeKey === "dashboard" && (
-                        <DoctorOverview doctorName={localUser?.fullName} />
+                        <DoctorOverview
+                            doctorName={localUser?.fullName}
+                            metrics={dashboardMetrics?.metrics}
+                            TotalEarnigs={dashboardMetrics?.TotalEarnigs}
+                            TodaysAppointments={dashboardMetrics?.TodaysAppointments}
+                            topReviews={dashboardMetrics?.reviews}
+                        />
                     )}
                     {activeKey === "personal" && (
                         <>
