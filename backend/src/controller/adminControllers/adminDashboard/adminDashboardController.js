@@ -730,3 +730,67 @@ export const fetchAppointments = async (req, res) => {
         })
     }
 }
+
+export const fetchMetrics = async (req, res) => {
+    try {
+
+        const metrics = [
+            { label: "Total Patients", value: 345 },
+            { label: "Active Doctors", value: 56 },
+            { label: "Today's Appointments", value: 125 },
+            { label: "Monthly Appointments", value: 725 },
+        ]
+
+        const monthlyEarnings = 45000;
+
+        const TopRatedDoctors = [
+            {
+                id: 1,
+                name: "Dr. Arathy Krishna",
+                avatar: "https://i.pravatar.cc/40",
+            },
+            {
+                id: 2,
+                name: "Dr. Jayadeep Sunil",
+                avatar: "https://i.pravatar.cc/41",
+            },
+            {
+                id: 3,
+                name: "Dr. Chritina Raichel",
+                avatar: "https://i.pravatar.cc/42",
+            },
+            {
+                id: 4,
+                name: "Dr. Gahana EV",
+                avatar: "https://i.pravatar.cc/43",
+            },
+            {
+                id: 5,
+                name: "Dr. Jagan Laal",
+                avatar: "https://i.pravatar.cc/44",
+            },
+        ];
+
+        const graphData = [
+            { "name": "ortho", "value": 120 },
+            { "name": "cardio", "value": 110 },
+            { "name": "Derma", "value": 100 },
+            { "name": "Therapy", "value": 90 }
+        ]
+
+        return res.status(200).json({
+            success: true,
+            metrics,
+            monthlyEarnings,
+            TopRatedDoctors,
+            graphData
+        });
+
+    } catch (error) {
+        console.error("Error while fetching dashboard data:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
