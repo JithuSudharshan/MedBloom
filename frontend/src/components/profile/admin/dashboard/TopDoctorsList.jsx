@@ -2,7 +2,7 @@ export default function TopDoctorsList({ doctors }) {
     return (
         <div className="bg-white rounded-2xl shadow-md p-6 h-[360px]">
             <ul className="space-y-6">
-                {doctors.map((doctor) => (
+                {doctors?.map((doctor) => (
                     <li key={doctor.id} className="flex items-center gap-4">
                         <img
                             src={doctor.avatar}

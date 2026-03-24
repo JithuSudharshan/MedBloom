@@ -206,3 +206,13 @@ export const fetchAppointmentsForAdmin = async (config) => {
         throw error
     }
 }
+
+export const fetchMetricsForAdmin = async () => {
+    try {
+        const response = await api.get("/admin/Dashboard-Metrics")
+        return response
+    } catch (error) {
+        console.log("Error while fetchings appoinments", error)
+        throw error
+    }
+}

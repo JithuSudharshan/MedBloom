@@ -11,6 +11,7 @@ import {
     fetchAppointmentsForAdmin,
     fetchApprovedList,
     fetchDataForTable,
+    fetchMetricsForAdmin,
     fetchPatientsList,
     unblockDoctor
 } from "../../../api/adminApi";
@@ -26,8 +27,11 @@ import Loader from "../../ui/Loading.jsx";
 
 
 const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
+
+
     const [activeKey, setActiveKey] = useState("dashboard");
     const [openApproval, setOpenApproval] = useState(false);
+    const [dashboardMetrics, setDashboardMetrics] = useState([])
 
     const [doctorPage, setDoctorPage] = useState(1);
     const [patientPage, setPatientPage] = useState(1);
@@ -89,7 +93,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
             } = res?.data?.data;
 
             setDoctors(doctors);
-            setAppointmentPage(page);
+            setDoctorPage(page);
             setTotalDoctorPages(totalPages);
             setTotalcount(totalNoOfDoctors)
             setPendingCount(totalPending)
@@ -152,7 +156,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
             } = res?.data?.data;
 
             setAppointments(appointments);
-            setDoctorPage(page);
+            setAppointmentPage(page);
             setTotalAppointmentPages(totalPages);
             setTotalcount(totalNoOfAppointments);
 
@@ -161,6 +165,25 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
             showToast.error("Something  wrong while fetching data")
         } finally {
             setLoading(false);
+        }
+    }
+
+    const fetchMetrics = async () => {
+        try {
+            setLoading(true)
+            if (activeKey !== "dashboard") return;
+            const response = await fetchMetricsForAdmin()
+            if (!response.data.success) {
+                showToast.error(response.error.message || "Failed to fetch Dashboard Data")
+            }
+            setDashboardMetrics(response?.data)
+
+            console.log("dashboardMetrics", dashboardMetrics)
+
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -182,6 +205,12 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
             fetchPatients(patientPage);
         }
     }, [activeKey, patientPage]);
+
+    useEffect(() => {
+        if (activeKey === "dashboard") {
+            fetchMetrics()
+        }
+    }, [activeKey])
 
     const handleViewApprovedDoctor = (doctor) => {
         console.log("doctor details", doctor)
@@ -283,6 +312,8 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
         }
     }, [isEditModalOpen, selectedDepartment, reset]);
 
+
+
     return (
         <div className="min-h-screen max-w-7xl mx-auto w-full">
             <div className="flex gap-10 py-10">
@@ -302,7 +333,13 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
 
                 <main className="flex-1 mt-15">
                     {activeKey === "dashboard" && (
-                        <ServiceOverview />
+                        <ServiceOverview
+                            metrics={dashboardMetrics?.metrics}
+                            MonthlyEarnings={dashboardMetrics?.monthlyEarnings}
+                            TopRatedDoctors={dashboardMetrics?.TopRatedDoctors}
+                            graphData={dashboardMetrics?.graphData}
+
+                        />
                     )}
                     {activeKey === "doctors" && (
                         openApproval ? (
@@ -350,7 +387,6 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                         />
                     )}
                     {activeKey === "notifications" && (<NotificationsPage />)}
-
                 </main>
             </div>
 

@@ -8,22 +8,17 @@ import {
 } from "recharts";
 import { useEffect, useState } from "react";
 
-export default function ConsultationBySpecialityChart() {
+export default function ConsultationBySpecialityChart({ graphData }) {
 
-    const [data, setData] = useState([
-        { "name": "ortho", "value": 120 },
-        { "name": "cardio", "value": 110 },
-        { "name": "Derma", "value": 100 },
-        { "name": "Therapy", "value": 90 }
-    ]);
+    const [data, setData] = useState(graphData || []);
 
     useEffect(() => {
-        fetch("/api/consultations-by-speciality")
-            .then(res => res.json())
-            .then(result => setData(result));
-    }, []);
+        setData(graphData || []);
+    }, [graphData]);
 
-    if (!data.length) {
+    console.log("graphData", graphData)
+
+    if (!Array.isArray(data) || data.length === 0) {
         return (
             <div className="h-[360px] bg-white rounded-2xl p-6 animate-pulse" />
         );
@@ -36,7 +31,7 @@ export default function ConsultationBySpecialityChart() {
             </h3>
 
             <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data}>
+                <BarChart data={graphData || []}>
                     <CartesianGrid vertical={false} stroke="#f0f0f0" />
                     <XAxis dataKey="name" tickLine={false} axisLine={false} />
                     <YAxis tickLine={false} axisLine={false} />
