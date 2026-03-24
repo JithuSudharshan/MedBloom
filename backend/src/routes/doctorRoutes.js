@@ -3,7 +3,7 @@ import express from "express";
 import upload from "../config/multer.js";
 import { uploadToCloudinary } from "../middlewares/uploadToCloudinary.js";
 import { doctorBasicOnboarding, doctorProffesionalOnboarding } from "../controller/userControllers/DoctorDashboard/docotorOnboarding.js";
-import { editDoctorProfile, fetchDoctorDetails, updateDoctorAvatar } from "../controller/userControllers/DoctorDashboard/doctorProfileControllers.js";
+import { editDoctorProfile, fetchDoctorDetails, fetchMetricsForDoctor, updateDoctorAvatar } from "../controller/userControllers/DoctorDashboard/doctorProfileControllers.js";
 
 const router = express.Router();
 
@@ -38,5 +38,6 @@ router.patch(
     upload.none(),
     editDoctorProfile
 )
+router.get("/Dashboard-Metrics", fetchMetricsForDoctor)
 
 export default router;

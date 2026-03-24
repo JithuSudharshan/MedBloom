@@ -69,3 +69,12 @@ export const fetchAppointmentsForDoctor = async (config) => {
     }
 }
 
+export const fetchMetricsForDoctor = async () => {
+    try {
+        const response = await api.get("/doctor/Dashboard-Metrics")
+        return response
+    } catch (error) {
+        console.log("Error while fetchings appoinments", error)
+        throw error
+    }
+}

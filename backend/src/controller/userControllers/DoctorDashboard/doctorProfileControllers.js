@@ -178,3 +178,61 @@ export const editDoctorProfile = async (req, res) => {
     }
 };
 
+export const fetchMetricsForDoctor = async (req, res) => {
+    try {
+
+        const metrics = [
+            { label: "Total Appointments", value: 125 },
+            { label: "Total Consultations", value: 79 }
+        ]
+
+        const TotalEarnigs = 45000
+
+        const TodaysAppointments = [
+            { name: "Rajesh kumar", time: "10:30 AM", type: "Online" },
+            { name: "Rajesh kumar", time: "10:30 AM", type: "Online" },
+            { name: "Rajesh kumar", time: "10:30 AM", type: "Online" },
+            { name: "Rajesh kumar", time: "10:30 AM", type: "Clinic" },
+            { name: "Rajesh kumar", time: "10:30 AM", type: "Clinic" },
+            { name: "Rajesh kumar", time: "10:30 AM", type: "Clinic" },
+        ];
+
+        const reviews = [
+            {
+                name: "Akshay suresh",
+                avatar: "https://i.pravatar.cc/40",
+                comment: "Awesome experience.."
+            },
+            {
+                name: "Akshay suresh",
+                avatar: "https://i.pravatar.cc/41",
+                comment: "Awesome experience.."
+            },
+            {
+                name: "Akshay suresh",
+                avatar: "https://i.pravatar.cc/42",
+                comment: "Awesome experience.."
+            },
+            {
+                name: "Akshay suresh",
+                avatar: "https://i.pravatar.cc/43",
+                comment: "Awesome experience.."
+            }
+        ];
+
+        return res.status(200).json({
+            success: true,
+            metrics,
+            TotalEarnigs,
+            TodaysAppointments,
+            reviews
+        });
+
+    } catch (error) {
+        console.error("Error while fetching dashboard data:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
