@@ -17,7 +17,8 @@ import {
     addNewDepartment,
     fetchDataForDepartmentTable,
     editDepartmentInfo,
-    fetchAppointments
+    fetchAppointments,
+    fetchMetrics
 } from '../controller/adminControllers/adminDashboard/adminDashboardController.js';
 import {
     editPatientsProfile,
@@ -48,6 +49,7 @@ router.post("/departemnts/add-new", addNewDepartment)
 router.get("/department/table-info", fetchDataForDepartmentTable)
 router.post("/department/edit-info", editDepartmentInfo)
 router.get("/appointments", fetchAppointments)
+router.get("/Dashboard-Metrics", fetchMetrics);
 
 router.patch(
     "/doctors/:id/edit-profile",
