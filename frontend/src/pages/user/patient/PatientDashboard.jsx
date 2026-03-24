@@ -11,37 +11,6 @@ import { loadPatientData } from '../../../api/patientApi';
 import Loader from '../../../components/ui/Loading';
 import IsonboardedWarning from '../../../components/profile/IsonboardedWarning';
 
-const dummyAppointments = [
-    {
-        id: 1,
-        doctorName: "Dr. Arjun Menon",
-        speciality: "Cardiology",
-        dateTimeLabel: "2023-11-10 at 10:00 AM",
-        status: "Upcoming",
-    },
-    {
-        id: 2,
-        doctorName: "Dr. Arjun Menon",
-        speciality: "Cardiology",
-        dateTimeLabel: "2023-11-10 at 10:00 AM",
-        status: "Upcoming",
-    },
-    {
-        id: 3,
-        doctorName: "Dr. Arjun Menon",
-        speciality: "Cardiology",
-        dateTimeLabel: "2023-11-10 at 10:00 AM",
-        status: "Completed",
-    },
-    {
-        id: 4,
-        doctorName: "Dr. Arjun Menon",
-        speciality: "Cardiology",
-        dateTimeLabel: "2023-11-10 at 10:00 AM",
-        status: "Cancelled",
-    }
-];
-
 export default function PatientProfilePage() {
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const navigate = useNavigate();
@@ -107,7 +76,6 @@ export default function PatientProfilePage() {
                 sections={patientProfileConfig.sections}
                 actions={patientProfileConfig.actions}
                 profileData={patientDetails}
-                appointments={dummyAppointments}
                 onLogout={handleLogout}
                 isLoggingOut={isLoggingOut}
             >
