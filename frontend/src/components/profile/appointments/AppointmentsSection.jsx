@@ -6,6 +6,8 @@ import AppointmentDrawer from "./AppointmentDrawer";
 import CancelAppointmentModal from "./CancelAppointmentModal";
 import { Pagination } from "../../ui/Pagination";
 import FindDoctorModal from "./FindDoctorModal";
+import ReviewModal from "./ReviewModal";
+
 const TABS = ["All", "Upcoming", "Completed", "Cancelled"];
 
 export default function AppointmentsSection({
@@ -24,6 +26,8 @@ export default function AppointmentsSection({
     const [isFindDoctorOpen, setIsFindDoctorOpen] = useState(false);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const [appointmentToCancel, setAppointmentToCancel] = useState(null);
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [appointmentToReview, setAppointmentToReview] = useState(null);
 
     const handleReschedule = (app) => {
         const docId = app.doctorId || app.doctor; // Use appropriate property
@@ -143,8 +147,11 @@ export default function AppointmentsSection({
                             secondaryText={app.secondaryText || app.speciality}
                             dateTimeLabel={app.dateTimeLabel}
                             status={app.status}
-                            showFeedback={app.status === "Completed"}
-                            onFeedback={() => { }}
+                            showFeedback={app.status === "Completed" && !app.isReviewed}
+                            onFeedback={() => {
+                                setAppointmentToReview(app);
+                                setIsReviewModalOpen(true);
+                            }}
                             onViewPrescription={() => { }}
                             onReschedule={() => handleReschedule(app)}
                             onCancel={() => initiateCancel(app)}
@@ -176,6 +183,21 @@ export default function AppointmentsSection({
                 isOpen={isCancelModalOpen}
                 onClose={() => setIsCancelModalOpen(false)}
                 onConfirm={handleConfirmCancel}
+            />
+
+            {/* Review Modal */}
+            <ReviewModal
+                isOpen={isReviewModalOpen}
+                onClose={() => {
+                    setIsReviewModalOpen(false);
+                    setAppointmentToReview(null);
+                }}
+                appointment={appointmentToReview}
+                onSuccess={() => {
+                    if (appointmentToReview) {
+                        appointmentToReview.isReviewed = true;
+                    }
+                }}
             />
 
             {/* Slide-over Drawer */}

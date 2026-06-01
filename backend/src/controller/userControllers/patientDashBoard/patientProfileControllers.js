@@ -290,9 +290,9 @@ export const fetchPatientAppointments = async (req, res) => {
                 consultationMode: app.mode || app.doctor?.consultationMode || "offline",
                 dateTimeLabel: `${formattedDate}  ${formattedTime}`,
                 rawDate: app.date,
-                rawStartTime: app.startTime,
                 rawEndTime: app.endTime,
                 status: mappedStatus,
+                isReviewed: app.isReviewed || false,
             }
         });
 

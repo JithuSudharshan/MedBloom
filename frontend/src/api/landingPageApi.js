@@ -39,3 +39,13 @@ export const fetchAvailableSlots = async (id, date) => {
         throw error;
     }
 };
+
+export const fetchDoctorReviewsApi = async (id) => {
+    try {
+        const response = await api.get(`/doctors/${id}/reviews`);
+        return response;
+    } catch (error) {
+        console.error("Error fetching doctor reviews:", error);
+        throw error;
+    }
+};

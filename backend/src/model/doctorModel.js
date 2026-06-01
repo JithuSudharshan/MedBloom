@@ -88,6 +88,10 @@ const DoctorSchema = new Schema(
             type: Number,
             default: 0
         },
+        totalReviews: {
+            type: Number,
+            default: 0
+        },
         yearOfExperience: {
             type: Number,
             default: 0

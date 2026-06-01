@@ -181,3 +181,14 @@ export const verifyPatientTopUp = async (paymentData) => {
         throw error;
     }
 }
+
+// Review APIs
+export const submitReviewApi = async (reviewData) => {
+    try {
+        const response = await api.post("/patient/reviews", reviewData);
+        return response;
+    } catch (error) {
+        console.error("Error submitting review", error);
+        throw error;
+    }
+}

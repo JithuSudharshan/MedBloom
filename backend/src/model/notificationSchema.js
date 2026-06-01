@@ -27,7 +27,8 @@ const notificationSchema = new mongoose.Schema({
             'appointment_booked', 
             'appointment_cancelled', 
             'appointment_rescheduled', 
-            'video_reminder'
+            'video_reminder',
+            'new_review'
         ],
         required: true
     },

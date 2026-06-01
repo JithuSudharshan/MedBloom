@@ -7,8 +7,9 @@ import { createOrderForAppointment, verifyPaymentForAppointment, reschedulePatie
 import { motion } from 'framer-motion';
 import { Star, Award, Users, MapPin, BadgeCheck, Loader2 } from 'lucide-react';
 import PatientSlotPicker from '../../components/ui/PatientSlotPicker';
-import { fetchPublicDoctorProfile } from '../../api/landingPageApi';
+import { fetchPublicDoctorProfile, fetchDoctorReviewsApi } from '../../api/landingPageApi';
 import Loader from '../../components/ui/Loading';
+import ReviewsList from '../../components/profile/doctorDasboard/ReviewsList';
 import { useAuth } from '../../context/AuthContext';
 
 export default function PublicDoctorProfile() {
@@ -24,6 +25,7 @@ export default function PublicDoctorProfile() {
     const oldMode = searchParams.get('oldMode');
 
     const [doctorData, setDoctorData] = useState(null);
+    const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isProcessing, setIsProcessing] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
@@ -58,19 +60,23 @@ export default function PublicDoctorProfile() {
     }, []);
 
     useEffect(() => {
-        const fetchProfile = async () => {
+        const fetchProfileAndReviews = async () => {
             try {
                 const response = await fetchPublicDoctorProfile(id);
                 if (response.data.success) {
                     setDoctorData(response.data.data);
                 }
+                const reviewsResponse = await fetchDoctorReviewsApi(id);
+                if (reviewsResponse.data.success) {
+                    setReviews(reviewsResponse.data.data);
+                }
             } catch (error) {
-                console.error("Failed to load doctor profile");
+                console.error("Failed to load doctor profile or reviews");
             } finally {
                 setLoading(false);
             }
         };
-        fetchProfile();
+        fetchProfileAndReviews();
     }, [id]);
 
     if (loading) return <Loader />;
@@ -276,6 +282,16 @@ export default function PublicDoctorProfile() {
                                 <h3 className="text-2xl font-bold text-slate-900 mb-1">{doctor.numberOfPatientsTreated || 0}+</h3>
                                 <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Happy Patients</p>
                             </div>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="flex-1 overflow-y-auto pr-2 
+                                [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-200"
+                        >
+                            <ReviewsList reviews={reviews} />
                         </motion.div>
 
                     </div>

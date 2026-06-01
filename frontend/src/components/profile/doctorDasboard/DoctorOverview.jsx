@@ -3,7 +3,7 @@ import ReviewsList from "./ReviewsList";
 import DashboardMetrics from "../admin/dashboard/DashboardMetrics";
 import TodayAppointments from "./TodayAppointments";
 
-export default function DoctorOverview({ doctorName, metrics, TotalEarnigs, TodaysAppointments, topReviews }) {
+export default function DoctorOverview({ doctorName, metrics, TotalEarnigs, TodaysAppointments, topReviews, ratingStats }) {
     return (
         <div className="bg-[#FCF5F5] rounded-[2.5rem] p-8 lg:p-12 shadow-[0_20px_60px_-15px_rgba(176,139,140,0.2)] min-h-full flex flex-col w-full">
 
@@ -32,7 +32,7 @@ export default function DoctorOverview({ doctorName, metrics, TotalEarnigs, Toda
                     <TodayAppointments appointments={TodaysAppointments} />
                 </div>
                 <div className="overflow-y-auto pr-2 h-full [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#E8D3D4] hover:[&::-webkit-scrollbar-thumb]:bg-[#D4B8B9]">
-                    <ReviewsList reviews={topReviews} />
+                    <ReviewsList reviews={topReviews} ratingStats={ratingStats} variant="dashboard" />
                 </div>
             </div>
 

@@ -10,6 +10,7 @@ import { authenticateToken, authorizeRole } from "../middlewares/authMiddleware.
 import { uploadRecord, getRecords, updateRecord, deleteRecord } from "../controllers/medicalRecordController.js";
 
 import { getTransactions, initiateTopUp, verifyTopUp } from "../controller/userControllers/walletController.js";
+import { submitReview } from "../controller/userControllers/patientDashBoard/reviewController.js";
 
 const router = express.Router();
 
@@ -50,5 +51,8 @@ router.delete("/records/:id", authenticateToken(), authorizeRole("patient"), del
 router.get("/wallet/transactions", authenticateToken(), authorizeRole("patient"), getTransactions);
 router.post("/wallet/topup/initiate", authenticateToken(), authorizeRole("patient"), initiateTopUp);
 router.post("/wallet/topup/verify", authenticateToken(), authorizeRole("patient"), verifyTopUp);
+
+// Review Routes
+router.post("/reviews", authenticateToken(), authorizeRole("patient"), submitReview);
 
 export default router;

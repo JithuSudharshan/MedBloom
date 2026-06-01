@@ -1,6 +1,7 @@
 import Doctor from "../../../model/doctorModel.js";
 import User from "../../../model/userModel.js";
 import Appointment from "../../../model/appointmentModel.js";
+import Review from "../../../model/reviewModel.js";
 import { formatDOB } from "../../../utils/formatters.js";
 
 
@@ -198,35 +199,44 @@ export const fetchMetricsForDoctor = async (req, res) => {
             { name: "Rajesh kumar", time: "10:30 AM", type: "Clinic" },
         ];
 
-        const reviews = [
-            {
-                name: "Akshay suresh",
-                avatar: "https://i.pravatar.cc/40",
-                comment: "Awesome experience.."
-            },
-            {
-                name: "Akshay suresh",
-                avatar: "https://i.pravatar.cc/41",
-                comment: "Awesome experience.."
-            },
-            {
-                name: "Akshay suresh",
-                avatar: "https://i.pravatar.cc/42",
-                comment: "Awesome experience.."
-            },
-            {
-                name: "Akshay suresh",
-                avatar: "https://i.pravatar.cc/43",
-                comment: "Awesome experience.."
-            }
-        ];
+        const userId = req.user._id;
+        const doctor = await Doctor.findOne({ user: userId });
+
+        let reviews = [];
+        let ratingStats = {
+            overallRating: 0,
+            totalReviews: 0,
+            breakdown: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+        };
+
+        if (doctor) {
+            reviews = await Review.find({ doctor: doctor._id })
+                .populate({
+                    path: 'patient',
+                    select: 'name profile_url user',
+                    populate: { path: 'user', select: 'name profile_url' }
+                })
+                .sort({ createdAt: -1 })
+                .limit(5); // Recent 5 reviews
+
+            // Fetch breakdown
+            const allReviews = await Review.find({ doctor: doctor._id }).select('rating');
+            allReviews.forEach(r => {
+                if (r.rating >= 1 && r.rating <= 5) {
+                    ratingStats.breakdown[r.rating]++;
+                }
+            });
+            ratingStats.overallRating = doctor.rating;
+            ratingStats.totalReviews = doctor.totalReviews;
+        }
 
         return res.status(200).json({
             success: true,
             metrics,
             TotalEarnigs,
             TodaysAppointments,
-            reviews
+            reviews,
+            ratingStats
         });
 
     } catch (error) {

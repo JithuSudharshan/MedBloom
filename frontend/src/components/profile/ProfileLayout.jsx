@@ -167,6 +167,7 @@ const ProfileLayout = ({
                             TotalEarnigs={dashboardMetrics?.TotalEarnigs}
                             TodaysAppointments={dashboardMetrics?.TodaysAppointments}
                             topReviews={dashboardMetrics?.reviews}
+                            ratingStats={dashboardMetrics?.ratingStats}
                         />
                     )}
                     {activeKey === "personal" && (

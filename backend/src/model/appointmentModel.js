@@ -51,6 +51,10 @@ const appointmentSchema = new Schema(
         },
         notes: {
             type: String,
+        },
+        isReviewed: {
+            type: Boolean,
+            default: false
         }
     },
     { timestamps: true }
