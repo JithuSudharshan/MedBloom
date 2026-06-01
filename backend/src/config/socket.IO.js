@@ -1,4 +1,5 @@
 import { Server } from 'socket.io';
+import { videoCallSocket } from '../sockets/videoCallSocket.js';
 
 let io;
 
@@ -15,6 +16,10 @@ export const initSocket = (server) => {
         if (userId) {
             socket.join(userId.toString())
         }
+        
+        // Initialize video call socket handlers
+        videoCallSocket(io, socket);
+
         socket.on('disconnect', () => { });
     });
 }

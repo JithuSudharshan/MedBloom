@@ -87,6 +87,14 @@ const patientSchema = new mongoose.Schema({
     Mental_Health_History: {
         type: String,
         default: ''
+    },
+    appointments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Appointment'
+    }],
+    walletBalance: {
+        type: Number,
+        default: 0
     }
 }, {
     timestamps: true

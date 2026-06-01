@@ -114,6 +114,14 @@ const DoctorSchema = new Schema(
             type: String,
             enum: ["basic", "completed"],
             default: "basic",
+        },
+        appointments: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Appointment'
+        }],
+        walletBalance: {
+            type: Number,
+            default: 0
         }
     },
     { collection: "doctors", timestamps: true }
