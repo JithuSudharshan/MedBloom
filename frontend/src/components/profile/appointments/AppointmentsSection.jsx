@@ -1,7 +1,11 @@
 import { useState, useMemo } from "react";
+import { cancelPatientAppointment } from "../../../api/patientApi";
+import { useParams, useNavigate } from "react-router-dom";
 import AppointmentCard from "./AppointmentCard";
+import AppointmentDrawer from "./AppointmentDrawer";
+import CancelAppointmentModal from "./CancelAppointmentModal";
 import { Pagination } from "../../ui/Pagination";
-
+import FindDoctorModal from "./FindDoctorModal";
 const TABS = ["All", "Upcoming", "Completed", "Cancelled"];
 
 export default function AppointmentsSection({
@@ -9,10 +13,48 @@ export default function AppointmentsSection({
     page,
     totalPages,
     setPage,
+    userRole = "patient",
 }) {
+    const isDoctor = userRole === 'doctor';
+    const { id } = useParams();
+    const navigate = useNavigate();
 
     const [activeTab, setActiveTab] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
+    const [isFindDoctorOpen, setIsFindDoctorOpen] = useState(false);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [appointmentToCancel, setAppointmentToCancel] = useState(null);
+
+    const handleReschedule = (app) => {
+        const docId = app.doctorId || app.doctor; // Use appropriate property
+        navigate(`/doctor/${docId}?reschedule=true&oldId=${app.id || app._id}&oldMode=${app.consultationMode}`);
+    };
+
+    const initiateCancel = (app) => {
+        setAppointmentToCancel(app);
+        setIsCancelModalOpen(true);
+    };
+
+    const handleConfirmCancel = async (reason) => {
+        if (!appointmentToCancel) return;
+        
+        try {
+            const appointmentId = appointmentToCancel.id || appointmentToCancel._id;
+            const res = await cancelPatientAppointment(appointmentId, reason);
+            
+            if (res.data?.success) {
+                // Optimistically update the UI instead of forcing a full reload
+                // Note: The ideal way would be to call a fetchAppointments function passed from ProfileLayout.
+                // For now, we update the local object (though this won't persist across unmounts without refetching)
+                appointmentToCancel.status = 'Cancelled';
+            }
+        } catch (error) {
+            console.error("Failed to cancel appointment", error);
+        } finally {
+            setIsCancelModalOpen(false);
+            setAppointmentToCancel(null);
+        }
+    };
 
     const filteredAppointments = useMemo(() => {
 
@@ -22,12 +64,10 @@ export default function AppointmentsSection({
                 activeTab === "All" || app.status === activeTab;
 
             const matchesSearch =
-                app.doctorName
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase()) ||
-                app.speciality
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase());
+                (app.primaryTitle && app.primaryTitle.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (app.doctorName && app.doctorName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (app.secondaryText && app.secondaryText.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (app.speciality && app.speciality.toLowerCase().includes(searchTerm.toLowerCase()));
 
             return matchesTab && matchesSearch;
 
@@ -35,18 +75,27 @@ export default function AppointmentsSection({
 
     }, [appointments, activeTab, searchTerm]);
 
+    const selectedAppointment = id ? appointments.find(app => app.id === id || app._id === id) : null;
+
     return (
-        <section className="bg-white rounded-3xl shadow-[0_32px_80px_rgba(16,24,40,0.12)] px-8 py-8 w-full">
+        <section className={`bg-white rounded-[3rem] px-8 py-10 w-full flex-1 flex flex-col ${
+            isDoctor ? "shadow-[0_20px_60px_-15px_rgba(176,139,140,0.2)]" : "shadow-[0_20px_60px_-15px_rgba(0,109,111,0.2)]"
+        }`}>
 
             {/* Header */}
             <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-[20px] font-semibold text-[#006D6F]">
+                <h2 className={`text-[20px] font-semibold ${isDoctor ? "text-[#6B3B3D]" : "text-[#006D6F]"}`}>
                     My Appointments
                 </h2>
 
-                <button className="rounded-full bg-[#008C89] px-6 py-2 text-[13px] font-medium text-white shadow-sm hover:bg-[#006e6b] transition">
-                    Book New Appointment
-                </button>
+                {!isDoctor && (
+                    <button 
+                        onClick={() => setIsFindDoctorOpen(true)}
+                        className="rounded-full bg-[#008C89] px-6 py-2 text-[13px] font-medium text-white shadow-sm hover:bg-[#006e6b] transition"
+                    >
+                        Book New Appointment
+                    </button>
+                )}
             </div>
 
             {/* Search */}
@@ -65,7 +114,7 @@ export default function AppointmentsSection({
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
                                     className={`rounded-md border px-4 py-2 text-[13px] font-medium transition ${isActive
-                                        ? "border-[#008C89] bg-[#008C89] text-white"
+                                        ? (isDoctor ? "border-[#B08B8C] bg-[#B08B8C] text-white" : "border-[#008C89] bg-[#008C89] text-white")
                                         : "border-[#D1D5DB] bg-white text-[#4B5563] hover:bg-[#F3F4F6]"
                                         }`}
                                 >
@@ -80,7 +129,7 @@ export default function AppointmentsSection({
 
 
             {/* Appointment List */}
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-5 flex-1">
 
                 {filteredAppointments.length === 0 ? (
                     <p className="text-gray-500 text-sm text-center py-10">
@@ -90,16 +139,17 @@ export default function AppointmentsSection({
                     filteredAppointments.map((app) => (
                         <AppointmentCard
                             key={app.id}
-                            primaryTitle={app.doctorName}
-                            secondaryText={app.speciality}
+                            primaryTitle={app.primaryTitle || app.doctorName}
+                            secondaryText={app.secondaryText || app.speciality}
                             dateTimeLabel={app.dateTimeLabel}
                             status={app.status}
                             showFeedback={app.status === "Completed"}
                             onFeedback={() => { }}
                             onViewPrescription={() => { }}
-                            onReschedule={() => { }}
-                            onCancel={() => { }}
-                            onViewDetails={() => { }}
+                            onReschedule={() => handleReschedule(app)}
+                            onCancel={() => initiateCancel(app)}
+                            onViewDetails={() => navigate(`/${userRole}/appointments/${app.id || app._id}`)}
+                            userRole={userRole}
                         />
                     ))
                 )}
@@ -111,8 +161,32 @@ export default function AppointmentsSection({
                     current={page}
                     total={totalPages}
                     onChange={setPage}
+                    userRole={userRole}
                 />
             </div>
+
+            {/* Find Doctor Modal */}
+            <FindDoctorModal 
+                isOpen={isFindDoctorOpen} 
+                onClose={() => setIsFindDoctorOpen(false)} 
+            />
+
+            {/* Cancel Modal */}
+            <CancelAppointmentModal 
+                isOpen={isCancelModalOpen}
+                onClose={() => setIsCancelModalOpen(false)}
+                onConfirm={handleConfirmCancel}
+            />
+
+            {/* Slide-over Drawer */}
+            <AppointmentDrawer 
+                isOpen={!!(id && selectedAppointment)}
+                onClose={() => navigate(`/${userRole}/appointments`)}
+                appointment={selectedAppointment}
+                userRole={userRole}
+                onCancel={() => initiateCancel(selectedAppointment)}
+                onReschedule={() => handleReschedule(selectedAppointment)}
+            />
 
         </section>
     );
