@@ -3,7 +3,10 @@ import express from "express";
 import upload from "../config/multer.js";
 import { uploadToCloudinary } from "../middlewares/uploadToCloudinary.js";
 import { doctorBasicOnboarding, doctorProffesionalOnboarding } from "../controller/userControllers/DoctorDashboard/docotorOnboarding.js";
-import { editDoctorProfile, fetchDoctorDetails, fetchMetricsForDoctor, updateDoctorAvatar } from "../controller/userControllers/DoctorDashboard/doctorProfileControllers.js";
+import { editDoctorProfile, fetchDoctorDetails, fetchMetricsForDoctor, updateDoctorAvatar, fetchDoctorAppointments, savePrescription } from "../controller/userControllers/DoctorDashboard/doctorProfileControllers.js";
+import { getAvailability, updateAvailability } from "../controller/userControllers/DoctorDashboard/doctorAvailabilityController.js";
+import { authenticateToken, authorizeRole } from "../middlewares/authMiddleware.js";
+import { getTransactions, initiateTopUp, verifyTopUp } from "../controller/userControllers/walletController.js";
 
 const router = express.Router();
 
@@ -39,5 +42,14 @@ router.patch(
     editDoctorProfile
 )
 router.get("/Dashboard-Metrics", fetchMetricsForDoctor)
+router.get("/appointments", fetchDoctorAppointments)
+router.get("/availability", getAvailability)
+router.put("/availability", updateAvailability)
+router.put("/appointments/:id/prescription", savePrescription)
+
+// Wallet Routes
+router.get("/wallet/transactions", authenticateToken(), authorizeRole("doctor"), getTransactions);
+router.post("/wallet/topup/initiate", authenticateToken(), authorizeRole("doctor"), initiateTopUp);
+router.post("/wallet/topup/verify", authenticateToken(), authorizeRole("doctor"), verifyTopUp);
 
 export default router;

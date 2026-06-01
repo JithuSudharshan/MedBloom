@@ -17,7 +17,7 @@ export const PublicRoute = () => {
     // If authenticated, redirect to appropriate dashboard
     if (isAuthenticated) {
         if (isPatient) {
-            return <Navigate to="/patient/dashboard" replace />
+            return <Navigate to="/patient/personal" replace />
         }
         if (isDoctor) {
             return <Navigate to="/doctor/dashboard" replace />

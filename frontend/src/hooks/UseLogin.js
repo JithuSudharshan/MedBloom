@@ -65,7 +65,7 @@ export default function useLogin() {
                 if (userRole === 'doctor') {
                     navigate('/doctor/dashboard');
                 } else {
-                    navigate('/patient/dashboard');
+                    navigate('/patient/personal');
                 }
 
                 reset();

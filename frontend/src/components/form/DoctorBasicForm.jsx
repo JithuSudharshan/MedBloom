@@ -40,6 +40,7 @@ export default function DoctorBasicForm({
                         register={register}
                         error={errors[field.name]}
                         setValue={setValue}
+                        role="doctor"
                     />
                 );
             case "input":
@@ -52,6 +53,7 @@ export default function DoctorBasicForm({
                         error={errors[field.name]}
                         placeholder={field.placeholder}
                         type={field.inputType || "text"}
+                        role="doctor"
                     />
                 );
             case "radio":
@@ -63,6 +65,7 @@ export default function DoctorBasicForm({
                         options={field.options}
                         register={register}
                         error={errors[field.name]}
+                        role="doctor"
                     />
                 );
             case "textarea":
@@ -75,6 +78,7 @@ export default function DoctorBasicForm({
                         error={errors[field.name]}
                         placeholder={field.placeholder}
                         rows={field.rows}
+                        role="doctor"
                     />
                 );
             case "date":
@@ -86,6 +90,7 @@ export default function DoctorBasicForm({
                         register={register}
                         setValue={setValue}
                         error={errors[field.name]}
+                        role="doctor"
                     />
                 );
             case "select":
@@ -98,6 +103,7 @@ export default function DoctorBasicForm({
                         error={errors[field.name]}
                         placeholder={field.placeholder}
                         options={field.options}
+                        role="doctor"
                     />
                 );
             default:
@@ -107,7 +113,7 @@ export default function DoctorBasicForm({
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl mx-auto p-6 bg-white rounded shadow">
-            <h2 className="text-2xl font-semibold text-teal-700 mb-6">Basic Details</h2>
+            <h2 className="text-2xl font-semibold text-[#6B3B3D] mb-6">Basic Details</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6">
                 {basicFields.map(renderField)}
             </div>
@@ -124,6 +130,7 @@ export default function DoctorBasicForm({
                     error={errors.consultationFeesOnline}
                     placeholder="e.g., 500"
                     type="number"
+                    role="doctor"
                 />
             )}
 
@@ -135,6 +142,7 @@ export default function DoctorBasicForm({
                     error={errors.consultationFeesOffline}
                     placeholder="e.g., 700"
                     type="number"
+                    role="doctor"
                 />
             )}
 
@@ -150,8 +158,9 @@ export default function DoctorBasicForm({
                 )}
                 <Button
                     loading={isSubmitting}
-                    className="px-10 py-3 hover:bg-teal-600"
+                    className="px-10 py-3"
                     type="submit"
+                    role="doctor"
                 >
                     {isSubmitting ? "Saving..." : mode === "edit" ? "Save changes" : "Save and Continue"}
                 </Button>

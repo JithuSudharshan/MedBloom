@@ -35,6 +35,7 @@ const LoginForm = ({ selected, isAdmin }) => {
                     register={register}
                     error={errors?.email}
                     placeholder="Enter your email"
+                    role={selected}
                 />
                 <PasswordInput
                     label="Password"
@@ -42,20 +43,21 @@ const LoginForm = ({ selected, isAdmin }) => {
                     register={register}
                     error={errors?.password}
                     placeholder="Enter your password"
+                    role={selected}
                 />
 
-                {isAdmin ? <></> : <p className="text-xs font-medium md-3 text-right hover:underline text-teal-600 cursor-pointer " onClick={naviagteToForgotPassword} >forgot password</p>}
+                {isAdmin ? <></> : <p className={`text-xs font-medium md-3 text-right hover:underline cursor-pointer transition-colors ${selected === "Doctor" ? "text-[#B08B8C]" : "text-teal-600"}`} onClick={naviagteToForgotPassword} >forgot password</p>}
 
 
-                {isAdmin ? <Button loading={loading} type="submit" >{loading ? "Signing in..." : "Sign In as Admin"}</Button>
+                {isAdmin ? <Button loading={loading} type="submit" role="admin" >{loading ? "Signing in..." : "Sign In as Admin"}</Button>
                     :
-                    <Button loading={loading} type="submit">{loading ? "Signing in..." : `Sign In as ${selected}`}</Button>}
+                    <Button loading={loading} type="submit" role={selected}>{loading ? "Signing in..." : `Sign In as ${selected}`}</Button>}
 
             </form>
             {/* Link to login page */}
             {isAdmin ? <></> : <p className="text-sm text-left mt-5 text-gray-600 mt-4">
                 Not registered yet? Join now{" "}
-                <a href="/signup" onClick={switchToSignup} className="text-teal-500 font-medium hover:underline">
+                <a href="/signup" onClick={switchToSignup} className={`font-medium hover:underline transition-colors ${selected === "Doctor" ? "text-[#B08B8C]" : "text-teal-500"}`}>
                     Register
                 </a>
             </p>}

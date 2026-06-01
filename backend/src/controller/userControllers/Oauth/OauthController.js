@@ -137,8 +137,9 @@ export const handleOAuthCallback = async (req, res) => {
             delete req.session.oauth_role;
             delete req.session.oauth_nonce;
 
-            console.log(`SUCCESS: Redirecting to /${user.role}/dashboard`)
-            res.redirect(`http://localhost:5173/${user.role}/dashboard`)
+            const redirectPath = user.role === 'patient' ? '/patient/personal' : `/${user.role}/dashboard`;
+            console.log(`SUCCESS: Redirecting to ${redirectPath}`)
+            res.redirect(`http://localhost:5173${redirectPath}`)
         })
 
     } catch (error) {

@@ -28,3 +28,27 @@ export const formatName = (nameString) => {
         .join(" ")
 }
 
+export const formatNotificationDateTime = (dateStr, timeStr) => {
+    try {
+        let dateObj;
+        if (timeStr && timeStr.includes('T')) {
+            dateObj = new Date(timeStr);
+        } else if (timeStr) {
+            dateObj = new Date(`${dateStr}T${timeStr}`);
+        } else {
+            dateObj = new Date(dateStr);
+        }
+
+        if (isNaN(dateObj.getTime())) return `${dateStr} ${timeStr || ''}`.trim();
+
+        const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
+        const formattedDate = dateObj.toLocaleDateString('en-US', optionsDate);
+
+        const optionsTime = { hour: '2-digit', minute: '2-digit', hour12: true };
+        const formattedTime = dateObj.toLocaleTimeString('en-US', optionsTime);
+
+        return `${formattedDate} at ${formattedTime}`;
+    } catch (e) {
+        return `${dateStr} ${timeStr || ''}`.trim();
+    }
+};

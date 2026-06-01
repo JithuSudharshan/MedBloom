@@ -61,7 +61,7 @@ export const editDoctorProfile = async (formData) => {
 
 export const fetchAppointmentsForDoctor = async (config) => {
     try {
-        const response = api.get("/doctor/appointments", config)
+        const response = await api.get("/doctor/appointments", config)
         return response
     } catch (error) {
         console.log("Error while fetching appointments", error)
@@ -76,5 +76,56 @@ export const fetchMetricsForDoctor = async () => {
     } catch (error) {
         console.log("Error while fetchings appoinments", error)
         throw error
+    }
+}
+
+export const fetchDoctorAvailability = async () => {
+    try {
+        const response = await api.get("/doctor/availability")
+        return response
+    } catch (error) {
+        console.log("Error while fetching doctor availability", error)
+        throw error
+    }
+}
+
+export const saveDoctorAvailability = async (payload) => {
+    try {
+        const response = await api.put("/doctor/availability", payload)
+        return response
+    } catch (error) {
+        console.log("Error while saving doctor availability", error)
+        throw error
+    }
+}
+
+// Wallet APIs
+export const fetchDoctorWallet = async () => {
+    try {
+        const response = await api.get("/doctor/wallet/transactions");
+        return response;
+    } catch (error) {
+        console.error("Error fetching doctor wallet", error);
+        throw error;
+    }
+}
+
+export const initiateDoctorTopUp = async (amount) => {
+    try {
+        const response = await api.post("/doctor/wallet/topup/initiate", { amount });
+        return response;
+    } catch (error) {
+        console.error("Error initiating doctor top up", error);
+        throw error;
+    }
+}
+
+export const verifyDoctorTopUp = async (paymentData) => {
+    try {
+        const response = await api.post("/doctor/wallet/topup/verify", paymentData);
+        return response;
+    } catch (error) {
+        console.error("Error verifying doctor top up", error);
+        throw error;
     }
 }

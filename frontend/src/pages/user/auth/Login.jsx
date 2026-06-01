@@ -9,7 +9,7 @@ const Login = () => {
 
     return (
         <div className='flex h-screen'>
-            <LeftHero imgSrc={role === 'Patient' ? patientImg : doctorImg} imgSize={"w-1/2"} headLine={"Healthcare made simple"} sentence={role === "Patient" ? "Log in to book appointments, view your health records, and stay connected with your doctors." : "Log in to manage your appointments, connect with patients, and provide the best care with ease."} />
+            <LeftHero imgSrc={role === 'Patient' ? patientImg : doctorImg} imgSize={"w-1/2"} headLine={"Healthcare made simple"} sentence={role === "Patient" ? "Log in to book appointments, view your health records, and stay connected with your doctors." : "Log in to manage your appointments, connect with patients, and provide the best care with ease."} role={role} />
             <AuthCard oneLine={"Sign in to your account to continue"} onChange={setRole} authState={"login"} />
         </div>
     )

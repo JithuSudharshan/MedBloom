@@ -29,6 +29,7 @@ const SignupForm = ({ selected }) => {
                     register={register}
                     error={errors?.name}
                     placeholder="Enter your full name"
+                    role={selected}
                 />
                 <Input
                     label="Email"
@@ -37,6 +38,7 @@ const SignupForm = ({ selected }) => {
                     register={register}
                     error={errors?.email}
                     placeholder="Enter your email"
+                    role={selected}
                 />
                 <Input
                     label="Phone Number"
@@ -45,6 +47,7 @@ const SignupForm = ({ selected }) => {
                     register={register}
                     error={errors?.phone}
                     placeholder="Enter your phone number"
+                    role={selected}
                 />
                 <PasswordInput
                     label="Password"
@@ -52,6 +55,7 @@ const SignupForm = ({ selected }) => {
                     register={register}
                     error={errors?.password}
                     placeholder="Create a password"
+                    role={selected}
                 />
                 <PasswordInput
                     label="Confirm Password"
@@ -59,14 +63,15 @@ const SignupForm = ({ selected }) => {
                     register={register}
                     error={errors?.confirmPassword}
                     placeholder="Confirm your password"
+                    role={selected}
                 />
 
-                <Button loading={loading} type="submit">{loading ? "Registering..." : `Register as ${selected}`}</Button>
+                <Button loading={loading} type="submit" role={selected}>{loading ? "Registering..." : `Register as ${selected}`}</Button>
             </form>
             {/* Link to login page */}
             <p className="text-sm text-center text-gray-600 mt-4">
                 Already have an account?{" "}
-                <a href="/login" onClick={switchToSignin} className="text-teal-500 font-medium hover:underline">
+                <a href="/login" onClick={switchToSignin} className={`font-medium hover:underline transition-colors ${selected === "Doctor" ? "text-[#B08B8C]" : "text-teal-500"}`}>
                     Login
                 </a>
             </p>
