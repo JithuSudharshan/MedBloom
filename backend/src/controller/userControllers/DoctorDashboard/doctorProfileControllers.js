@@ -1,5 +1,6 @@
 import Doctor from "../../../model/doctorModel.js";
 import User from "../../../model/userModel.js";
+import Appointment from "../../../model/appointmentModel.js";
 import { formatDOB } from "../../../utils/formatters.js";
 
 
@@ -236,3 +237,121 @@ export const fetchMetricsForDoctor = async (req, res) => {
         })
     }
 }
+
+export const fetchDoctorAppointments = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page || "1", 10);
+        const limit = parseInt(req.query.limit || "5", 10);
+        const skip = (page - 1) * limit;
+
+        const { _id } = req.user
+
+        if (!_id)
+            return res.status(404).json({ success: false, message: "user not found" })
+
+        const user = _id;
+        const doctor = await Doctor.findOne({ user })
+
+        if (!doctor)
+            return res.status(404).json({ success: false, message: "Doctor not found" })
+
+        const filter = {
+            doctor: doctor._id,
+            status: { $ne: 'pending_payment' }
+        };
+
+        const totalCount = await Appointment.countDocuments(filter);
+        const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+
+        const appointments = await Appointment.find(filter)
+            .sort({ date: -1, startTime: -1 })
+            .skip(skip)
+            .limit(limit)
+            .populate({
+                path: 'patient',
+                populate: {
+                    path: 'user',
+                    select: 'name'
+                }
+            });
+
+        const mappedAppointments = appointments.map((app) => {
+            let mappedStatus = "Upcoming";
+            if (app.status === "completed") mappedStatus = "Completed";
+            if (app.status === "cancelled") mappedStatus = "Cancelled";
+
+            let formattedDate = app.date;
+            try {
+                const dateObj = new Date(app.date);
+                formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            } catch(e) {}
+
+            let formattedTime = app.startTime;
+            try {
+                const timeObj = new Date(app.startTime);
+                if (!isNaN(timeObj.getTime())) {
+                    formattedTime = timeObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+                }
+            } catch(e) {}
+
+            return {
+                id: app._id,
+                primaryTitle: app.patient?.user?.name || "Unknown Patient",
+                secondaryText: "Patient", // or some other patient info if needed
+                dateTimeLabel: `${formattedDate} at ${formattedTime}`,
+                rawDate: app.date,
+                rawStartTime: app.startTime,
+                rawEndTime: app.endTime,
+                status: mappedStatus,
+            }
+        });
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                appointments: mappedAppointments,
+                page,
+                totalPages,
+                totalCount: totalCount
+            },
+        });
+
+    } catch (error) {
+        console.error("Error while fetching appointments:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
+
+export const savePrescription = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { prescription, notes } = req.body;
+        
+        const appointment = await Appointment.findById(id);
+        if (!appointment) {
+            return res.status(404).json({ success: false, message: "Appointment not found" });
+        }
+
+        appointment.prescription = prescription;
+        if (notes !== undefined) {
+            appointment.notes = notes;
+        }
+
+        await appointment.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Prescription saved successfully",
+            data: appointment
+        });
+    } catch (error) {
+        console.error("Error while saving prescription:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};

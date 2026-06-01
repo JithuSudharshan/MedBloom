@@ -34,39 +34,43 @@ const DoctorInformation = ({ doctor, showActions = true, isAdmin = false }) => {
 
     return (
         <div className={
-            `bg-white rounded-2xl p-10 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6 h-full  ` +
-            (showActions ? "shadow-xl" : "")
+            `bg-white rounded-[2rem] p-10 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6 h-full relative ` +
+            (showActions ? "shadow-[0_20px_60px_-15px_rgba(176,139,140,0.2)]" : "")
         } >
+            {/* Action Buttons Top Right */}
+            {showActions && (
+                <div className="absolute top-8 right-10 flex gap-3 z-10">
+                    {doctor.authMethod !== "google" && (
+                        <button onClick={handleClick} className="border border-[#B08B8C] text-[#B08B8C] px-5 py-1.5 text-sm font-medium rounded-full hover:bg-[#F8E9EA] transition shadow-sm">
+                            Change Password
+                        </button>
+                    )}
+                    <button onClick={handleEditProfile} className="bg-[#B08B8C] text-white px-6 py-1.5 text-sm font-medium rounded-full hover:bg-[#9D7778] transition shadow-md">
+                        Edit Profile
+                    </button>
+                </div>
+            )}
+
             {/* LEFT COLUMN */}
             <div>
-                <h2 className="text-2xl font-semibold text-teal-700 mb-8">Basic Details</h2>
+                <h2 className="text-2xl font-semibold text-[#6B3B3D] mb-8">Basic Details</h2>
                 <ProfileRow label="Full name" value={doctor?.fullName || "-"} />
                 <ProfileRow label="Email Address" value={doctor?.email || "-"} />
                 <ProfileRow label="Phone Number" value={doctor?.phone || "-"} />
                 <ProfileRow label="Date Of Birth" value={doctor?.dob || "-"} />
                 <ProfileRow label="Gender" value={doctor?.gender || "-"} />
                 <ProfileRow label="Clinic Address" value={doctor?.address || "-"} />
-
-                {showActions && doctor.authMethod !== "google" && (
-                    <button onClick={handleClick} className="mt-8 bg-teal-600 text-white px-5 py-2 text-sm rounded-full hover:bg-teal-700 transition">
-                        Change Password
-                    </button>
-                )}
             </div>
 
             {/* RIGHT COLUMN */}
             <div>
                 <MedicalGrid showBio={showActions} userDetails={doctor} user={"doctor"} />
-                <button onClick={handleEditProfile} className="mt-20 bg-teal-600 text-white px-5 py-2 text-sm rounded-full hover:bg-teal-700 transition float-right">
-                    Edit Profile
-                </button>
-
             </div>
 
             {/* Modal */}
             {showActions && (
                 <Modal isOpen={openModal} onClose={handleClose}>
-                    <h3 className="text-xl font-semibold text-teal-700 mb-4">Change Password</h3>
+                    <h3 className="text-xl font-semibold text-[#6B3B3D] mb-4">Change Password</h3>
                     <form onSubmit={handleSubmit((data) => onSubmit(data, setLoading))}>
                         <PasswordInput
                             label="Current Password"
@@ -102,7 +106,7 @@ const DoctorInformation = ({ doctor, showActions = true, isAdmin = false }) => {
                             </Button>
                             <Button
                                 type="submit"
-                                className="bg-teal-600 text-white px-4 py-2 rounded-xl hover:bg-teal-700"
+                                className="bg-[#B08B8C] text-white px-4 py-2 rounded-xl hover:bg-[#6B3B3D]"
                             >
                                 {loading ? "Saving..." : "Save"}
                             </Button>

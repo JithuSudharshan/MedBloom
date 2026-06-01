@@ -124,7 +124,7 @@ export const useDoctorBasicInfo = () => {
             const response = await doctorbasicOnboarding(formData)
             console.log(response)
             if (!response?.data?.success) {
-                showToast.error(res?.data?.message || 'Submission failed,Try again');
+                showToast.error(response?.data?.message || 'Submission failed,Try again');
                 return;
             }
 

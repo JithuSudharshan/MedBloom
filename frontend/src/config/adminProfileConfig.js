@@ -17,15 +17,15 @@ const adminProfileConfig = {
         alt: "Profile picture"
     },
     sidebarMenu: [
-        { key: "dashboard", label: "Your Dashboard", icon: dashboard },
-        { key: "doctors", label: "Doctors", icon: PersonalIcon },
-        { key: "patients", label: "Patients", icon: patients },
-        { key: "appointments", label: "Appointments", icon: Appointment },
-        { key: "publications", label: "Publications", icon: Publications },
-        { key: "notifications", label: "Notification", icon: Notification_icon },
-        { key: "departments", label: "Departments", icon: department_icon },
-        { key: "transactions", label: "Transaction", icon: Transaction },
-        { key: "revenue", label: "Revenue", icon: Wallet },
+        { key: "dashboard", label: "Your Dashboard", icon: dashboard, path: "/admin/dashboard" },
+        { key: "doctors", label: "Doctors", icon: PersonalIcon, path: "/admin/doctors" },
+        { key: "patients", label: "Patients", icon: patients, path: "/admin/patients" },
+        { key: "appointments", label: "Appointments", icon: Appointment, path: "/admin/appointments" },
+        { key: "publications", label: "Publications", icon: Publications, path: "/admin/publications" },
+        { key: "notifications", label: "Notification", icon: Notification_icon, path: "/admin/notifications" },
+        { key: "departments", label: "Departments", icon: department_icon, path: "/admin/departments" },
+        { key: "transactions", label: "Transaction", icon: Transaction, path: "/admin/transactions" },
+        { key: "revenue", label: "Revenue", icon: Wallet, path: "/admin/revenue" },
         { key: "logout", label: "Logout", icon: Logout }
     ],
 };

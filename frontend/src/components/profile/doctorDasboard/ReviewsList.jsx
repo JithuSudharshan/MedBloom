@@ -5,7 +5,7 @@ export default function ReviewsList({ reviews }) {
     return (
         <div className="bg-white rounded-2xl shadow-md p-6">
 
-            <h3 className="text-teal-700 font-semibold text-lg mb-4">
+            <h3 className="text-[#6B3B3D] font-semibold text-lg mb-4">
                 Reviews & Ratings
             </h3>
 
@@ -14,7 +14,7 @@ export default function ReviewsList({ reviews }) {
                 {reviews?.map((review, index) => (
                     <div
                         key={index}
-                        className="border border-teal-200 rounded-lg p-3 flex gap-3"
+                        className="border border-[#B08B8C]/30 rounded-lg p-3 flex gap-3"
                     >
 
                         <img

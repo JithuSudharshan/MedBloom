@@ -10,13 +10,15 @@ import { useAuth } from '../../../context/AuthContext';
 import { loadPatientData } from '../../../api/patientApi';
 import Loader from '../../../components/ui/Loading';
 import IsonboardedWarning from '../../../components/profile/IsonboardedWarning';
+import FindDoctorModal from '../../../components/profile/appointments/FindDoctorModal';
 
 export default function PatientProfilePage() {
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const navigate = useNavigate();
     const { logout } = useAuth();
     const [patientDetails, setPatientDetails] = useState({});
-    const [loading, setloading] = useState(true)
+    const [loading, setloading] = useState(true);
+    const [isNavbarModalOpen, setIsNavbarModalOpen] = useState(false);
 
 
     useEffect(() => {
@@ -66,8 +68,11 @@ export default function PatientProfilePage() {
     }
     return (
         <>
-            <Navbar current={"login"} />
-            <ProfileBanner profileOwner={"Patient Profile"} profileDescription={"Manage your personal information and health records"} />
+            <Navbar current={"login"} onBookNow={() => setIsNavbarModalOpen(true)} />
+            <ProfileBanner 
+                userRole="patient"
+                userDetails={patientDetails} 
+            />
             {!patientDetails.isOnboarded && <IsonboardedWarning onClick={handleCompleteOnboarding} />}
             <ProfileLayout
                 user={"patient"}
@@ -86,6 +91,10 @@ export default function PatientProfilePage() {
                 </div>
             </ProfileLayout>
             {loading && <Loader />}
+            <FindDoctorModal 
+                isOpen={isNavbarModalOpen} 
+                onClose={() => setIsNavbarModalOpen(false)} 
+            />
         </>
     );
 }

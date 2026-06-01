@@ -11,19 +11,39 @@ import { fetchAppointmentsForPatient } from "../../api/patientApi";
 import { showToast } from "../ui/Toast";
 import Loader from "../ui/Loading";
 import { fetchAppointmentsForDoctor, fetchMetricsForDoctor } from "../../api/doctorApi";
+import AvailabilitySettings from "./doctorDasboard/AvailabilitySettings";
+import MedicalRecords from "./records/MedicalRecords";
+import WalletPage from "./wallet/WalletPage";
+import TransactionsPage from "./transactions/TransactionsPage";
+
+import { useLocation } from "react-router-dom";
 
 const ProfileLayout = ({
     user,
     sidebarMenu,
     profileData,
     onLogout,
-    isLoggingOut,
-    isActive
+    isLoggingOut
 }) => {
 
-    const [loading, setLoading] = useState(false)
+    const location = useLocation();
+    const validDoctorKeys = ["dashboard", "personal", "patients", "availability", "appointments", "publications", "notifications", "transactions", "wallet", "settings"];
+    const validPatientKeys = ["dashboard", "personal", "appointments", "records", "notifications", "transactions", "wallet", "settings"];
+    const pathSegments = location.pathname.split("/").filter(Boolean);
+    const derivedKey = validDoctorKeys.find(key => pathSegments.includes(key)) ||
+        validPatientKeys.find(key => pathSegments.includes(key)) ||
+        pathSegments.pop();
 
-    const [activeKey, setActiveKey] = useState(isActive)
+    let activeKey = "dashboard";
+    if (user === "doctor" && validDoctorKeys.includes(derivedKey)) {
+        activeKey = derivedKey;
+    } else if (user === "patient" && validPatientKeys.includes(derivedKey)) {
+        activeKey = derivedKey;
+    } else if (user === "patient") {
+        activeKey = "personal"; // Patients don't have a dashboard default
+    }
+
+    const [loading, setLoading] = useState(false)
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
     const [localUser, setLocalUser] = useState(profileData)
     const [dashboardMetrics, setDashboardMetrics] = useState([])
@@ -56,7 +76,7 @@ const ProfileLayout = ({
                 page,
                 totalPages,
                 totalNoOfAppointments
-            } = res?.data?.data;
+            } = res?.data?.data || {};
 
             setAppointments(appointments);
             setAppointmentPage(page);
@@ -80,8 +100,6 @@ const ProfileLayout = ({
                 showToast.error(response.error.message || "Failed to fetch Dashboard Data")
             }
             setDashboardMetrics(response?.data)
-
-            console.log("dashboardMetrics", dashboardMetrics)
 
         } catch (error) {
             console.log(error)
@@ -117,27 +135,31 @@ const ProfileLayout = ({
     };
 
     return (
-        <div className="min-h-screen max-w-7xl mx-auto w-full">
-            <div className="flex gap-10 items-stretch max-w-7xl mx-auto">
+        <div className={`h-screen w-full py-6 lg:py-10 overflow-hidden ${user === 'doctor' ? "bg-[#FCF8F8]" : "bg-[#F8FDFD]"
+            }`}>
+            <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 w-full px-6 md:px-10 xl:px-16 mx-auto max-w-[1800px] h-full items-start">
 
                 {/* Sidebar */}
-                <aside>
+                <aside className="w-full lg:w-80 shrink-0 h-full">
                     <SidebarMenu
                         menu={sidebarMenu}
                         src={localUser?.avatar?.src}
                         alt={localUser?.avatar?.alt}
                         name={localUser?.fullName}
-                        activeKey={activeKey}
-                        onChange={setActiveKey}
                         onLogout={onLogout}
                         isLoggingOut={isLoggingOut}
                         onEditAvatar={() => setIsAvatarModalOpen(true)}
+                        userRole={user}
                     />
 
                 </aside>
 
                 {/* Main cards and dashboard content */}
-                <main className="flex-1 mt-15 flex">
+                <main className={`flex-1 flex flex-col min-w-0 h-full overflow-y-auto  pr-2 
+                    [&::-webkit-scrollbar]:w-2 
+                    [&::-webkit-scrollbar-track]:bg-transparent 
+                    [&::-webkit-scrollbar-thumb]:rounded-full 
+                    ${user === 'doctor' ? "[&::-webkit-scrollbar-thumb]:bg-[#F5EBEB] hover:[&::-webkit-scrollbar-thumb]:bg-[#E8D3D4]" : "[&::-webkit-scrollbar-thumb]:bg-teal-50 hover:[&::-webkit-scrollbar-thumb]:bg-teal-100"}`}>
                     {activeKey === "dashboard" && (
                         <DoctorOverview
                             doctorName={localUser?.fullName}
@@ -162,10 +184,15 @@ const ProfileLayout = ({
                         page={appointmentPage}
                         totalPages={totalAppointmentPages}
                         setPage={setAppointmentPage}
+                        userRole={user}
                     />}
 
 
-                    {activeKey === "notifications" && (<NotificationsPage profileTitle="Doctor Profile" />)}
+                    {activeKey === "availability" && <AvailabilitySettings userRole={user} />}
+                    {activeKey === "notifications" && <NotificationsPage userRole={user} />}
+                    {activeKey === "records" && <MedicalRecords />}
+                    {activeKey === "wallet" && <WalletPage userRole={user} />}
+                    {activeKey === "transactions" && <TransactionsPage userRole={user} />}
 
                 </main>
             </div>

@@ -82,13 +82,7 @@ const AvatarCropper = ({ onCancel, onSave, user, _id, role }) => {
         ctx.imageSmoothingQuality = "high";
 
         ctx.beginPath();
-        ctx.arc(
-            crop.width / 2,
-            crop.height / 2,
-            Math.min(crop.width, crop.height) / 2,
-            0,
-            2 * Math.PI
-        );
+        ctx.rect(0, 0, crop.width, crop.height);
         ctx.closePath();
         ctx.clip();
 
@@ -179,7 +173,6 @@ const AvatarCropper = ({ onCancel, onSave, user, _id, role }) => {
                                 }
                             }}
                             aspect={1}
-                            circularCrop
                             keepSelection
                         >
                             <img
@@ -195,11 +188,10 @@ const AvatarCropper = ({ onCancel, onSave, user, _id, role }) => {
                     <div className="flex flex-col items-center gap-2">
                         <span className="text-sm text-gray-500">Preview</span>
 
-                        <div className="w-40 h-40 rounded-full overflow-hidden border border-gray-200">
+                        <div className="w-40 h-40 rounded-xl overflow-hidden border border-gray-200">
                             <canvas
                                 ref={previewCanvasRef}
-                                className="w-full h-full"
-                                style={{ borderRadius: "9999px" }}
+                                className="w-full h-full object-cover"
                             />
                         </div>
                     </div>

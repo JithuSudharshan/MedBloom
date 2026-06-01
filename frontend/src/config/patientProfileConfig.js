@@ -1,12 +1,5 @@
 import avatar from '../assets/images/avatar-default.png'
-import PersonalIcon from '../assets/icons/Profile_Icons/Personal.svg?react';
-import Appointment from '../assets/icons/Profile_Icons/Appointment_icon.svg?react'
-import Medical_records from '../assets/icons/Profile_Icons/Medical_records.svg?react'
-import Notification_icon from '../assets/icons/Profile_Icons/Notification.svg?react'
-import Transaction from '../assets/icons/Profile_Icons/Transaction.svg?react'
-import Wallet from "../assets/icons/Profile_Icons/Wallet.svg?react"
-import Settings from '../assets/icons/Profile_Icons/Settings.svg?react'
-import Logout from '../assets/icons/Profile_Icons/Logout.svg?react'
+import { User, Calendar, FileText, Bell, CreditCard, Wallet, Settings, LogOut } from 'lucide-react';
 
 const patientProfileConfig = {
     avatar: {
@@ -14,14 +7,14 @@ const patientProfileConfig = {
         alt: "Profile picture"
     },
     sidebarMenu: [
-        { key: "personal", label: "Personal Information", icon: PersonalIcon },
-        { key: "appointments", label: "My Appointments", icon: Appointment },
-        { key: "records", label: "Medical Records", icon: Medical_records },
-        { key: "notifications", label: "Notification", icon: Notification_icon },
-        { key: "transactions", label: "Transaction", icon: Transaction },
-        { key: "wallet", label: "Wallet", icon: Wallet },
-        { key: "settings", label: "Account Settings", icon: Settings },
-        { key: "logout", label: "Logout", icon: Logout }
+        { key: "personal", label: "Personal Information", icon: User, path: "/patient/personal" },
+        { key: "appointments", label: "My Appointments", icon: Calendar, path: "/patient/appointments" },
+        { key: "records", label: "Medical Records", icon: FileText, path: "/patient/records" },
+        { key: "notifications", label: "Notification", icon: Bell, path: "/patient/notifications" },
+        { key: "transactions", label: "Transaction", icon: CreditCard, path: "/patient/transactions" },
+        { key: "wallet", label: "Wallet", icon: Wallet, path: "/patient/wallet" },
+        { key: "settings", label: "Account Settings", icon: Settings, path: "/patient/settings" },
+        { key: "logout", label: "Logout", icon: LogOut }
     ],
     sections: [
         {

@@ -202,8 +202,8 @@ export const useEditPatientProfile = (initialPatient, { isAdmin = false, patient
             isAdmin ?
                 navigate("/admin/dashboard")
                 :
-                navigate('/patient/dashboard')
-            showToast.success('Porfile edit Updated');
+                navigate('/patient/personal')
+            showToast.success('Your profile has been Updated');
             reset();
             return
 

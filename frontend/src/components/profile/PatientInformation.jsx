@@ -37,10 +37,11 @@ const PatientInformation = ({ patient, isAdmin = false }) => {
     console.log("patient.authMethod", patient.authMethod)
 
     return (
-        <div className="bg-white rounded-2xl shadow-xl p-10 grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-6">
+        <div className="bg-white rounded-[2.5rem] p-10 lg:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] min-h-full flex flex-col w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8 flex-1">
             {/* LEFT COLUMN */}
             <div>
-                <h2 className="text-2xl font-semibold text-teal-700 mb-8">Basic Details</h2>
+                <h2 className="text-2xl font-semibold text-[#008C89] mb-8">Basic Details</h2>
                 <ProfileRow label="Full name" value={patient?.fullName} />
                 <ProfileRow label="Email Address" value={patient?.email} />
 
@@ -53,20 +54,24 @@ const PatientInformation = ({ patient, isAdmin = false }) => {
                 <ProfileRow label="Gender" value={patient?.gender} />
                 <ProfileRow label="Address" value={patient?.address} />
 
-                {patient.authMethod !== "google" && !isAdmin ?
-                    <button onClick={handleClick} className="mt-8 bg-teal-600 text-white px-5 py-2 text-sm rounded-full hover:bg-teal-700 transition">
-                        Change Password
-                    </button>
-                    :
-                    <></>
-                }
             </div>
 
             {/* RIGHT COLUMN */}
             <div>
-                <h2 className="text-2xl font-semibold text-teal-700 mb-8">Medical Information</h2>
+                <h2 className="text-2xl font-semibold text-[#008C89] mb-8">Medical Information</h2>
                 <MedicalGrid userDetails={patient} user={"patient"} />
-                <button onClick={handleEditProfile} className="mt-20 bg-teal-600 text-white px-5 py-2 text-sm rounded-full hover:bg-teal-700 transition float-right">
+            </div>
+
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end gap-4 mt-8 pt-8 border-t border-teal-50/60">
+                {patient.authMethod !== "google" && !isAdmin && (
+                    <button onClick={handleClick} className="bg-white border border-[#008C89] text-[#008C89] px-6 py-2.5 text-sm font-medium rounded-full hover:bg-teal-50 transition-colors shadow-sm">
+                        Change Password
+                    </button>
+                )}
+                <button onClick={handleEditProfile} className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-8 py-2.5 text-sm font-medium rounded-full hover:from-teal-600 hover:to-cyan-600 transition-all shadow-md hover:shadow-lg">
                     Edit Profile
                 </button>
             </div>

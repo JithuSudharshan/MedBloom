@@ -95,8 +95,8 @@ export default function DcotorProfilePage() {
     }
     return (
         <>
-            <Navbar current={"login"} />
-            <ProfileBanner profileOwner={"Doctor Profile"} profileDescription={"Manage your personal information and bussiness records"} />
+            <Navbar current={"login"} userRole="doctor" />
+            <ProfileBanner userRole="doctor" userDetails={doctorDetails} />
             {!doctorDetails.isOnboarded && < IsonboardedWarning onClick={handleNavigate} />}
             <ProfileLayout
                 user={"doctor"}

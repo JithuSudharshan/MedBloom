@@ -19,16 +19,16 @@ const doctorProfileConfig = {
         alt: "Profile picture"
     },
     sidebarMenu: [
-        { key: "dashboard", label: "Your Dashboard", icon: dashboard },
-        { key: "personal", label: "Personal Information", icon: PersonalIcon },
-        { key: "Patients", label: "Patients", icon: patients },
-        { key: "Availability", label: "Availability", icon: Avilability },
-        { key: "appointments", label: "My Appointments", icon: Appointment },
-        { key: "publications", label: "My Publications", icon: Publications },
-        { key: "notifications", label: "Notification", icon: Notification_icon },
-        { key: "transactions", label: "Transaction", icon: Transaction },
-        { key: "wallet", label: "Wallet", icon: Wallet },
-        { key: "settings", label: "Account Settings", icon: Settings },
+        { key: "dashboard", label: "Your Dashboard", icon: dashboard, path: "/doctor/dashboard" },
+        { key: "personal", label: "Personal Information", icon: PersonalIcon, path: "/doctor/personal" },
+        { key: "Patients", label: "Patients", icon: patients, path: "/doctor/patients" },
+        { key: "Availability", label: "Availability", icon: Avilability, path: "/doctor/availability" },
+        { key: "appointments", label: "My Appointments", icon: Appointment, path: "/doctor/appointments" },
+        { key: "publications", label: "My Publications", icon: Publications, path: "/doctor/publications" },
+        { key: "notifications", label: "Notification", icon: Notification_icon, path: "/doctor/notifications" },
+        { key: "transactions", label: "Transaction", icon: Transaction, path: "/doctor/transactions" },
+        { key: "wallet", label: "Wallet", icon: Wallet, path: "/doctor/wallet" },
+        { key: "settings", label: "Account Settings", icon: Settings, path: "/doctor/settings" },
         { key: "logout", label: "Logout", icon: Logout }
     ],
     sections: [

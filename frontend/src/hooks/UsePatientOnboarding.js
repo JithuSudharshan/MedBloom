@@ -169,7 +169,6 @@ export const usePatientOnboarding = () => {
             Food_or_Drug_Intolerances: '',
             smoking: '',
             drinking: '',
-            Food_or_Drug_Intolerances: '',
             Mental_Health_History: '',
             profilePicture: null,
         },
@@ -215,12 +214,11 @@ export const usePatientOnboarding = () => {
             console.log([...formData.entries()])
 
             const response = await patientOnboarding(formData)
-            console.log(response)
             if (!response?.data?.success) {
-                showToast.error(res?.data?.message || 'Submission failed,Try again');
+                showToast.error(response?.data?.message || 'Submission failed,Try again');
                 return;
             }
-            navigate("/patient/dashboard")
+            navigate("/patient/personal")
             showToast.success('Onboarding successful!');
 
             reset();

@@ -42,7 +42,7 @@ export default function EditDoctorProfilePage({ isAdmin = false, doctorId }) {
     return (
         <div className="max-w-6xl mx-auto bg-white rounded-2xl mt-10 shadow-lg p-10">
 
-            <h2 className="text-2xl font-semibold text-teal-700 mb-6">
+            <h2 className="text-2xl font-semibold text-[#6B3B3D] mb-6">
                 Edit Profile
             </h2>
 

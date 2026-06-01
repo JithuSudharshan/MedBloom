@@ -1,5 +1,6 @@
 import User from "../../../model/userModel.js";
 import Patient from "../../../model/patientModel.js";
+import Appointment from "../../../model/appointmentModel.js";
 import { formatDOB, formatName } from '../../../utils/formatters.js'
 
 
@@ -40,6 +41,16 @@ export const fetchUserDetails = async (req, res) => {
 
         const DOB = formatDOB(patient.dob)
 
+        const fieldsToCheck = [
+            patient.gender, patient.address, patient.bloodType, patient.cholesterol,
+            patient.height, patient.weight, patient.bloodPressure, patient.glucoseLevel,
+            patient.allergies, patient.smoking, patient.drinking, patient.medicalCondition,
+            patient.Food_or_Drug_Intolerances, patient.Mental_Health_History, patient.emergencyNumber,
+            isUser.phone, patient.dob
+        ];
+        const filledFields = fieldsToCheck.filter(field => field !== undefined && field !== null && field !== "").length;
+        const profileStatus = Math.round((filledFields / fieldsToCheck.length) * 100) + "% Complete";
+
         res.status(200).json({
             success: true,
             details: {
@@ -68,7 +79,10 @@ export const fetchUserDetails = async (req, res) => {
                 Mental_Health_History: patient.Mental_Health_History,
                 isOnboarded: isUser.isOnboarded,
                 phone: isUser.phone,
-                emergencyNumber: patient.emergencyNumber
+                emergencyNumber: patient.emergencyNumber,
+                profileStatus: profileStatus,
+                nextAppointment: "Oct 24, 2026",
+                lastCheckup: "2 months ago"
             }
         });
 
@@ -202,7 +216,7 @@ export const fetchPatientAppointments = async (req, res) => {
     try {
 
         const page = parseInt(req.query.page || "1", 10);
-        const limit = parseInt(req.query.limit || "5", 5);
+        const limit = parseInt(req.query.limit || "5", 10);
         const skip = (page - 1) * limit;
 
 
@@ -217,53 +231,78 @@ export const fetchPatientAppointments = async (req, res) => {
         if (!patient)
             return res.status(404).json({ success: false, message: "Patient not found" })
 
-        const filter = { status: "pending" }; // will cyhange according to appointmnet schema
+        const filter = { 
+            patient: patient._id, 
+            status: { $ne: 'pending_payment' } 
+        }; 
 
-        //here comes the appointment mongoDb logic
-        const totalPages = 3
+        const totalCount = await Appointment.countDocuments(filter);
+        const totalPages = Math.max(1, Math.ceil(totalCount / limit));
 
-        //Math.max(1, Math.ceil(total / limit));
+        const appointments = await Appointment.find(filter)
+            .sort({ date: -1, startTime: -1 })
+            .skip(skip)
+            .limit(limit)
+            .populate({
+                path: 'doctor',
+                select: 'displayName primarySpecialization profilePicture clinicAddress consultationMode'
+            });
 
+        const mappedAppointments = appointments.map((app) => {
+            // Map status
+            let mappedStatus = "Upcoming";
+            if (app.status === "completed") mappedStatus = "Completed";
+            if (app.status === "cancelled") mappedStatus = "Cancelled";
 
-        const dummyAppointments = [
-            {
-                id: 1,
-                doctorName: "Dr. Arjun Menon",
-                speciality: "Cardiology",
-                dateTimeLabel: "2023-11-10 at 10:00 AM",
-                status: "Upcoming",
-            },
-            {
-                id: 2,
-                doctorName: "Dr. Arjun Menon",
-                speciality: "Cardiology",
-                dateTimeLabel: "2023-11-10 at 10:00 AM",
-                status: "Upcoming",
-            },
-            {
-                id: 3,
-                doctorName: "Dr. Arjun Menon",
-                speciality: "Cardiology",
-                dateTimeLabel: "2023-11-10 at 10:00 AM",
-                status: "Completed",
-            },
-            {
-                id: 4,
-                doctorName: "Dr. Arjun Menon",
-                speciality: "Cardiology",
-                dateTimeLabel: "2023-11-10 at 10:00 AM",
-                status: "Cancelled",
+            // Format date to something readable e.g., "Nov 10, 2023"
+            let formattedDate = app.date;
+            try {
+                const dateObj = new Date(app.date);
+                formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            } catch(e) {}
+
+            // Format time properly (app.startTime is an ISO string)
+            let formattedTime = app.startTime;
+            try {
+                const timeObj = new Date(app.startTime);
+                if (!isNaN(timeObj.getTime())) {
+                    formattedTime = timeObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+                }
+            } catch(e) {}
+
+            let docName = app.doctor?.displayName || "Unknown";
+            const docNameLower = docName.toLowerCase().trim();
+            if (!docNameLower.startsWith("dr.") && !docNameLower.startsWith("dr ")) {
+                docName = `Dr. ${docName}`;
+            } else if (docNameLower.startsWith("dr ")) {
+                // Ensure it has a period if it just says "Dr "
+                docName = `Dr. ${docName.substring(3).trim()}`;
             }
-        ];
 
+            return {
+                id: app._id,
+                appointmentId: app.appointmentId || `#MED-${app._id.toString().slice(-6).toUpperCase()}`,
+                doctorId: app.doctor?._id,
+                primaryTitle: docName,
+                secondaryText: app.doctor?.primarySpecialization || "Specialist",
+                doctorImage: app.doctor?.profilePicture || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150&h=150',
+                clinicAddress: app.doctor?.clinicAddress || "MedBloom Central Hospital",
+                consultationMode: app.mode || app.doctor?.consultationMode || "offline",
+                dateTimeLabel: `${formattedDate}  ${formattedTime}`,
+                rawDate: app.date,
+                rawStartTime: app.startTime,
+                rawEndTime: app.endTime,
+                status: mappedStatus,
+            }
+        });
 
         return res.status(200).json({
             success: true,
             data: {
-                appointments: dummyAppointments,
+                appointments: mappedAppointments,
                 page,
                 totalPages,
-                totalCount: dummyAppointments.length
+                totalCount: totalCount
             },
         });
 
