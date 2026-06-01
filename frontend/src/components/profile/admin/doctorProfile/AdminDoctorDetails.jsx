@@ -25,8 +25,6 @@ const AdminDoctorDetails = ({ doctorId, onBack }) => {
     };
 
 
-    if (!doctorId) return null;
-
     const fetchDoctorDetails = async (id) => {
         try {
             setLoading(true);
@@ -47,8 +45,12 @@ const AdminDoctorDetails = ({ doctorId, onBack }) => {
     };
 
     useEffect(() => {
-        fetchDoctorDetails(doctorId);
+        if(doctorId) {
+            fetchDoctorDetails(doctorId);
+        }
     }, [doctorId]);
+
+    if (!doctorId) return null;
 
     if (loading || !doctor) {
         return (

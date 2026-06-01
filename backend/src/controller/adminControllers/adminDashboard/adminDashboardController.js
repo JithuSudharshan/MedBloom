@@ -9,7 +9,7 @@ import Department from "../../../model/departmentModel.js";
 export const fetchPendingDoctorList = async (req, res) => {
     try {
         const page = parseInt(req.query.page || "1", 10);
-        const limit = parseInt(req.query.limit || "5", 5);
+        const limit = parseInt(req.query.limit || "5", 10);
         const skip = (page - 1) * limit;
 
         const filter = { status: "pending" };
@@ -644,7 +644,7 @@ export const editDepartmentInfo = async (req, res) => {
         const updatedDepartment = await department.save()
 
         if (!updatedDepartment)
-            return status(400).json({ success: false, message: "something went wrong while updating info" })
+            return res.status(400).json({ success: false, message: "something went wrong while updating info" })
 
         const formattedData = await Department.find({}).select('-__v');
 
@@ -669,7 +669,7 @@ export const editDepartmentInfo = async (req, res) => {
 export const fetchAppointments = async (req, res) => {
     try {
         const page = parseInt(req.query.page || "1", 10);
-        const limit = parseInt(req.query.limit || "5", 5);
+        const limit = parseInt(req.query.limit || "5", 10);
         const skip = (page - 1) * limit;
 
         const filter = { status: "pending" }; // will cyhange according to appointmnet schema

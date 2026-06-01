@@ -3,7 +3,7 @@ import DataTable from '../TableData';
 import { Pagination } from '../../../ui/Pagination';
 import { PatientStats } from './PatientStats';
 
-const ListPatientsForAdmin = ({ patients, page, setPage, totalPages, onViewPatient, patientCount, newPatients = 780, activeVisit = 210 }) => {
+const ListPatientsForAdmin = ({ patients, page, setPage, totalPages, onViewPatient, onBlockPatient, patientCount, newPatients = 780, activeVisit = 210 }) => {
     const patientColumns = [
         { key: "name", header: "Name" },
         { key: "email", header: "Email" },

@@ -16,7 +16,7 @@ import {
     unblockDoctor
 } from "../../../api/adminApi";
 import ListPatientsForAdmin from "./patientProfile/ListPatientsForAdmin";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import ListOfDepartments from "./ListOfDepartments.jsx";
 import AddDepartmentForm from "./AddDepartmentForm";
 import { useDepartmentForm } from "../../../hooks/useDepartmentForm.js"
@@ -29,7 +29,11 @@ import Loader from "../../ui/Loading.jsx";
 const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
 
 
-    const [activeKey, setActiveKey] = useState("dashboard");
+    const location = useLocation();
+    const derivedKey = location.pathname.split("/").pop();
+    const isValidKey = ["dashboard", "doctors", "patients", "appointments", "departments", "notifications"].includes(derivedKey);
+    const activeKey = isValidKey ? derivedKey : "dashboard";
+
     const [openApproval, setOpenApproval] = useState(false);
     const [dashboardMetrics, setDashboardMetrics] = useState([])
 
@@ -90,7 +94,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                 totalPages,
                 totalNoOfDoctors,
                 totalPending
-            } = res?.data?.data;
+            } = res?.data?.data || {};
 
             setDoctors(doctors);
             setDoctorPage(page);
@@ -121,7 +125,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                 page,
                 totalPages,
                 totalPatients
-            } = res?.data?.data;
+            } = res?.data?.data || {};
 
             setTotalcount(totalPatients)
             setPatients(patients);
@@ -153,7 +157,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                 page,
                 totalPages,
                 totalNoOfAppointments
-            } = res?.data?.data;
+            } = res?.data?.data || {};
 
             setAppointments(appointments);
             setAppointmentPage(page);
@@ -215,12 +219,6 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
     const handleViewApprovedDoctor = (doctor) => {
         console.log("doctor details", doctor)
         navigate(`/admin/doctors/${doctor._id}`)
-    };
-
-    const handleViewPendingDoctor = (doctor) => {
-        setSelectedDoctorId(doctor._id)
-        setDetailSource("pending")
-        setViewMode("detail")
     };
 
     const handleOpenApproval = () => setOpenApproval(true);
@@ -325,7 +323,6 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                         alt={"admin Photo"}
                         name={"Admin"}
                         activeKey={activeKey}
-                        onChange={setActiveKey}
                         onLogout={onLogout}
                         isLoggingOut={isLoggingOut}
                     />
@@ -345,7 +342,6 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                         openApproval ? (
                             <DoctorApprovalList
                                 onBack={handleCloseApproval}
-                                viewDetails={handleViewPendingDoctor}
                             />
                         ) : (
                             <ListDoctorsForAdmin

@@ -28,7 +28,7 @@ const DoctorApprovalList = ({ onBack }) => {
                 showToast.error("Something went wrong while fetching data")
             }
 
-            const { doctors, page, totalPages } = res?.data?.data;
+            const { doctors, page, totalPages } = res?.data?.data || {};
 
             setDoctors(doctors);
             setPage(page);
