@@ -3,14 +3,29 @@ import Notification from '../model/notificationSchema.js';
 
 const router = express.Router();
 
-// GET all notifications for logged-in user (doctor)
+// GET all notifications for logged-in user (paginated)
 router.get('/', async (req, res, next) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 15;
+        const skip = (page - 1) * limit;
+
+        const totalNotifications = await Notification.countDocuments({ receiverId: req.user._id });
+        const totalPages = Math.ceil(totalNotifications / limit);
+
         const notifications = await Notification
             .find({ receiverId: req.user._id })
-            .sort({ timestamp: -1 });
+            .sort({ timestamp: -1 })
+            .skip(skip)
+            .limit(limit);
 
-        res.json({ success: true, notifications });
+        res.json({ 
+            success: true, 
+            notifications,
+            currentPage: page,
+            totalPages,
+            hasMore: page < totalPages
+        });
     } catch (err) {
         next(err);
     }

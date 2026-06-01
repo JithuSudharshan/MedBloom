@@ -11,6 +11,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import oauthRoutes from "./routes/oauthRoutes.js";
 import patientRoutes from './routes/patientRoutes.js';
 import doctorRoutes from "./routes/doctorRoutes.js";
+import publicDoctorRoutes from "./routes/publicDoctorRoutes.js";
 import notificationRoutes from './routes/notificationRoutes.js';
 import "./config/passport.js";
 import { authenticateToken, authorizeRole } from './middlewares/authMiddleware.js';
@@ -69,7 +70,8 @@ app.use('/api/oauth', oauthRoutes);
 app.use('/api/admin', authenticateToken({ sendRequiresRefresh: false }), authorizeRole("admin"), adminRoutes)
 app.use('/api/patient', authenticateToken({ sendRequiresRefresh: false }), authorizeRole("patient"), patientRoutes)
 app.use('/api/doctor', authenticateToken({ sendRequiresRefresh: false }), authorizeRole("doctor", "admin"), doctorRoutes)
-app.use('/api/notification', authenticateToken({ sendRequiresRefresh: false }), authorizeRole('doctor'), notificationRoutes);
+app.use('/api/doctors', publicDoctorRoutes) // Public/Patient booking routes
+app.use('/api/notification', authenticateToken({ sendRequiresRefresh: false }), authorizeRole('doctor', 'patient', 'admin'), notificationRoutes);
 
 app.use(handleError)
 
