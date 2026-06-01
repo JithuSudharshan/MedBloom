@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
-export default function FileUpload({ label, name, register, error, setValue }) {
+export default function FileUpload({ label, name, register, error, setValue, role = "patient" }) {
+    const isDoctor = role?.toLowerCase() === 'doctor';
     const [preview, setPreview] = useState(null);
     const [fileName, setFileName] = useState('');
 
@@ -43,12 +44,12 @@ export default function FileUpload({ label, name, register, error, setValue }) {
 
     return (
         <div className="mb-6">
-            <label className="text-sm text-teal-700 mb-2 font-medium block">{label}</label>
+            <label className={`text-sm mb-2 font-medium block transition-colors ${isDoctor ? "text-[#6B3B3D]" : "text-teal-700"}`}>{label}</label>
 
             {/* Show preview if image is uploaded */}
             {preview ? (
                 <div className="relative">
-                    <div className="w-full rounded-lg border-2 border-teal-400 bg-teal-50 p-4">
+                    <div className={`w-full rounded-lg border-2 p-4 transition-colors ${isDoctor ? "border-[#B08B8C] bg-[#FCF8F8]" : "border-teal-400 bg-teal-50"}`}>
                         <div className="flex items-center gap-4">
                             {/* Image Preview */}
                             <img
@@ -88,8 +89,8 @@ export default function FileUpload({ label, name, register, error, setValue }) {
                     />
                     <label
                         htmlFor={name}
-                        className="w-full px-4 py-8 text-gray-400 rounded-lg border-2 border-dashed border-gray-300 
-                            hover:border-teal-400 cursor-pointer flex flex-col items-center justify-center text-sm bg-white transition-colors"
+                        className={`w-full px-4 py-8 text-gray-400 rounded-lg border-2 border-dashed border-gray-300 
+                            cursor-pointer flex flex-col items-center justify-center text-sm bg-white transition-colors ${isDoctor ? "hover:border-[#B08B8C]" : "hover:border-teal-400"}`}
                     >
                         <svg
                             className="w-8 h-8 mb-2 text-gray-400"

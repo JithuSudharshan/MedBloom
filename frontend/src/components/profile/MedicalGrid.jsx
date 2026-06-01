@@ -1,11 +1,11 @@
 
-const MedicalItem = ({ label, value, unit, highlight }) => {
+const MedicalItem = ({ label, value, unit, highlight, isDoctor }) => {
     const displayValue = value ? `${value} ${unit || ""}` : "-";
 
     return (
         <div>
             <p className="text-gray-400 text-sm">{label}</p>
-            <p className={`font-semibold ${highlight ? "text-[#00737A]" : "text-gray-800"}`}>
+            <p className={`font-semibold ${highlight ? (isDoctor ? "text-[#6B3B3D]" : "text-[#00737A]") : "text-gray-800"}`}>
                 {displayValue}
             </p>
         </div>
@@ -44,7 +44,7 @@ const MedicalGrid = ({ userDetails, user, showBio }) => (
                 <div className="space-y-8">
                     {/* Short bio on top */}
                     {showBio && (
-                        <div className="bg-teal-50 border border-teal-100 rounded-lg p-5">
+                        <div className="bg-[#F8E9EA] border border-[#B08B8C]/20 rounded-lg p-5">
                             <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">
                                 Short bio
                             </p>
@@ -61,11 +61,13 @@ const MedicalGrid = ({ userDetails, user, showBio }) => (
                             label="Display Name"
                             value={userDetails?.displayName || userDetails?.fullName}
                             highlight
+                            isDoctor={user === "doctor"}
                         />
                         <MedicalItem
                             label="Specialization"
                             value={userDetails?.primarySpecialization}
                             highlight
+                            isDoctor={user === "doctor"}
                         />
                         <MedicalItem
                             label="Years of Experience"
@@ -74,6 +76,7 @@ const MedicalGrid = ({ userDetails, user, showBio }) => (
                                     ? `${userDetails.yearsOfExperience} Years`
                                     : "-"
                             }
+                            isDoctor={user === "doctor"}
                         />
 
                         <MedicalItem
@@ -87,6 +90,7 @@ const MedicalGrid = ({ userDetails, user, showBio }) => (
                                             ? "Offline"
                                             : "-"
                             }
+                            isDoctor={user === "doctor"}
                         />
 
                         {(userDetails?.consultationMode === "both" || userDetails?.consultationMode === "online") && (<MedicalItem
@@ -96,6 +100,7 @@ const MedicalGrid = ({ userDetails, user, showBio }) => (
                                     ? `₹ ${userDetails.consultationFeesOnline}`
                                     : "-"
                             }
+                            isDoctor={user === "doctor"}
                         />)}
 
                         {(userDetails?.consultationMode === "both" || userDetails?.consultationMode === "offline") && (<MedicalItem
@@ -105,6 +110,7 @@ const MedicalGrid = ({ userDetails, user, showBio }) => (
                                     ? `₹ ${userDetails.consultationFeesOffline}`
                                     : "-"
                             }
+                            isDoctor={user === "doctor"}
                         />)}
                     </div>
                 </div>
