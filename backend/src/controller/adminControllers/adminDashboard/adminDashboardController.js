@@ -127,6 +127,20 @@ export const fetchApprovedDoctorList = async (req, res) => {
 
         const filter = { status: { $in: ["approved", "blocked"] } };
 
+        if (req.query.search) {
+            const searchRegex = new RegExp(req.query.search, 'i');
+            
+            // Search Doctor displayName or User email
+            // To search user email, we first find matching Users
+            const matchedUsers = await User.find({ email: searchRegex }).select('_id');
+            const userIds = matchedUsers.map(u => u._id);
+
+            filter.$or = [
+                { displayName: searchRegex },
+                { user: { $in: userIds } }
+            ];
+        }
+
         const [doctors, totalApproved, totalPending] = await Promise.all([
             Doctor.find(filter)
                 .select(

@@ -45,6 +45,8 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
     const [totalAppointmentPages, setTotalAppointmentPages] = useState(1)
     const [appointmentSearchTerm, setAppointmentSearchTerm] = useState("")
     const [appointmentTab, setAppointmentTab] = useState("All")
+    const [doctorSearchTerm, setDoctorSearchTerm] = useState("")
+    const [patientSearchTerm, setPatientSearchTerm] = useState("")
 
     const [doctors, setDoctors] = useState([])
     const [patients, setPatients] = useState([])
@@ -83,7 +85,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
             setLoading(true);
 
             const res = await fetchApprovedList({
-                params: { page: pageNumber, limit: 5 }
+                params: { page: pageNumber, limit: 5, search: doctorSearchTerm }
             })
 
             if (!res.data?.success) {
@@ -116,7 +118,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
             setLoading(true);
 
             const res = await fetchPatientsList({
-                params: { page: pageNumber, limit: 15 }
+                params: { page: pageNumber, limit: 15, search: patientSearchTerm }
             })
 
             if (!res.data?.success) {
@@ -205,15 +207,21 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
 
     useEffect(() => {
         if (activeKey === "doctors") {
-            fetchApprovedDoctors(doctorPage);
+            const timer = setTimeout(() => {
+                fetchApprovedDoctors(doctorPage);
+            }, 500);
+            return () => clearTimeout(timer);
         }
-    }, [activeKey, doctorPage]);
-
-    useEffect(() => {
         if (activeKey === "patients") {
-            fetchPatients(patientPage);
+            const timer = setTimeout(() => {
+                fetchPatients(patientPage);
+            }, 500);
+            return () => clearTimeout(timer);
         }
-    }, [activeKey, patientPage]);
+        if (activeKey === "departments") {
+            console.log(departmentData)
+        }
+    }, [activeKey, doctorPage, patientPage, doctorSearchTerm, patientSearchTerm]);
 
     useEffect(() => {
         if (activeKey === "dashboard") {
@@ -360,6 +368,8 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                                 viewDetails={handleViewApprovedDoctor}
                                 onOpenBlock={openBlockModal}
                                 onOpenUnblock={openUnblockModal}
+                                searchTerm={doctorSearchTerm}
+                                setSearchTerm={setDoctorSearchTerm}
                             />
                         )
                     )}
@@ -371,6 +381,8 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                             setPage={setPatientPage}
                             page={patientPage}
                             totalPages={totalPatientPages}
+                            searchTerm={patientSearchTerm}
+                            setSearchTerm={setPatientSearchTerm}
                         />
                     )}
                     {activeKey === "appointments" && <AdminAppointmentsTable

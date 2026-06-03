@@ -11,6 +11,14 @@ export const fetchTotalPatients = async (req, res) => {
 
         const filter = { role: "patient", isVerified: true };
 
+        if (req.query.search) {
+            const searchRegex = new RegExp(req.query.search, 'i');
+            filter.$or = [
+                { name: searchRegex },
+                { email: searchRegex }
+            ];
+        }
+
         const [users, totalPatients] = await Promise.all([
             User.find(filter)
                 .select("name email phone lastLogin")

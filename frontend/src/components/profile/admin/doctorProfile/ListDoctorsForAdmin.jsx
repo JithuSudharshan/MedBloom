@@ -36,14 +36,10 @@ const ListDoctorsForAdmin = ({
     doctors,
     totalPages,
     doctorsCount,
-    pendingCount
+    pendingCount,
+    searchTerm,
+    setSearchTerm
 }) => {
-    const [search, setSearch] = useState("");
-
-    const filteredDoctors = doctors.filter((doc) =>
-        doc.displayName.toLowerCase().includes(search.toLowerCase())
-    );
-
     console.log("totalPages", totalPages)
 
     return (
@@ -65,8 +61,11 @@ const ListDoctorsForAdmin = ({
                     <input
                         type="text"
                         placeholder="Search Doctors by name...."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        value={searchTerm}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            setPage(1); // Reset page on search
+                        }}
                         className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                     />
                 </div>
@@ -82,15 +81,19 @@ const ListDoctorsForAdmin = ({
 
             {/* Doctor list */}
             <div className="mt-4">
-                {filteredDoctors.map((doctor) => (
-                    <DoctorRow
-                        key={doctor._id}
+                {doctors.length === 0 ? (
+                    <p className="text-gray-500 text-sm text-center py-10">No doctors found.</p>
+                ) : (
+                    doctors.map((doctor) => (
+                        <DoctorRow
+                            key={doctor._id}
                         doctor={doctor}
                         onOpenBlock={onOpenBlock}
                         onOpenUnblock={onOpenUnblock}
                         viewDetails={viewDetails}
-                    />
-                ))}
+                        />
+                    ))
+                )}
             </div>
             <div>
                 <Pagination current={page} total={totalPages} onChange={setPage} />
