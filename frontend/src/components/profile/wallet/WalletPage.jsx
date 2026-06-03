@@ -7,18 +7,20 @@ import TopUpModal from './TopUpModal';
 import { Pagination } from '../../ui/Pagination';
 import { fetchPatientWallet, initiatePatientTopUp, verifyPatientTopUp } from '../../../api/patientApi';
 import { fetchDoctorWallet, initiateDoctorTopUp, verifyDoctorTopUp } from '../../../api/doctorApi';
+import { fetchAdminWalletData } from '../../../api/adminApi';
 import { showToast } from '../../ui/Toast';
 
 const WalletPage = ({ userRole }) => {
     const isDoctor = userRole === 'doctor';
+    const isAdmin = userRole === 'admin';
 
     // Theme Colors
-    const themeBg = isDoctor ? 'bg-[#FCF8F8]' : 'bg-[#F8FDFD]';
-    const primaryText = isDoctor ? 'text-[#6B3B3D]' : 'text-[#00A4A3]';
-    const primaryBg = isDoctor ? 'bg-[#6B3B3D]' : 'bg-[#00A4A3]';
-    const primaryHover = isDoctor ? 'hover:bg-[#5a3133]' : 'hover:bg-teal-700';
-    const secondaryBg = isDoctor ? 'bg-[#F8E9EA]' : 'bg-teal-50';
-    const secondaryHover = isDoctor ? 'hover:bg-[#f1d7d8]' : 'hover:bg-teal-100';
+    const themeBg = isDoctor ? 'bg-[#FCF8F8]' : isAdmin ? 'bg-[#F8FAFC]' : 'bg-[#F8FDFD]';
+    const primaryText = isDoctor ? 'text-[#6B3B3D]' : isAdmin ? 'text-[#0F172A]' : 'text-[#00A4A3]';
+    const primaryBg = isDoctor ? 'bg-[#6B3B3D]' : isAdmin ? 'bg-[#334155]' : 'bg-[#00A4A3]';
+    const primaryHover = isDoctor ? 'hover:bg-[#5a3133]' : isAdmin ? 'hover:bg-[#1E293B]' : 'hover:bg-teal-700';
+    const secondaryBg = isDoctor ? 'bg-[#F8E9EA]' : isAdmin ? 'bg-[#F1F5F9]' : 'bg-teal-50';
+    const secondaryHover = isDoctor ? 'hover:bg-[#f1d7d8]' : isAdmin ? 'hover:bg-[#E2E8F0]' : 'hover:bg-teal-100';
 
     const [balance, setBalance] = useState(0);
     const [transactions, setTransactions] = useState([]);
@@ -54,10 +56,17 @@ const WalletPage = ({ userRole }) => {
     const loadWalletData = useCallback(async () => {
         try {
             setLoading(true);
-            const res = isDoctor ? await fetchDoctorWallet() : await fetchPatientWallet();
+            let res;
+            if (isAdmin) {
+                res = await fetchAdminWalletData();
+            } else if (isDoctor) {
+                res = await fetchDoctorWallet();
+            } else {
+                res = await fetchPatientWallet();
+            }
             if (res?.data?.success) {
-                setBalance(res.data.walletBalance);
-                setTransactions(res.data.transactions);
+                setBalance(res.data.data ? res.data.data.walletBalance : res.data.walletBalance);
+                setTransactions(res.data.data ? res.data.data.transactions : res.data.transactions);
             }
         } catch (error) {
             console.error("Failed to load wallet data:", error);
@@ -65,7 +74,7 @@ const WalletPage = ({ userRole }) => {
         } finally {
             setLoading(false);
         }
-    }, [isDoctor]);
+    }, [isDoctor, isAdmin]);
 
     useEffect(() => {
         loadWalletData();
@@ -165,14 +174,16 @@ const WalletPage = ({ userRole }) => {
     return (
         <div className="w-full flex flex-col gap-6 font-sans">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h1 className="text-2xl font-bold text-gray-800">My Wallet</h1>
-                <button
-                    onClick={() => setIsTopUpOpen(true)}
-                    className={`flex items-center gap-2 ${primaryBg} ${primaryHover} text-white px-5 py-2.5 rounded-lg font-medium transition-all shadow-sm hover:shadow-md`}
-                >
-                    <Plus className="w-5 h-5" />
-                    Add Funds
-                </button>
+                <h1 className="text-2xl font-bold text-gray-800">{isAdmin ? "Platform Escrow" : "My Wallet"}</h1>
+                {!isAdmin && (
+                    <button
+                        onClick={() => setIsTopUpOpen(true)}
+                        className={`flex items-center gap-2 ${primaryBg} ${primaryHover} text-white px-5 py-2.5 rounded-lg font-medium transition-all shadow-sm hover:shadow-md`}
+                    >
+                        <Plus className="w-5 h-5" />
+                        Add Funds
+                    </button>
+                )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -182,14 +193,16 @@ const WalletPage = ({ userRole }) => {
                         <p className="text-white/80 font-medium mb-1">Available Balance</p>
                         <h2 className="text-4xl font-bold">₹{balance.toFixed(2)}</h2>
                     </div>
-                    <div className="relative z-10 flex gap-4 mt-6">
-                        <button
-                            onClick={() => setIsTopUpOpen(true)}
-                            className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 backdrop-blur-sm"
-                        >
-                            <ArrowDownLeft className="w-4 h-4" /> Top Up
-                        </button>
-                    </div>
+                    {!isAdmin && (
+                        <div className="relative z-10 flex gap-4 mt-6">
+                            <button
+                                onClick={() => setIsTopUpOpen(true)}
+                                className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 backdrop-blur-sm"
+                            >
+                                <ArrowDownLeft className="w-4 h-4" /> Top Up
+                            </button>
+                        </div>
+                    )}
                     {/* Decorative Background */}
                     <Wallet className="absolute -bottom-6 -right-6 w-40 h-40 text-white/10 rotate-12" />
                 </div>

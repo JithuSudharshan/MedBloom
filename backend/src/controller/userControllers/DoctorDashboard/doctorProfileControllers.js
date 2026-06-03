@@ -3,10 +3,14 @@ import User from "../../../model/userModel.js";
 import Appointment from "../../../model/appointmentModel.js";
 import Review from "../../../model/reviewModel.js";
 import { MedicalRecord } from "../../../model/medicalRecordModel.js";
+import Transaction from "../../../model/transactionModel.js";
+import Admin from "../../../model/adminModel.js";
+import crypto from 'crypto';
 import { formatDOB } from "../../../utils/formatters.js";
 import PDFDocument from 'pdfkit';
 import { uploadBufferToCloudinary } from "../../../utils/cloudinaryUploader.js";
 import { sendPrescriptionEmail } from "../../../utils/sendEmail.js";
+import { notifyAdmin, sendNotification } from "../../../utils/notificationHelper.js";
 
 const generatePrescriptionPdfBuffer = (appointment, doctor, medications) => {
     return new Promise((resolve, reject) => {
@@ -227,6 +231,14 @@ export const editDoctorProfile = async (req, res) => {
                 .json({ success: false, message: "Doctor not found" });
         }
 
+        const feeChanges = [];
+        if (consultationFeesOnline && Number(consultationFeesOnline) !== doctor.consultationFees.online) {
+            feeChanges.push(`Online Fee changed from ₹${doctor.consultationFees.online || 0} to ₹${consultationFeesOnline}`);
+        }
+        if (consultationFeesOffline && Number(consultationFeesOffline) !== doctor.consultationFees.offline) {
+            feeChanges.push(`Offline Fee changed from ₹${doctor.consultationFees.offline || 0} to ₹${consultationFeesOffline}`);
+        }
+
         doctor.displayName = displayName || doctor.displayName
         doctor.contactNumber = contactNumber || doctor.contactNumber
         doctor.gender = gender || doctor.gender
@@ -237,6 +249,14 @@ export const editDoctorProfile = async (req, res) => {
         doctor.consultationFees.offline = consultationFeesOffline || doctor.consultationFees.offline
 
         await doctor.save()
+
+        if (feeChanges.length > 0) {
+            await notifyAdmin({
+                message: `Profile Update Alert: Dr. ${doctor.displayName} modified their fees. ${feeChanges.join(', ')}.`,
+                type: 'doctor_update',
+                link: '/admin/doctors'
+            });
+        }
 
         return res.status(200).json({
             success: true,
@@ -353,7 +373,7 @@ export const fetchDoctorAppointments = async (req, res) => {
                 path: 'patient',
                 populate: {
                     path: 'user',
-                    select: 'name'
+                    select: 'name email'
                 }
             });
 
@@ -385,13 +405,17 @@ export const fetchDoctorAppointments = async (req, res) => {
 
             return {
                 id: app._id,
+                appointmentId: app.appointmentId,
                 primaryTitle: app.patient?.user?.name || "Unknown Patient",
-                secondaryText: "Patient", // or some other patient info if needed
+                patientName: app.patient?.user?.name || "Unknown Patient",
+                patientImage: app.patient?.profile_url,
+                secondaryText: app.patient?.user?.email || "Patient",
                 dateTimeLabel: `${formattedDate} at ${formattedTime}`,
                 rawDate: app.date,
                 rawStartTime: app.startTime,
                 rawEndTime: app.endTime,
                 status: mappedStatus,
+                prescription: app.prescription,
             }
         });
 
@@ -514,6 +538,70 @@ export const completeConsultation = async (req, res) => {
         appointment.status = 'completed';
         appointment.consultationEndedAt = new Date();
         await appointment.save();
+
+        // --- Payout Engine ---
+        const PLATFORM_FEE_PERCENTAGE = 0.20; // 20% Platform Commission
+        const appointmentAmount = appointment.amount || 0;
+
+        if (appointmentAmount > 0) {
+            const adminFee = appointmentAmount * PLATFORM_FEE_PERCENTAGE;
+            const doctorPayout = appointmentAmount - adminFee;
+
+            const doctor = await Doctor.findById(appointment.doctor);
+            if (doctor) {
+                // 1. Credit Doctor's Wallet
+                doctor.walletBalance = (doctor.walletBalance || 0) + doctorPayout;
+                await doctor.save();
+
+                // 2. Create Ledger Transaction
+                await Transaction.create({
+                    transactionId: "TXN-" + crypto.randomBytes(4).toString('hex').toUpperCase(),
+                    userId: doctor._id,
+                    userModel: 'Doctor',
+                    type: 'credit',
+                    amount: doctorPayout,
+                    description: `Payout for Consultation ${appointment.appointmentId}. (Platform Fee: ₹${adminFee})`,
+                    status: 'Success',
+                    paymentGateway: 'system'
+                });
+
+                // 3. Notify Doctor
+                await sendNotification({
+                    receiverId: doctor.user, // Reference to User ID
+                    message: `Consultation complete! ₹${doctorPayout} has been credited to your wallet.`,
+                    type: 'wallet_topup',
+                    link: '/doctor/wallet'
+                });
+
+                // 4. Admin Escrow (Debit)
+                try {
+                    const admin = await Admin.findOne();
+                    if (admin) {
+                        admin.walletBalance = (admin.walletBalance || 0) - doctorPayout;
+                        await admin.save();
+
+                        await Transaction.create({
+                            userId: admin._id,
+                            userModel: 'Admin',
+                            transactionId: "TXN-" + crypto.randomBytes(4).toString('hex').toUpperCase(),
+                            type: 'debit',
+                            amount: doctorPayout,
+                            description: `Payout to Dr. ${doctor.displayName} for consultation ${appointment.appointmentId}. (Platform Fee retained: ₹${adminFee})`,
+                            status: 'Success'
+                        });
+                    }
+                } catch (adminDebitErr) {
+                    console.error("Admin escrow debit failed:", adminDebitErr);
+                }
+
+                // 5. Notify Admin of Revenue
+                await notifyAdmin({
+                    message: `Revenue Alert: Platform earned ₹${adminFee} commission from Dr. ${doctor.displayName}'s consultation.`,
+                    type: 'wallet_topup',
+                    link: '/admin/dashboard'
+                });
+            }
+        }
 
         res.status(200).json({
             success: true,

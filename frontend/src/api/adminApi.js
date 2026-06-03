@@ -216,3 +216,13 @@ export const fetchMetricsForAdmin = async () => {
         throw error
     }
 }
+
+export const fetchAdminWalletData = async () => {
+    try {
+        const response = await api.get('/admin/wallet');
+        return response;
+    } catch (error) {
+        console.log("Error while fetching admin wallet data", error);
+        throw error;
+    }
+};

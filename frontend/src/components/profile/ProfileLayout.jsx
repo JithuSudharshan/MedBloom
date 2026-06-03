@@ -64,7 +64,7 @@ const ProfileLayout = ({
                 await fetchAppointmentsForPatient({
                     params: { page: pageNumber, limit: 5 }
                 }) : await fetchAppointmentsForDoctor({
-                    params: { page: pageNumber, limit: 5 }
+                    params: { page: pageNumber, limit: 7 }
                 }))
 
             if (!res.data?.success) {

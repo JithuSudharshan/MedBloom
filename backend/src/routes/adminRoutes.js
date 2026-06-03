@@ -27,6 +27,7 @@ import {
     fetchTotalPatients
 } from '../controller/adminControllers/adminDashboard/adminPatientControllers.js';
 import { uploadToCloudinary } from '../middlewares/uploadToCloudinary.js';
+import { getAdminWallet } from '../controller/adminControllers/adminDashboard/adminWalletController.js';
 
 const router = express.Router()
 
@@ -50,6 +51,7 @@ router.get("/department/table-info", fetchDataForDepartmentTable)
 router.post("/department/edit-info", editDepartmentInfo)
 router.get("/appointments", fetchAppointments)
 router.get("/Dashboard-Metrics", fetchMetrics);
+router.get("/wallet", getAdminWallet);
 
 router.patch(
     "/doctors/:id/edit-profile",

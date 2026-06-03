@@ -33,10 +33,13 @@ export default function AppointmentDrawer({ isOpen, onClose, appointment, userRo
     formattedStatus = formattedStatus.charAt(0).toUpperCase() + formattedStatus.slice(1);
     if (formattedStatus === 'In_progress') formattedStatus = 'In Progress';
 
-    const docName = appointment.doctorName || appointment.primaryTitle || 'Doctor';
-    const docImage = appointment.doctorImage || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150&h=150';
-    const docSpeciality = appointment.speciality || appointment.secondaryText || 'Specialist';
-    const dateTime = appointment.dateTimeLabel || 'October 15, 2025  10:30 AM';
+    // Dynamically choose between Doctor or Patient info based on userRole
+    const personName = isDoctor ? (appointment.patientName || appointment.primaryTitle) : (appointment.doctorName || appointment.primaryTitle || 'Doctor');
+    const personImage = isDoctor 
+        ? (appointment.patientImage || 'https://cdn-icons-png.flaticon.com/512/3061/3061126.png')
+        : (appointment.doctorImage || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150&h=150');
+    const personSubtitle = isDoctor ? (appointment.secondaryText || 'Patient') : (appointment.speciality || appointment.secondaryText || 'Specialist');
+    const dateTime = appointment.dateTimeLabel || 'TBD';
     
     // Check consultation mode
     const consultationMode = appointment.mode || appointment.consultationMode || 'Online Consultation';
@@ -183,12 +186,12 @@ export default function AppointmentDrawer({ isOpen, onClose, appointment, userRo
                             {/* Doctor/Patient Info */}
                             <div className="flex flex-col items-center text-center">
                                 <img 
-                                    src={docImage} 
-                                    alt={docName} 
+                                    src={personImage} 
+                                    alt={personName} 
                                     className="w-24 h-24 rounded-full object-cover shadow-md mb-4 border-4 border-white"
                                 />
-                                <h2 className="text-2xl font-bold text-slate-800 mb-1">{docName}</h2>
-                                <p className="text-slate-500 font-medium">{docSpeciality}</p>
+                                <h2 className="text-2xl font-bold text-slate-800 mb-1">{personName}</h2>
+                                <p className="text-slate-500 font-medium">{personSubtitle}</p>
                                 <div className={`mt-4 ${theme.lightBg} ${theme.primaryText} px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider`}>
                                     {isOnline ? "Online Consultation" : "Offline Consultation"}
                                 </div>

@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import Appointment from '../../../model/appointmentModel.js';
 import Doctor from '../../../model/doctorModel.js';
 import Patient from '../../../model/patientModel.js';
+import Admin from '../../../model/adminModel.js';
 import Transaction from '../../../model/transactionModel.js';
 import { ENV } from '../../../config/env.js';
 import { getIO } from '../../../config/socket.IO.js';
@@ -146,7 +147,28 @@ export const verifyPaymentAndBook = async (req, res) => {
         await Doctor.findByIdAndUpdate(appointment.doctor, { $push: { appointments: appointment._id } });
         await Patient.findByIdAndUpdate(appointment.patient, { $push: { appointments: appointment._id } });
 
-        // --- 4. Real-time updates & Email ---
+        // --- 4. Admin Wallet Escrow (Credit) ---
+        try {
+            const admin = await Admin.findOne();
+            if (admin) {
+                admin.walletBalance = (admin.walletBalance || 0) + (appointment.amount || 0);
+                await admin.save();
+
+                await Transaction.create({
+                    userId: admin._id,
+                    userModel: 'Admin',
+                    transactionId: "TXN-" + crypto.randomBytes(4).toString('hex').toUpperCase(),
+                    type: 'credit',
+                    amount: appointment.amount || 0,
+                    description: `Payment received for appointment ${appointment.appointmentId}`,
+                    status: 'Success'
+                });
+            }
+        } catch (adminEscrowErr) {
+            console.error("Admin escrow credit failed:", adminEscrowErr);
+        }
+
+        // --- 5. Real-time updates & Email ---
         try {
             const doctorObj = await Doctor.findById(appointment.doctor).populate('user');
             const patientObj = await Patient.findById(appointment.patient).populate('user');
@@ -462,6 +484,27 @@ export const bookAppointmentWithWallet = async (req, res) => {
             status: 'Success'
         });
         await transaction.save();
+
+        // Admin Escrow (Credit)
+        try {
+            const admin = await Admin.findOne();
+            if (admin) {
+                admin.walletBalance = (admin.walletBalance || 0) + fee;
+                await admin.save();
+
+                await Transaction.create({
+                    userId: admin._id,
+                    userModel: 'Admin',
+                    transactionId: "TXN-" + crypto.randomBytes(4).toString('hex').toUpperCase(),
+                    type: 'credit',
+                    amount: fee,
+                    description: `Payment received for appointment ${uniqueId}`,
+                    status: 'Success'
+                });
+            }
+        } catch (adminEscrowErr) {
+            console.error("Admin escrow credit failed:", adminEscrowErr);
+        }
 
         // Update arrays
         patient.appointments.push(newAppointment._id);

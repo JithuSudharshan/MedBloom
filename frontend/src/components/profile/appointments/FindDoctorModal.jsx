@@ -36,7 +36,7 @@ export default function FindDoctorModal({ isOpen, onClose }) {
                     fetchDoctorsData(),
                     fetchDepartmentsList()
                 ]);
-                setDoctors(doctorsRes?.data?.data || []);
+                setDoctors(doctorsRes?.data?.data?.doctors || []);
                 setDepartments(departmentsRes?.data?.data || []);
             } catch (error) {
                 console.error("Failed to fetch data:", error);

@@ -28,6 +28,7 @@ import AdminLogin from '../pages/admin/auth/AdminLogin';
 import AdminDashboard from '../pages/admin/dashboard/AdminDashboard';
 import PatientOnboardingForm from '../pages/user/patient/PatientOnboardingForm';
 import VideoConsultationRoom from '../pages/consultation/VideoConsultationRoom';
+import ApplicationReviewPage from '../pages/admin/dashboard/ApplicationReviewPage';
 
 export const AppInner = () => {
     const { user } = useAuth();
@@ -100,6 +101,8 @@ export const AppInner = () => {
                         <Route path="appointments" element={<AdminDashboard />} />
                         <Route path="departments" element={<AdminDashboard />} />
                         <Route path="notifications" element={<AdminDashboard />} />
+                        <Route path="wallet" element={<AdminDashboard />} />
+                        <Route path="doctor/review/:doctorId" element={<ApplicationReviewPage />} />
                         <Route path="doctors/:doctorId/edit" element={<AdminEditDoctorPage />} />
                         <Route path="patients/:patientId" element={<AdminPatientDetailsPage />} />
                         <Route path="patient/:patientId/edit" element={<AdminEditPatientPage />} />

@@ -3,12 +3,18 @@ import DataTable from '../TableData';
 import { Pagination } from '../../../ui/Pagination';
 import { PatientStats } from './PatientStats';
 
-const ListPatientsForAdmin = ({ patients, page, setPage, totalPages, onViewPatient, onBlockPatient, patientCount, newPatients = 780, activeVisit = 210, searchTerm, setSearchTerm }) => {
+const ListPatientsForAdmin = ({ patients, page, setPage, totalPages, onViewPatient, onBlockPatient, patientCount, newPatients, activeVisit, searchTerm, setSearchTerm }) => {
     const patientColumns = [
         { key: "name", header: "Name" },
         { key: "email", header: "Email" },
         { key: "gender", header: "Gender" },
-        { key: "totalVisits", header: "Total Visits" },
+        {
+            key: "totalVisits",
+            header: "Total Visits",
+            render: (_, patient) => (
+                <span className="text-gray-700 font-medium">{patient.totalVisits || 0}</span>
+            )
+        },
         {
             key: "actions",
             header: "Actions",

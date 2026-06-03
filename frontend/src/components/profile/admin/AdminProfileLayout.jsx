@@ -24,6 +24,7 @@ import ServiceOverview from "./dashboard/ServiceOverview.jsx";
 import AdminAppointmentsTable from "./appointments/AdminAppointmentsTable.jsx";
 import NotificationsPage from "../NotificationsPage.jsx";
 import Loader from "../../ui/Loading.jsx";
+import WalletPage from "../wallet/WalletPage.jsx";
 
 
 const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
@@ -31,7 +32,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
 
     const location = useLocation();
     const derivedKey = location.pathname.split("/").pop();
-    const isValidKey = ["dashboard", "doctors", "patients", "appointments", "departments", "notifications"].includes(derivedKey);
+    const isValidKey = ["dashboard", "doctors", "patients", "appointments", "departments", "notifications", "wallet"].includes(derivedKey);
     const activeKey = isValidKey ? derivedKey : "dashboard";
 
     const [openApproval, setOpenApproval] = useState(false);
@@ -54,6 +55,8 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
 
     const [totalCount, setTotalcount] = useState(0)
     const [pendingCount, setPendingCount] = useState(0)
+    const [newPatientsCount, setNewPatientsCount] = useState(0);
+    const [activeVisitsCount, setActiveVisitsCount] = useState(0);
 
     const [selectedDoctorId, setSelectedDoctorId] = useState(null);
     const [selectedDepartment, setSelectedDepartment] = useState(null);
@@ -128,10 +131,14 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                 patients,
                 page,
                 totalPages,
-                totalPatients
+                totalPatients,
+                newPatientsCount,
+                activeVisitsCount
             } = res?.data?.data || {};
 
             setTotalcount(totalPatients)
+            setNewPatientsCount(newPatientsCount || 0);
+            setActiveVisitsCount(activeVisitsCount || 0);
             setPatients(patients);
             setPatientPage(page);
             setTotalPatientPages(totalPages);
@@ -378,6 +385,8 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                             onViewPatient={handleViewPatient}
                             patients={patients}
                             patientCount={totalCount}
+                            newPatients={newPatientsCount}
+                            activeVisit={activeVisitsCount}
                             setPage={setPatientPage}
                             page={patientPage}
                             totalPages={totalPatientPages}
@@ -404,6 +413,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                         />
                     )}
                     {activeKey === "notifications" && (<NotificationsPage userRole="admin" />)}
+                    {activeKey === "wallet" && (<WalletPage userRole="admin" />)}
                 </main>
             </div>
 

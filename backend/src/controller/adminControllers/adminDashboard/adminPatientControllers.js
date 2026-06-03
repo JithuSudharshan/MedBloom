@@ -1,5 +1,6 @@
 import Patient from "../../../model/patientModel.js";
 import User from "../../../model/userModel.js";
+import Appointment from "../../../model/appointmentModel.js";
 import { formatDOB, formatName } from "../../../utils/formatters.js";
 
 
@@ -19,7 +20,9 @@ export const fetchTotalPatients = async (req, res) => {
             ];
         }
 
-        const [users, totalPatients] = await Promise.all([
+        const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+        const [users, totalPatients, newPatientsCount, activeVisitsCount] = await Promise.all([
             User.find(filter)
                 .select("name email phone lastLogin")
                 .sort({ createdAt: -1 })
@@ -27,6 +30,8 @@ export const fetchTotalPatients = async (req, res) => {
                 .limit(limit)
                 .lean(),
             User.countDocuments(filter),
+            User.countDocuments({ ...filter, createdAt: { $gte: startOfMonth } }),
+            Appointment.countDocuments({ status: { $in: ['confirmed', 'in_progress', 'completed'] } })
         ]);
 
         const userIds = users.map((u) => u._id);
@@ -36,15 +41,28 @@ export const fetchTotalPatients = async (req, res) => {
             .lean();
 
 
+        const patientIds = patientDocs.map(p => p._id);
+
+        const visitCounts = await Appointment.aggregate([
+            { $match: { patient: { $in: patientIds }, status: { $in: ['confirmed', 'completed'] } } },
+            { $group: { _id: "$patient", count: { $sum: 1 } } }
+        ]);
+
+        const visitCountsByPatientId = new Map(
+            visitCounts.map(v => [String(v._id), v.count])
+        );
+
         const patientByUserId = new Map(
             patientDocs.map((p) => [String(p.user), p])
         );
 
         const patients = users.map((u) => {
             const p = patientByUserId.get(String(u._id));
+            const totalVisits = p ? (visitCountsByPatientId.get(String(p._id)) || 0) : 0;
             return {
                 ...u,
                 gender: p?.gender || null,
+                totalVisits
             };
         });
 
@@ -59,6 +77,8 @@ export const fetchTotalPatients = async (req, res) => {
                 page,
                 totalPages,
                 totalPatients,
+                newPatientsCount,
+                activeVisitsCount
             },
         });
     } catch (error) {

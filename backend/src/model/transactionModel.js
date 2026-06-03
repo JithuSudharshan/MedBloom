@@ -14,7 +14,7 @@ const transactionSchema = new Schema({
     userModel: {
         type: String,
         required: true,
-        enum: ['Patient', 'Doctor']
+        enum: ['Patient', 'Doctor', 'Admin']
     },
     type: {
         type: String,

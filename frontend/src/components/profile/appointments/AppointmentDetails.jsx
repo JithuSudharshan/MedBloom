@@ -5,14 +5,19 @@ import { useNavigate } from 'react-router-dom';
 export default function AppointmentDetails({ appointment, userRole, onBack, onReschedule, onCancel }) {
     const isDoctor = userRole === 'doctor';
 
-    // Fallbacks for data
-    const id = appointment.id || appointment._id || 'MED-109283';
+    // Real data extraction with safe fallbacks
+    const id = appointment.appointmentId || appointment.id || appointment._id || 'N/A';
     const status = appointment.status || 'Confirmed';
-    const docName = appointment.doctorName || appointment.primaryTitle || 'Doctor';
-    const docImage = appointment.doctorImage || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150&h=150';
-    const docSpeciality = appointment.speciality || appointment.secondaryText || 'Specialist';
-    const dateTime = appointment.dateTimeLabel || 'October 15, 2025  10:30 AM';
-    const consultationMode = appointment.mode || 'Online Consultation';
+    
+    // Dynamically choose between Doctor or Patient info based on userRole
+    const personName = isDoctor ? (appointment.patientName || appointment.primaryTitle) : (appointment.doctorName || appointment.primaryTitle);
+    const personImage = isDoctor 
+        ? (appointment.patientImage || 'https://cdn-icons-png.flaticon.com/512/3061/3061126.png')
+        : (appointment.doctorImage || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150&h=150');
+    
+    const personSubtitle = isDoctor ? (appointment.secondaryText || 'Patient') : (appointment.speciality || appointment.secondaryText || 'Specialist');
+    const dateTime = appointment.dateTimeLabel || 'TBD';
+    const consultationMode = appointment.consultationMode || appointment.mode || 'offline';
 
     const statusStyles = {
         Completed: "bg-[#ecfdf5] text-[#047857]",
@@ -87,8 +92,8 @@ export default function AppointmentDetails({ appointment, userRole, onBack, onRe
                 
                 {/* Header: ID and Status */}
                 <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-[#006D6F] font-semibold text-lg">
-                        Appointments ID : #{id}
+                    <h3 className={`font-semibold text-lg ${isDoctor ? 'text-[#6B3B3D]' : 'text-[#006D6F]'}`}>
+                        Appointments ID : {id.startsWith('#') ? id : `#${id}`}
                     </h3>
                     <div className={`px-5 py-1.5 rounded-full text-sm font-medium ${currentStatusStyle}`}>
                         {status}
@@ -101,17 +106,17 @@ export default function AppointmentDetails({ appointment, userRole, onBack, onRe
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                     <div className="flex items-center gap-4">
                         <img 
-                            src={docImage} 
-                            alt={docName} 
+                            src={personImage} 
+                            alt={personName} 
                             className="w-20 h-20 rounded-full object-cover shadow-sm"
                         />
                         <div>
-                            <h2 className="text-2xl font-bold text-[#006D6F] mb-1">{docName}</h2>
-                            <p className="text-slate-400 font-medium">{docSpeciality}</p>
+                            <h2 className={`text-2xl font-bold mb-1 ${isDoctor ? 'text-[#6B3B3D]' : 'text-[#006D6F]'}`}>{personName}</h2>
+                            <p className="text-slate-400 font-medium">{personSubtitle}</p>
                         </div>
                     </div>
                     
-                    <div className="bg-[#ebffff] text-[#00A4A3] px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap">
+                    <div className={`${isDoctor ? 'bg-rose-50 text-[#B08B8C]' : 'bg-[#ebffff] text-[#00A4A3]'} px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap capitalize`}>
                         {consultationMode}
                     </div>
                 </div>
@@ -129,7 +134,7 @@ export default function AppointmentDetails({ appointment, userRole, onBack, onRe
                         <div className="flex items-center gap-4">
                             <button 
                                 onClick={onReschedule}
-                                className="bg-[#00A4A3] hover:bg-[#008c8a] text-white px-6 py-2 rounded-lg text-sm font-medium transition shadow-sm"
+                                className={`${isDoctor ? 'bg-[#B08B8C] hover:bg-[#9D7778]' : 'bg-[#00A4A3] hover:bg-[#008c8a]'} text-white px-6 py-2 rounded-lg text-sm font-medium transition shadow-sm`}
                             >
                                 Reschedule
                             </button>
@@ -154,9 +159,9 @@ export default function AppointmentDetails({ appointment, userRole, onBack, onRe
                         </p>
                         
                         <button 
-                            onClick={() => navigate(`/consultation/${id}`)}
+                            onClick={() => navigate(`/consultation/${appointment.id || appointment._id}`)}
                             disabled={!canJoinVideo}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition shadow-sm ${canJoinVideo ? 'bg-[#00A4A3] hover:bg-[#008c8a] text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition shadow-sm ${canJoinVideo ? (isDoctor ? 'bg-[#B08B8C] hover:bg-[#9D7778] text-white' : 'bg-[#00A4A3] hover:bg-[#008c8a] text-white') : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>
                             <Video className="w-5 h-5" />
                             {canJoinVideo ? 'Join Video Call' : 'Not yet available'}
                         </button>

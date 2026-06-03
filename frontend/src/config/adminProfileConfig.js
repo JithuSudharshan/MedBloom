@@ -24,8 +24,7 @@ const adminProfileConfig = {
         { key: "publications", label: "Publications", icon: Publications, path: "/admin/publications" },
         { key: "notifications", label: "Notification", icon: Notification_icon, path: "/admin/notifications" },
         { key: "departments", label: "Departments", icon: department_icon, path: "/admin/departments" },
-        { key: "transactions", label: "Transaction", icon: Transaction, path: "/admin/transactions" },
-        { key: "revenue", label: "Revenue", icon: Wallet, path: "/admin/revenue" },
+        { key: "wallet", label: "Wallet", icon: Wallet, path: "/admin/wallet" },
         { key: "logout", label: "Logout", icon: Logout }
     ],
 };

@@ -1,6 +1,7 @@
 import Notification from "../model/notificationSchema.js";
 import { getIO } from "../config/socket.IO.js";
 import User from "../model/userModel.js";
+import Admin from "../model/adminModel.js";
 
 /**
  * Creates a notification in the database and emits it via Socket.IO
@@ -57,7 +58,7 @@ export const sendNotification = async ({ senderId, receiverId, message, type, li
  */
 export const notifyAdmin = async ({ message, type, link }) => {
     try {
-        const adminUser = await User.findOne({ role: 'admin' }).select('_id');
+        const adminUser = await Admin.findOne().select('_id');
         if (!adminUser) {
             console.error("Admin user not found, could not send admin notification.");
             return null;

@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { cancelPatientAppointment } from "../../../api/patientApi";
 import { useParams, useNavigate } from "react-router-dom";
 import AppointmentCard from "./AppointmentCard";
+import DoctorAppointmentRow from "./DoctorAppointmentRow";
 import AppointmentDrawer from "./AppointmentDrawer";
 import CancelAppointmentModal from "./CancelAppointmentModal";
 import { Pagination } from "../../ui/Pagination";
@@ -74,8 +75,11 @@ export default function AppointmentsSection({
                 activeTab === "All" || app.status === activeTab;
 
             const matchesSearch =
+                (app.appointmentId && app.appointmentId.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (app.id && app.id.toLowerCase().includes(searchTerm.toLowerCase())) ||
                 (app.primaryTitle && app.primaryTitle.toLowerCase().includes(searchTerm.toLowerCase())) ||
                 (app.doctorName && app.doctorName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (app.patientName && app.patientName.toLowerCase().includes(searchTerm.toLowerCase())) ||
                 (app.secondaryText && app.secondaryText.toLowerCase().includes(searchTerm.toLowerCase())) ||
                 (app.speciality && app.speciality.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -146,29 +150,52 @@ export default function AppointmentsSection({
                         No appointments found
                     </p>
                 ) : (
-                    filteredAppointments.map((app) => (
-                        <AppointmentCard
-                            key={app.id}
-                            primaryTitle={app.primaryTitle || app.doctorName}
-                            secondaryText={app.secondaryText || app.speciality}
-                            dateTimeLabel={app.dateTimeLabel}
-                            status={app.status}
-                            showFeedback={app.status === "Completed" && !app.isReviewed}
-                            onFeedback={() => {
-                                setAppointmentToReview(app);
-                                setIsReviewModalOpen(true);
-                            }}
-                            onViewPrescription={() => {
-                                setAppointmentToViewPrescription(app);
-                                setIsViewPrescriptionOpen(true);
-                            }}
-                            hasPrescription={Array.isArray(app.prescription) && app.prescription.length > 0}
-                            onReschedule={() => handleReschedule(app)}
-                            onCancel={() => initiateCancel(app)}
-                            onViewDetails={() => navigate(`/${userRole}/appointments/${app.id || app._id}`)}
-                            userRole={userRole}
-                        />
-                    ))
+                    <div className={isDoctor ? "flex flex-col gap-3" : "grid grid-cols-1 lg:grid-cols-2 gap-6"}>
+                        {filteredAppointments.map((app) => {
+                            if (isDoctor) {
+                                return (
+                                    <DoctorAppointmentRow
+                                        key={app.id || app._id}
+                                        appointmentId={app.appointmentId || app.id || app._id}
+                                        primaryTitle={app.primaryTitle || app.patientName}
+                                        secondaryText={app.secondaryText}
+                                        dateTimeLabel={app.dateTimeLabel}
+                                        status={app.status}
+                                        onViewPrescription={() => {
+                                            setAppointmentToViewPrescription(app);
+                                            setIsViewPrescriptionOpen(true);
+                                        }}
+                                        hasPrescription={Array.isArray(app.prescription) && app.prescription.length > 0}
+                                        onViewDetails={() => navigate(`/${userRole}/appointments/${app.id || app._id}`)}
+                                    />
+                                );
+                            }
+
+                            return (
+                                <AppointmentCard
+                                    key={app.id || app._id}
+                                    primaryTitle={app.primaryTitle || app.doctorName}
+                                    secondaryText={app.secondaryText || app.speciality}
+                                    dateTimeLabel={app.dateTimeLabel}
+                                    status={app.status}
+                                    showFeedback={app.status === "Completed" && !app.isReviewed}
+                                    onFeedback={() => {
+                                        setAppointmentToReview(app);
+                                        setIsReviewModalOpen(true);
+                                    }}
+                                    onViewPrescription={() => {
+                                        setAppointmentToViewPrescription(app);
+                                        setIsViewPrescriptionOpen(true);
+                                    }}
+                                    hasPrescription={Array.isArray(app.prescription) && app.prescription.length > 0}
+                                    onReschedule={() => handleReschedule(app)}
+                                    onCancel={() => initiateCancel(app)}
+                                    onViewDetails={() => navigate(`/${userRole}/appointments/${app.id || app._id}`)}
+                                    userRole={userRole}
+                                />
+                            );
+                        })}
+                    </div>
                 )}
             </div>
 

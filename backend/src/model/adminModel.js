@@ -22,6 +22,10 @@ const adminSchema = new mongoose.Schema(
             minlength: [8, "Password must be at least 8 characters"],
             select: false, // Don't return password by default in queries
         },
+        walletBalance: {
+            type: Number,
+            default: 0
+        },
         refreshTokens: [{
             token: { type: String, required: true },
             createdAt: { type: Date, default: Date.now },
