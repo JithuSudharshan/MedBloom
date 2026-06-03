@@ -2,7 +2,7 @@ import Review from "../../../model/reviewModel.js";
 import Appointment from "../../../model/appointmentModel.js";
 import Doctor from "../../../model/doctorModel.js";
 import Patient from "../../../model/patientModel.js";
-import { sendNotification } from "../../../utils/notificationHelper.js";
+import { sendNotification, notifyAdmin } from "../../../utils/notificationHelper.js";
 
 export const submitReview = async (req, res) => {
     try {
@@ -65,6 +65,15 @@ export const submitReview = async (req, res) => {
             type: 'new_review',
             link: '/doctor/dashboard' // Adjust link if there's a specific review page
         });
+
+        // Escalate low ratings to Admin
+        if (rating <= 2) {
+            await notifyAdmin({
+                message: `Quality Alert: Dr. ${doctor.displayName} received a ${rating}-star review from ${patient.name || 'a patient'}.`,
+                type: 'new_review',
+                link: '/admin/doctors'
+            });
+        }
 
         res.status(201).json({ success: true, message: "Review submitted successfully", data: newReview });
     } catch (error) {
