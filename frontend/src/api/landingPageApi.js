@@ -1,8 +1,8 @@
 import api from "./axiosInstance";
 
-export const fetchDoctorsData = async () => {
+export const fetchDoctorsData = async (params = {}) => {
     try {
-        const response = api.get("/user/doctorsData")
+        const response = await api.get("/user/doctorsData", { params })
         return response
     } catch (error) {
         console.log("Error while fetching Dr data for Find doctor page", error)

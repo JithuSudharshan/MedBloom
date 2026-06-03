@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import Navbar from '../../components/landing page/Navbar'
 import HeroSection from '../../components/landing page/HeroSection'
 import Footer from '../../components/landing page/Footer'
@@ -6,71 +6,118 @@ import findDoctorsImg from "../../assets/images/findDoctors.png"
 import SearchBar from '../../components/landing page/SearchBar'
 import { Pagination } from '../../components/ui/Pagination'
 import DoctorsGrid from '../../components/landing page/DoctorGrid'
-import { fetchDoctorsData } from '../../api/landingPageApi'
+import { fetchDoctorsData, fetchDepartmentsList } from '../../api/landingPageApi'
 import Loader from '../../components/ui/Loading'
 import AISymptomChecker from '../../components/landing page/AISymptomChecker'
-import { Search } from 'lucide-react'
+import { Search, Filter, SlidersHorizontal, Loader2 } from 'lucide-react'
 
 const FindDoctorsPage = () => {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
     const [doctors, setDoctors] = useState([])
+    const [departments, setDepartments] = useState([]);
+    
+    // Pagination & Meta
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Fetch initial data
+    // Advanced Filters
+    const [filters, setFilters] = useState({
+        speciality: 'All',
+        mode: 'both',
+        minFee: '',
+        maxFee: '',
+        sortBy: 'rating'
+    });
+
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+    // Fetch Departments for Dropdown
     useEffect(() => {
-        const fetchDoctorsDetails = async () => {
+        const getDepartments = async () => {
             try {
-                const response = await fetchDoctorsData()
-                setDoctors(response?.data?.data || [])
-            } catch (error) {
-                console.error("Failed to fetch doctors:", error)
-            } finally {
-                setIsLoading(false);
+                const res = await fetchDepartmentsList();
+                if (res.data?.success) {
+                    setDepartments(res.data.data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch departments", err);
             }
+        };
+        getDepartments();
+    }, []);
+
+    // Fetch Doctors with Filters
+    const fetchDoctorsDetails = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const params = {
+                search: debouncedSearchTerm,
+                speciality: filters.speciality,
+                mode: filters.mode,
+                sortBy: filters.sortBy,
+                page,
+                limit: 8
+            };
+            if (filters.minFee) params.minFee = filters.minFee;
+            if (filters.maxFee) params.maxFee = filters.maxFee;
+
+            const response = await fetchDoctorsData(params);
+            
+            // Note: Our updated backend returns { data: { doctors, page, totalPages, totalCount } }
+            if (response?.data?.data?.doctors) {
+                setDoctors(response.data.data.doctors);
+                setTotalPages(response.data.data.totalPages || 1);
+            } else if (Array.isArray(response?.data?.data)) {
+                // Fallback for old backend response
+                setDoctors(response.data.data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch doctors:", error)
+        } finally {
+            setIsLoading(false);
         }
+    }, [debouncedSearchTerm, filters, page]);
 
-        fetchDoctorsDetails()
-    }, [])
+    useEffect(() => {
+        fetchDoctorsDetails();
+    }, [fetchDoctorsDetails]);
 
-    // Debounce effect
+    // Debounce search effect
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm);
-        }, 300);
+            setPage(1); // Reset to page 1 on new search
+        }, 500);
 
         return () => clearTimeout(timer);
     }, [searchTerm]);
 
     const handleImmediateSearch = () => {
         setDebouncedSearchTerm(searchTerm);
+        setPage(1);
     };
 
-    // Filtering Logic
-    const filteredDoctors = doctors.filter((doctor) => {
-        if (!debouncedSearchTerm) return true;
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({ ...prev, [name]: value }));
+        setPage(1); // Reset page on filter change
+    };
 
-        const term = debouncedSearchTerm.toLowerCase();
-        
-        // Safely extract searchable fields
-        const name = (doctor.displayName || "").toLowerCase();
-        const specialty = (doctor.primarySpecialization || "").toLowerCase();
-        
-        // Location might be nested or named differently based on API structure, checking common variations
-        const location = (
-            doctor.location || 
-            doctor.city || 
-            doctor.state || 
-            doctor.clinicAddress?.city || 
-            doctor.clinicAddress?.state || 
-            ""
-        ).toLowerCase();
-
-        return name.includes(term) || specialty.includes(term) || location.includes(term);
-    });
-
-    if (isLoading) return <Loader />
+    const clearFilters = () => {
+        setSearchTerm("");
+        setDebouncedSearchTerm("");
+        setFilters({
+            speciality: 'All',
+            mode: 'both',
+            minFee: '',
+            maxFee: '',
+            sortBy: 'rating'
+        });
+        setPage(1);
+    };
 
     return (
         <div className="min-h-screen bg-white">
@@ -97,12 +144,100 @@ const FindDoctorsPage = () => {
                 onSearch={handleImmediateSearch}
             />
             
-            <section className="max-w-7xl mx-auto px-6 py-12 min-h-[400px]">
-                {filteredDoctors.length > 0 ? (
+            <section className="max-w-7xl mx-auto px-6 py-6 min-h-[400px]">
+                
+                {/* Advanced Filter Bar */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-8">
+                    <div className="flex items-center justify-between lg:hidden mb-4">
+                        <h3 className="font-semibold text-gray-700 flex items-center gap-2">
+                            <Filter className="w-4 h-4" /> Filters
+                        </h3>
+                        <button 
+                            onClick={() => setShowMobileFilters(!showMobileFilters)}
+                            className="p-2 bg-gray-100 rounded-lg text-gray-600"
+                        >
+                            <SlidersHorizontal className="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    <div className={`flex-col lg:flex-row gap-4 ${showMobileFilters ? 'flex' : 'hidden lg:flex'}`}>
+                        {/* Speciality */}
+                        <div className="flex-1">
+                            <label className="block text-xs font-medium text-gray-500 mb-1">Speciality</label>
+                            <select 
+                                name="speciality" 
+                                value={filters.speciality} 
+                                onChange={handleFilterChange}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#00A4A3]/20 outline-none"
+                            >
+                                <option value="All">All Specialities</option>
+                                {departments.map((dept, idx) => (
+                                    <option key={idx} value={dept.departmentName}>{dept.departmentName}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Mode */}
+                        <div className="flex-1">
+                            <label className="block text-xs font-medium text-gray-500 mb-1">Consultation Mode</label>
+                            <select 
+                                name="mode" 
+                                value={filters.mode} 
+                                onChange={handleFilterChange}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#00A4A3]/20 outline-none"
+                            >
+                                <option value="both">Any Mode</option>
+                                <option value="online">Online / Video</option>
+                                <option value="offline">In-Clinic</option>
+                            </select>
+                        </div>
+
+                        {/* Fee Range */}
+                        <div className="flex-[1.5]">
+                            <label className="block text-xs font-medium text-gray-500 mb-1">Fee Range (₹)</label>
+                            <div className="flex items-center gap-2">
+                                <input 
+                                    type="number" 
+                                    name="minFee"
+                                    value={filters.minFee}
+                                    onChange={handleFilterChange}
+                                    placeholder="Min" 
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#00A4A3]/20 outline-none"
+                                />
+                                <span className="text-gray-400">-</span>
+                                <input 
+                                    type="number" 
+                                    name="maxFee"
+                                    value={filters.maxFee}
+                                    onChange={handleFilterChange}
+                                    placeholder="Max" 
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#00A4A3]/20 outline-none"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Sort By */}
+                        <div className="flex-1">
+                            <label className="block text-xs font-medium text-gray-500 mb-1">Sort By</label>
+                            <select 
+                                name="sortBy" 
+                                value={filters.sortBy} 
+                                onChange={handleFilterChange}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#00A4A3]/20 outline-none"
+                            >
+                                <option value="rating">Highest Rated</option>
+                                <option value="experience">Most Experienced</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                {isLoading ? (
+                    <div className="py-20 flex justify-center"><Loader2 className="w-8 h-8 text-[#00A4A3] animate-spin" /></div>
+                ) : doctors.length > 0 ? (
                     <>
-                        <DoctorsGrid doctors={filteredDoctors} />
-                        {/* Only show pagination if there are results */}
-                        <Pagination />
+                        <DoctorsGrid doctors={doctors} />
+                        <Pagination current={page} total={totalPages} onChange={(p) => setPage(p)} userRole="patient" />
                     </>
                 ) : (
                     /* No Results UI with Kerala-authentic earth tone palette */
@@ -117,7 +252,7 @@ const FindDoctorsPage = () => {
                             We couldn't find any specialists matching "{debouncedSearchTerm}". Try adjusting your keywords, checking for typos, or searching a broader location.
                         </p>
                         <button 
-                            onClick={() => setSearchTerm("")}
+                            onClick={clearFilters}
                             className="mt-8 px-8 py-2.5 bg-gradient-to-r from-[#006666] to-[#008080] text-white font-medium rounded-full hover:shadow-lg transition-all duration-300 active:scale-95"
                         >
                             Clear Search
