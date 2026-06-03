@@ -42,6 +42,8 @@ const appointmentSchema = new Schema(
         },
         paymentId: {
             type: String,
+            unique: true,
+            sparse: true
         },
         amount: {
             type: Number,

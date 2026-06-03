@@ -11,6 +11,7 @@ import { uploadRecord, getRecords, updateRecord, deleteRecord } from "../control
 
 import { getTransactions, initiateTopUp, verifyTopUp } from "../controller/userControllers/walletController.js";
 import { submitReview } from "../controller/userControllers/patientDashBoard/reviewController.js";
+import { paymentLimiter } from "../middlewares/rateLimiter.js";
 
 const router = express.Router();
 
@@ -35,9 +36,9 @@ router.patch("/edit-profile",
 );
 
 // Booking Routes
-router.post("/appointments/create-order", authenticateToken(), authorizeRole("patient"), createPaymentOrder);
+router.post("/appointments/create-order", paymentLimiter, authenticateToken(), authorizeRole("patient"), createPaymentOrder);
 router.post("/appointments/book-wallet", authenticateToken(), authorizeRole("patient"), bookAppointmentWithWallet);
-router.post("/appointments/verify-payment", authenticateToken(), authorizeRole("patient"), verifyPaymentAndBook);
+router.post("/appointments/verify-payment", paymentLimiter, authenticateToken(), authorizeRole("patient"), verifyPaymentAndBook);
 router.put("/appointments/:id/cancel", authenticateToken(), authorizeRole("patient"), cancelAppointment);
 router.put("/appointments/:id/reschedule", authenticateToken(), authorizeRole("patient"), rescheduleAppointment);
 router.get("/appointments/:id/consultation-details", authenticateToken(), authorizeRole("patient"), getAppointmentDetailsForConsultation);
@@ -50,8 +51,8 @@ router.delete("/records/:id", authenticateToken(), authorizeRole("patient"), del
 
 // Wallet Routes
 router.get("/wallet/transactions", authenticateToken(), authorizeRole("patient"), getTransactions);
-router.post("/wallet/topup/initiate", authenticateToken(), authorizeRole("patient"), initiateTopUp);
-router.post("/wallet/topup/verify", authenticateToken(), authorizeRole("patient"), verifyTopUp);
+router.post("/wallet/topup/initiate", paymentLimiter, authenticateToken(), authorizeRole("patient"), initiateTopUp);
+router.post("/wallet/topup/verify", paymentLimiter, authenticateToken(), authorizeRole("patient"), verifyTopUp);
 
 // Review Routes
 router.post("/reviews", authenticateToken(), authorizeRole("patient"), submitReview);

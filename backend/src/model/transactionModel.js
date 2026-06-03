@@ -42,7 +42,9 @@ const transactionSchema = new Schema({
         default: 'system'
     },
     paymentId: {
-        type: String // Razorpay Payment ID or Order ID
+        type: String, // Razorpay Payment ID or Order ID
+        unique: true,
+        sparse: true
     }
 }, {
     timestamps: true
