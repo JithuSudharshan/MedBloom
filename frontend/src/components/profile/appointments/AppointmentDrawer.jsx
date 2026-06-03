@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Video, X, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export default function AppointmentDrawer({ isOpen, onClose, appointment, userRole, onReschedule, onCancel }) {
+export default function AppointmentDrawer({ isOpen, onClose, appointment, userRole, onReschedule, onCancel, onWritePrescription }) {
     if (!appointment) return null;
 
     const isDoctor = userRole === 'doctor';
@@ -23,6 +23,16 @@ export default function AppointmentDrawer({ isOpen, onClose, appointment, userRo
     // Use native appointmentId if it exists, otherwise fallback to formatting the raw ID
     const displayId = appointment.appointmentId || `#MED-${rawId.slice(-6).toUpperCase()}`;
     const status = appointment.status || 'Confirmed';
+    
+    let formattedStatus = status;
+    if (status === 'in_progress') formattedStatus = 'In Progress';
+    if (status === 'pending_payment') formattedStatus = 'Pending Payment';
+    // capitalize others if needed, assuming backend sends them properly (e.g. 'Completed', 'Cancelled', 'Confirmed')
+    // Actually the mapping in doctorProfileControllers maps to 'Upcoming', 'Completed', 'Cancelled'.
+    // If raw status comes through, let's just capitalize it for display
+    formattedStatus = formattedStatus.charAt(0).toUpperCase() + formattedStatus.slice(1);
+    if (formattedStatus === 'In_progress') formattedStatus = 'In Progress';
+
     const docName = appointment.doctorName || appointment.primaryTitle || 'Doctor';
     const docImage = appointment.doctorImage || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150&h=150';
     const docSpeciality = appointment.speciality || appointment.secondaryText || 'Specialist';
@@ -37,6 +47,7 @@ export default function AppointmentDrawer({ isOpen, onClose, appointment, userRo
         Upcoming: `${theme.lightBg} ${theme.primaryText}`,
         Confirmed: `${theme.lightBg} ${theme.primaryText}`,
         Cancelled: "bg-[#fef2f2] text-[#be123c]",
+        "In Progress": "bg-[#e0f2fe] text-[#0284c7]",
     };
     const navigate = useNavigate();
     const [canJoinVideo, setCanJoinVideo] = useState(false);
@@ -55,19 +66,21 @@ export default function AppointmentDrawer({ isOpen, onClose, appointment, userRo
 
         const parseDateTime = (timeStr) => {
             if (appointment.rawDate && timeStr) {
-                if (timeStr.includes('T')) return new Date(timeStr);
+                if (timeStr.includes('T')) return new Date(timeStr.replace('Z', ''));
                 const d = new Date(`${appointment.rawDate}T${timeStr}`);
                 if (!isNaN(d.getTime())) return d;
             }
             return null;
         };
 
-        let targetStartDate = parseDateTime(appointment.rawStartTime);
-        if (!targetStartDate) {
-            try {
-                let dateStr = dateTime.replace(' at ', ' ');
-                targetStartDate = new Date(dateStr);
-            } catch(e) {}
+        let targetStartDate = null;
+        try {
+            let dateStr = dateTime.replace(' at ', ' ');
+            targetStartDate = new Date(dateStr);
+        } catch(e) {}
+
+        if (!targetStartDate || isNaN(targetStartDate.getTime())) {
+            targetStartDate = parseDateTime(appointment.rawStartTime);
         }
 
         let targetEndDate = null;
@@ -118,7 +131,7 @@ export default function AppointmentDrawer({ isOpen, onClose, appointment, userRo
         return () => clearInterval(interval);
     }, [appointment, isOnline, status, dateTime]);
 
-    const effectiveStatus = isConcluded && status !== 'Cancelled' ? 'Completed' : status;
+    const effectiveStatus = isConcluded && formattedStatus !== 'Cancelled' ? 'Completed' : formattedStatus;
     const currentStatusStyle = statusStyles[effectiveStatus] || statusStyles.Confirmed;
 
     return (
@@ -272,6 +285,18 @@ export default function AppointmentDrawer({ isOpen, onClose, appointment, userRo
                                     className="border border-red-200 text-red-500 bg-red-50 hover:bg-red-100 py-3 rounded-xl text-sm font-bold transition"
                                 >
                                     Cancel
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Footer Actions for Doctor */}
+                        {effectiveStatus !== 'Cancelled' && isDoctor && !isOnline && (
+                            <div className="p-6 border-t border-slate-100 bg-white">
+                                <button 
+                                    onClick={() => { onClose(); onWritePrescription(appointment); }}
+                                    className={`w-full ${theme.primaryBg} ${theme.primaryBgHover} text-white py-3.5 rounded-xl text-sm font-bold transition shadow-md flex items-center justify-center gap-2`}
+                                >
+                                    Write Prescription
                                 </button>
                             </div>
                         )}

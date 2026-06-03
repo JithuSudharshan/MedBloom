@@ -131,3 +131,70 @@ export const sendAppointmentConfirmationEmail = async (to, doctorName, date, tim
         console.log("Internal server error while sending confirmation mail", error);
     }
 }
+
+export const sendPrescriptionEmail = async (to, doctorName, pdfBuffer) => {
+    try {
+        await transporter.sendMail({
+            from: `"MedBloom Medical Records" <${ENV.EMAIL_USER}>`,
+            to: to,
+            subject: "Your Digital Prescription - MedBloom",
+            html: `
+        <div style="
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #eaf6f6, #c8f1f7);
+            padding: 50px 0;
+        ">
+            <div style="
+            max-width: 550px;
+            margin: auto;
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0,164,163,0.15);
+            border-top: 5px solid #00A4A3;
+            ">
+            <p style="color: #000000; font-size: 32px; font-weight: bold; margin-bottom: 10px;">
+                MED<span style="color: #00A4A3;">BLOOM</span>
+            </p>
+            
+            <h2 style="color: #111; font-size: 24px; margin-bottom: 25px;">Your Digital Prescription</h2>
+
+            <p style="color: #555; font-size: 15px; line-height: 1.6; margin-bottom: 30px;">
+                Hello, please find attached the digital prescription from your recent consultation with Dr. ${doctorName}.
+            </p>
+            
+            <p style="color: #555; font-size: 15px; line-height: 1.6; margin-bottom: 30px;">
+                You can also view this prescription at any time by logging into your MedBloom patient dashboard.
+            </p>
+
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/patient/dashboard" style="
+                display: inline-block;
+                background: linear-gradient(90deg, #00A4A3, #00C8C7);
+                color: white;
+                padding: 14px 35px;
+                border-radius: 10px;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 16px;
+                box-shadow: 0 4px 15px rgba(0,164,163,0.3);
+            ">View Dashboard</a>
+
+            <p style="color: #999; font-size: 12px; margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px;">
+                If you have any questions, please contact MedBloom support.
+            </p>
+            </div>
+        </div>
+        `,
+            attachments: [
+                {
+                    filename: 'prescription.pdf',
+                    content: pdfBuffer,
+                    contentType: 'application/pdf'
+                }
+            ]
+        });
+    } catch (error) {
+        console.log("Internal server error while sending prescription mail", error);
+    }
+}

@@ -11,6 +11,7 @@ export default function AppointmentCard({
     onReschedule,
     onCancel,
     onViewDetails,
+    hasPrescription,
     userRole = "patient",
 }) {
     const isDoctor = userRole === 'doctor';
@@ -62,14 +63,16 @@ export default function AppointmentCard({
                                 feedback
                             </button>
                         )}
-                        <button
-                            onClick={onViewPrescription}
-                            className={`rounded-full px-5 py-1.5 text-[12px] font-medium text-white shadow-sm transition ${
-                                isDoctor ? "bg-gradient-to-r from-[#B08B8C] to-[#C39496] hover:from-[#9D7778] hover:to-[#B08B8C]" : "bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600"
-                            }`}
-                        >
-                            View Prescription
-                        </button>
+                        {hasPrescription && (
+                            <button
+                                onClick={onViewPrescription}
+                                className={`rounded-full px-5 py-1.5 text-[12px] font-medium text-white shadow-sm transition ${
+                                    isDoctor ? "bg-gradient-to-r from-[#B08B8C] to-[#C39496] hover:from-[#9D7778] hover:to-[#B08B8C]" : "bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600"
+                                }`}
+                            >
+                                View Prescription
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <div className="flex items-center gap-3">

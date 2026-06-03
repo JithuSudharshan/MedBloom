@@ -7,6 +7,8 @@ import CancelAppointmentModal from "./CancelAppointmentModal";
 import { Pagination } from "../../ui/Pagination";
 import FindDoctorModal from "./FindDoctorModal";
 import ReviewModal from "./ReviewModal";
+import PrescriptionBuilderModal from "./PrescriptionBuilderModal";
+import ViewPrescriptionModal from "./ViewPrescriptionModal";
 
 const TABS = ["All", "Upcoming", "Completed", "Cancelled"];
 
@@ -28,6 +30,10 @@ export default function AppointmentsSection({
     const [appointmentToCancel, setAppointmentToCancel] = useState(null);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [appointmentToReview, setAppointmentToReview] = useState(null);
+    const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
+    const [appointmentForPrescription, setAppointmentForPrescription] = useState(null);
+    const [isViewPrescriptionOpen, setIsViewPrescriptionOpen] = useState(false);
+    const [appointmentToViewPrescription, setAppointmentToViewPrescription] = useState(null);
 
     const handleReschedule = (app) => {
         const docId = app.doctorId || app.doctor; // Use appropriate property
@@ -152,7 +158,11 @@ export default function AppointmentsSection({
                                 setAppointmentToReview(app);
                                 setIsReviewModalOpen(true);
                             }}
-                            onViewPrescription={() => { }}
+                            onViewPrescription={() => {
+                                setAppointmentToViewPrescription(app);
+                                setIsViewPrescriptionOpen(true);
+                            }}
+                            hasPrescription={Array.isArray(app.prescription) && app.prescription.length > 0}
                             onReschedule={() => handleReschedule(app)}
                             onCancel={() => initiateCancel(app)}
                             onViewDetails={() => navigate(`/${userRole}/appointments/${app.id || app._id}`)}
@@ -200,6 +210,31 @@ export default function AppointmentsSection({
                 }}
             />
 
+            {/* Prescription Builder Modal */}
+            <PrescriptionBuilderModal 
+                isOpen={isPrescriptionModalOpen}
+                onClose={() => {
+                    setIsPrescriptionModalOpen(false);
+                    setAppointmentForPrescription(null);
+                }}
+                appointment={appointmentForPrescription}
+                onSuccess={() => {
+                    if (appointmentForPrescription) {
+                        appointmentForPrescription.prescription = true;
+                    }
+                }}
+            />
+
+            {/* View Prescription Modal */}
+            <ViewPrescriptionModal
+                isOpen={isViewPrescriptionOpen}
+                onClose={() => {
+                    setIsViewPrescriptionOpen(false);
+                    setAppointmentToViewPrescription(null);
+                }}
+                appointment={appointmentToViewPrescription}
+            />
+
             {/* Slide-over Drawer */}
             <AppointmentDrawer 
                 isOpen={!!(id && selectedAppointment)}
@@ -208,6 +243,10 @@ export default function AppointmentsSection({
                 userRole={userRole}
                 onCancel={() => initiateCancel(selectedAppointment)}
                 onReschedule={() => handleReschedule(selectedAppointment)}
+                onWritePrescription={(app) => {
+                    setAppointmentForPrescription(app);
+                    setIsPrescriptionModalOpen(true);
+                }}
             />
 
         </section>

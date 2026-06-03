@@ -66,7 +66,20 @@ export const getRecords = async (req, res) => {
         const totalCount = await MedicalRecord.countDocuments(query);
         const totalPages = Math.max(1, Math.ceil(totalCount / limit));
 
-        const records = await MedicalRecord.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit);
+        const records = await MedicalRecord.find(query)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .populate({
+                path: 'appointmentId',
+                populate: {
+                    path: 'doctor',
+                    populate: {
+                        path: 'user',
+                        select: 'name'
+                    }
+                }
+            });
 
         res.status(200).json({ success: true, records, page, totalPages, totalCount });
     } catch (error) {

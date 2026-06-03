@@ -1,10 +1,11 @@
 import Appointment from '../model/appointmentModel.js';
 
+const activeRooms = new Map(); // appointmentId -> { doctor: socketId, patient: socketId }
+
 export const videoCallSocket = (io, socket) => {
     // Join a specific consultation room
     socket.on('join-consultation', async ({ appointmentId, userRole }) => {
         try {
-            // Because appointmentId passed from frontend is the MongoDB _id (rawId), not the string 'appointmentId' property
             const appointment = await Appointment.findById(appointmentId);
             
             if (!appointment) {
@@ -16,7 +17,7 @@ export const videoCallSocket = (io, socket) => {
             }
 
             const parseTimeStr = (dateStr, timeStr) => {
-                if (timeStr && timeStr.includes('T')) return new Date(timeStr);
+                if (timeStr && timeStr.includes('T')) return new Date(timeStr.replace('Z', ''));
                 const d = new Date(`${dateStr}T${timeStr}`);
                 if (!isNaN(d.getTime())) return d;
                 return null;
@@ -30,7 +31,6 @@ export const videoCallSocket = (io, socket) => {
             }
 
             if (!targetStartDate) {
-                // If we can't parse time, fallback to allow joining for safety
                 socket.join(appointmentId);
                 socket.to(appointmentId).emit('user-joined', { socketId: socket.id, userRole });
                 return;
@@ -49,8 +49,33 @@ export const videoCallSocket = (io, socket) => {
             }
 
             socket.join(appointmentId);
+            socket.appointmentId = appointmentId;
+            socket.userRole = userRole;
+
+            let roomRoles = activeRooms.get(appointmentId) || {};
+            roomRoles[userRole] = socket.id;
+            activeRooms.set(appointmentId, roomRoles);
+
             // Notify others in the room that a user has joined
             socket.to(appointmentId).emit('user-joined', { socketId: socket.id, userRole });
+
+            // If both doctor and patient are present, start the consultation
+            if (roomRoles['doctor'] && roomRoles['patient']) {
+                if (appointment.status !== 'in_progress') {
+                    appointment.status = 'in_progress';
+                    appointment.consultationStartedAt = new Date();
+                    await appointment.save();
+                }
+                io.to(appointmentId).emit('consultation-started', { 
+                    startedAt: appointment.consultationStartedAt || new Date() 
+                });
+            } else if (appointment.status === 'in_progress') {
+                // If it's already in progress (e.g. reconnect), tell the connecting user it's started
+                socket.emit('consultation-started', { 
+                    startedAt: appointment.consultationStartedAt 
+                });
+            }
+
         } catch (error) {
             console.error("Socket Join Error:", error);
             socket.emit('call-error', { message: 'Server error while joining' });
@@ -75,12 +100,29 @@ export const videoCallSocket = (io, socket) => {
     // Leave Consultation
     socket.on('leave-consultation', ({ appointmentId }) => {
         socket.leave(appointmentId);
+        
+        let roomRoles = activeRooms.get(appointmentId);
+        if (roomRoles && socket.userRole) {
+            delete roomRoles[socket.userRole];
+            if (Object.keys(roomRoles).length === 0) {
+                activeRooms.delete(appointmentId);
+            }
+        }
+        
         socket.to(appointmentId).emit('user-left', { socketId: socket.id });
     });
 
     // Handle disconnection specifically for video calls if needed
     socket.on('disconnect', () => {
-        // Since socket automatically leaves rooms, we might not need to do much here,
-        // but 'user-left' could be handled by the client detecting disconnects
+        if (socket.appointmentId && socket.userRole) {
+            let roomRoles = activeRooms.get(socket.appointmentId);
+            if (roomRoles) {
+                delete roomRoles[socket.userRole];
+                if (Object.keys(roomRoles).length === 0) {
+                    activeRooms.delete(socket.appointmentId);
+                }
+            }
+            socket.to(socket.appointmentId).emit('user-left', { socketId: socket.id });
+        }
     });
 };

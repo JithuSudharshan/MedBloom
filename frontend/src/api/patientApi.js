@@ -192,3 +192,13 @@ export const submitReviewApi = async (reviewData) => {
         throw error;
     }
 }
+
+export const fetchAppointmentDetailsForConsultation = async (appointmentId) => {
+    try {
+        const response = await api.get(`/patient/appointments/${appointmentId}/consultation-details`);
+        return response;
+    } catch (error) {
+        console.error("Error fetching consultation details", error);
+        throw error;
+    }
+}

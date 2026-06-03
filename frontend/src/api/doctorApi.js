@@ -129,3 +129,33 @@ export const verifyDoctorTopUp = async (paymentData) => {
         throw error;
     }
 }
+
+export const savePrescriptionApi = async (appointmentId, payload) => {
+    try {
+        const response = await api.put(`/doctor/appointments/${appointmentId}/prescription`, payload);
+        return response;
+    } catch (error) {
+        console.error("Error saving prescription", error);
+        throw error;
+    }
+}
+
+export const completeConsultationApi = async (appointmentId) => {
+    try {
+        const response = await api.put(`/doctor/appointments/${appointmentId}/complete`);
+        return response;
+    } catch (error) {
+        console.error("Error completing consultation", error);
+        throw error;
+    }
+}
+
+export const fetchPatientRecordsForConsultation = async (appointmentId) => {
+    try {
+        const response = await api.get(`/doctor/appointments/${appointmentId}/patient-records`);
+        return response;
+    } catch (error) {
+        console.error("Error fetching patient records", error);
+        throw error;
+    }
+}

@@ -12,6 +12,14 @@ const medicalRecordSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
+        isDigital: {
+            type: Boolean,
+            default: false
+        },
+        appointmentId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Appointment'
+        },
         category: {
             type: String,
             enum: ['lab', 'imaging', 'prescription', 'other'],
@@ -23,15 +31,15 @@ const medicalRecordSchema = new mongoose.Schema(
         },
         fileUrl: {
             type: String,
-            required: true,
+            required: function() { return !this.isDigital; }
         },
         fileType: {
             type: String,
-            required: true,
+            required: function() { return !this.isDigital; }
         },
         fileSize: {
             type: Number,
-            required: true,
+            required: function() { return !this.isDigital; }
         },
     },
     { timestamps: true }

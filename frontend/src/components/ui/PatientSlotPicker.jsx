@@ -15,9 +15,11 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
         for (let i = 0; i < windowDays; i++) {
             const d = new Date();
             d.setDate(d.getDate() + i);
+            const pad = (n) => n.toString().padStart(2, '0');
+            const localIsoDate = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
             dates.push({
                 dateObj: d,
-                isoDate: d.toISOString().split('T')[0],
+                isoDate: localIsoDate,
                 dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
                 dayNumber: d.getDate(),
                 month: d.toLocaleDateString('en-US', { month: 'short' })
@@ -78,7 +80,16 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
 
     // Check if slot isoStart exists in bookedSlots
     const isBooked = (slotIso) => {
-        return bookedSlots.some(b => b.startTime === slotIso);
+        return bookedSlots.some(b => {
+            let bookedTime = b.startTime;
+            if (bookedTime && bookedTime.includes('T')) {
+                // Extract HH:mm from ISO string for backward compatibility
+                const d = new Date(bookedTime);
+                const pad = (n) => n.toString().padStart(2, '0');
+                bookedTime = `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
+            }
+            return bookedTime === slotIso;
+        });
     };
 
     const handleDateClick = (dateStr) => {

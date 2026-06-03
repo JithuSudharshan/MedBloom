@@ -264,9 +264,16 @@ export const fetchPatientAppointments = async (req, res) => {
             // Format time properly (app.startTime is an ISO string)
             let formattedTime = app.startTime;
             try {
-                const timeObj = new Date(app.startTime);
-                if (!isNaN(timeObj.getTime())) {
-                    formattedTime = timeObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+                if (app.startTime && !app.startTime.includes('T')) {
+                    const [hour, minute] = app.startTime.split(':');
+                    const timeObj = new Date();
+                    timeObj.setHours(parseInt(hour, 10), parseInt(minute, 10), 0);
+                    formattedTime = timeObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                } else {
+                    const timeObj = new Date(app.startTime);
+                    if (!isNaN(timeObj.getTime())) {
+                        formattedTime = timeObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+                    }
                 }
             } catch(e) {}
 
@@ -314,3 +321,35 @@ export const fetchPatientAppointments = async (req, res) => {
         })
     }
 }
+
+export const getAppointmentDetailsForConsultation = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const appointment = await Appointment.findById(id).populate({
+            path: 'doctor',
+            populate: { path: 'user' }
+        });
+
+        if (!appointment) {
+            return res.status(404).json({ success: false, message: "Appointment not found" });
+        }
+
+        const patientDoc = await Patient.findOne({ user: req.user._id });
+        // Verify patient owns the appointment
+        if (!patientDoc || appointment.patient.toString() !== patientDoc._id.toString()) {
+            return res.status(403).json({ success: false, message: "Unauthorized to view this appointment" });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: appointment
+        });
+    } catch (error) {
+        console.error("Error fetching appointment details:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};

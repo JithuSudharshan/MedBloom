@@ -56,8 +56,13 @@ export function generateAvailableSlots(availability, targetDateStr, bookedSlots)
         });
 
         if (!isOverlapping) {
-            const isoStart = new Date(candidateStart).toISOString();
-            const isoEnd = new Date(candidateEnd).toISOString();
+            const pad = (n) => n.toString().padStart(2, '0');
+            const dStart = new Date(candidateStart);
+            const dEnd = new Date(candidateEnd);
+            
+            // Format HH:mm using UTC hours since we constructed them with setUTCHours
+            const isoStart = `${pad(dStart.getUTCHours())}:${pad(dStart.getUTCMinutes())}`;
+            const isoEnd = `${pad(dEnd.getUTCHours())}:${pad(dEnd.getUTCMinutes())}`;
             
             // Format time for display (e.g. 09:00 AM)
             const formatTime = (ms) => {

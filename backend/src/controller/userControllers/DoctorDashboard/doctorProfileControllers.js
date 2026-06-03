@@ -2,8 +2,67 @@ import Doctor from "../../../model/doctorModel.js";
 import User from "../../../model/userModel.js";
 import Appointment from "../../../model/appointmentModel.js";
 import Review from "../../../model/reviewModel.js";
+import { MedicalRecord } from "../../../model/medicalRecordModel.js";
 import { formatDOB } from "../../../utils/formatters.js";
+import PDFDocument from 'pdfkit';
+import { uploadBufferToCloudinary } from "../../../utils/cloudinaryUploader.js";
+import { sendPrescriptionEmail } from "../../../utils/sendEmail.js";
 
+const generatePrescriptionPdfBuffer = (appointment, doctor, medications) => {
+    return new Promise((resolve, reject) => {
+        try {
+            const doc = new PDFDocument({ margin: 50 });
+            const buffers = [];
+            doc.on('data', buffers.push.bind(buffers));
+            doc.on('end', () => resolve(Buffer.concat(buffers)));
+            doc.on('error', reject);
+
+            const docName = doctor?.user?.name ? `Dr. ${doctor.user.name}` : "Doctor";
+            
+            // Header
+            doc.fontSize(24).fillColor('#00A4A3').text('MedBloom', { align: 'center' });
+            doc.moveDown();
+            doc.fontSize(16).fillColor('#333333').text('Digital Prescription', { align: 'center' });
+            doc.moveDown(2);
+
+            // Details
+            doc.fontSize(12).fillColor('#555555');
+            doc.text(`Doctor: ${docName}`);
+            doc.text(`Date: ${new Date().toLocaleDateString('en-US')}`);
+            doc.text(`Appointment ID: ${appointment.appointmentId}`);
+            doc.moveDown(2);
+
+            // Medications
+            doc.fontSize(14).fillColor('#000000').text('Medications:', { underline: true });
+            doc.moveDown(0.5);
+
+            medications.forEach((med, index) => {
+                doc.fontSize(12).fillColor('#333333').text(`${index + 1}. ${med.medication}`);
+                doc.fontSize(10).fillColor('#666666')
+                   .text(`   Dosage: ${med.dosage} | Frequency: ${med.frequency} | Duration: ${med.duration}`);
+                if (med.instructions) {
+                    doc.text(`   Instructions: ${med.instructions}`);
+                }
+                doc.moveDown(0.5);
+            });
+
+            if (appointment.notes) {
+                doc.moveDown();
+                doc.fontSize(14).fillColor('#000000').text('Additional Notes:', { underline: true });
+                doc.moveDown(0.5);
+                doc.fontSize(12).fillColor('#333333').text(appointment.notes);
+            }
+
+            // Footer
+            doc.moveDown(4);
+            doc.fontSize(10).fillColor('#999999').text('This is a digitally generated prescription.', { align: 'center' });
+
+            doc.end();
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
 
 export const fetchDoctorDetails = async (req, res) => {
     try {
@@ -298,9 +357,16 @@ export const fetchDoctorAppointments = async (req, res) => {
 
             let formattedTime = app.startTime;
             try {
-                const timeObj = new Date(app.startTime);
-                if (!isNaN(timeObj.getTime())) {
-                    formattedTime = timeObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+                if (app.startTime && !app.startTime.includes('T')) {
+                    const [hour, minute] = app.startTime.split(':');
+                    const timeObj = new Date();
+                    timeObj.setHours(parseInt(hour, 10), parseInt(minute, 10), 0);
+                    formattedTime = timeObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                } else {
+                    const timeObj = new Date(app.startTime);
+                    if (!isNaN(timeObj.getTime())) {
+                        formattedTime = timeObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+                    }
                 }
             } catch(e) {}
 
@@ -345,20 +411,138 @@ export const savePrescription = async (req, res) => {
             return res.status(404).json({ success: false, message: "Appointment not found" });
         }
 
+        if (!Array.isArray(prescription) || prescription.length === 0) {
+            return res.status(400).json({ success: false, message: "Prescription must contain at least one medication" });
+        }
+
         appointment.prescription = prescription;
         if (notes !== undefined) {
             appointment.notes = notes;
         }
 
+        const doctor = await Doctor.findById(appointment.doctor).populate('user');
+        const patient = await User.findById(appointment.patient); // Patient model points to user? Wait, appointment.patient is the Patient document.
+        
+        // Generate PDF
+        const pdfBuffer = await generatePrescriptionPdfBuffer(appointment, doctor, prescription);
+        
+        // Upload to Cloudinary
+        const uploadResult = await uploadBufferToCloudinary(pdfBuffer, 'prescriptions', 'raw');
+        appointment.prescriptionPdfUrl = uploadResult.secure_url;
+
         await appointment.save();
+
+        // Auto-create a virtual MedicalRecord for this prescription
+        let medicalRecord = await MedicalRecord.findOne({ appointmentId: appointment._id });
+        
+        const docName = doctor?.user?.name ? `Dr. ${doctor.user.name}` : "Doctor";
+
+        if (!medicalRecord) {
+            const dateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+            medicalRecord = new MedicalRecord({
+                patientId: appointment.patient,
+                title: `Digital Prescription - ${docName}`,
+                category: 'prescription',
+                description: `Generated from Virtual Consultation on ${dateStr}`,
+                isDigital: true,
+                appointmentId: appointment._id,
+                fileUrl: appointment.prescriptionPdfUrl // Attach the PDF URL
+            });
+            await medicalRecord.save();
+        } else {
+            medicalRecord.fileUrl = appointment.prescriptionPdfUrl;
+            await medicalRecord.save();
+        }
+
+        // Send Email if we can get patient email
+        try {
+            // Need to fetch patient user to get email. Patient model schema needs investigation, but let's try populating.
+            const populatedAppt = await Appointment.findById(id).populate({
+                path: 'patient',
+                populate: { path: 'user' }
+            });
+            
+            const patientEmail = populatedAppt?.patient?.user?.email;
+            if (patientEmail) {
+                await sendPrescriptionEmail(patientEmail, doctor?.user?.name || "Doctor", pdfBuffer);
+            }
+        } catch (emailErr) {
+            console.error("Failed to send prescription email:", emailErr);
+        }
 
         res.status(200).json({
             success: true,
-            message: "Prescription saved successfully",
+            message: "Prescription saved and sent successfully",
             data: appointment
         });
     } catch (error) {
         console.error("Error while saving prescription:", error);
+        res.status(500).json({
+            success: false,
+            message: error.message || "Internal server error"
+        });
+    }
+};
+
+export const completeConsultation = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const appointment = await Appointment.findById(id);
+
+        if (!appointment) {
+            return res.status(404).json({ success: false, message: "Appointment not found" });
+        }
+
+        if (!appointment.prescription || appointment.prescription.length === 0) {
+            return res.status(400).json({ success: false, message: "A prescription must be submitted before completing the consultation" });
+        }
+
+        appointment.status = 'completed';
+        appointment.consultationEndedAt = new Date();
+        await appointment.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Consultation completed successfully",
+            data: appointment
+        });
+    } catch (error) {
+        console.error("Error while completing consultation:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
+
+export const getPatientRecordsForConsultation = async (req, res) => {
+    try {
+        const { id } = req.params; // Appointment ID
+
+        const appointment = await Appointment.findById(id).populate('patient');
+        if (!appointment) {
+            return res.status(404).json({ success: false, message: "Appointment not found" });
+        }
+
+        // Verify the doctor is authorized for this appointment
+        const doctorUserId = req.user._id;
+        const doctor = await Doctor.findOne({ user: doctorUserId });
+        if (!doctor || appointment.doctor.toString() !== doctor._id.toString()) {
+            return res.status(403).json({ success: false, message: "Unauthorized to view these records" });
+        }
+
+        const patientUserId = appointment.patient.user; // Patient schema has user reference
+
+        // Fetch the records
+        const records = await MedicalRecord.find({ patientId: patientUserId }).sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            data: records
+        });
+    } catch (error) {
+        console.error("Error fetching patient records for consultation:", error);
         res.status(500).json({
             success: false,
             message: "Internal server error"

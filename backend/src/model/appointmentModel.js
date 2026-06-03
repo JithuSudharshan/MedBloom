@@ -37,7 +37,7 @@ const appointmentSchema = new Schema(
         },
         status: {
             type: String,
-            enum: ['pending_payment', 'confirmed', 'completed', 'cancelled', 'rescheduled'],
+            enum: ['pending_payment', 'confirmed', 'in_progress', 'completed', 'cancelled', 'rescheduled'],
             default: 'pending_payment',
         },
         paymentId: {
@@ -46,15 +46,28 @@ const appointmentSchema = new Schema(
         amount: {
             type: Number,
         },
-        prescription: {
-            type: String,
-        },
+        prescription: [{
+            medication: { type: String, required: true },
+            dosage: { type: String, required: true },
+            frequency: { type: String, required: true },
+            duration: { type: String, required: true },
+            instructions: { type: String }
+        }],
         notes: {
             type: String,
         },
         isReviewed: {
             type: Boolean,
             default: false
+        },
+        consultationStartedAt: {
+            type: Date
+        },
+        consultationEndedAt: {
+            type: Date
+        },
+        prescriptionPdfUrl: {
+            type: String
         }
     },
     { timestamps: true }

@@ -4,6 +4,7 @@ import UploadRecordModal from './UploadRecordModal';
 import { fetchMedicalRecords, deleteMedicalRecord } from '../../../api/patientApi';
 import { showToast } from '../../ui/Toast';
 import { Pagination } from '../../ui/Pagination';
+import ViewPrescriptionModal from '../appointments/ViewPrescriptionModal';
 
 const CATEGORY_ICONS = {
     lab: { icon: Activity, colorClass: "text-teal-600 bg-teal-100" },
@@ -30,6 +31,10 @@ const MedicalRecords = () => {
     const [openMenuId, setOpenMenuId] = useState(null);
     const [recordToDelete, setRecordToDelete] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    // View Prescription Modal
+    const [isViewPrescriptionOpen, setIsViewPrescriptionOpen] = useState(false);
+    const [appointmentToView, setAppointmentToView] = useState(null);
 
     const loadRecords = useCallback(async () => {
         try {
@@ -93,6 +98,10 @@ const MedicalRecords = () => {
     };
 
     const handleDownload = (url, filename) => {
+        if (!url) {
+            showToast.error("This is a digital record and cannot be downloaded as a file directly.");
+            return;
+        }
         try {
             // If it's a Cloudinary URL, append fl_attachment to force download
             let downloadUrl = url;
@@ -112,7 +121,48 @@ const MedicalRecords = () => {
         } catch (error) {
             console.error("Download failed:", error);
             showToast.error("Failed to initiate download");
-            window.open(url, '_blank');
+            if (url) window.open(url, '_blank');
+        }
+    };
+
+    const handleView = (record) => {
+        if (record.isDigital && record.appointmentId) {
+            // Map the appointmentId raw mongoose doc to what ViewPrescriptionModal expects
+            const appt = record.appointmentId;
+            
+            // Format date and time
+            let formattedDate = appt.date;
+            try {
+                const dateObj = new Date(appt.date);
+                formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            } catch(e) {}
+
+            let formattedTime = appt.startTime;
+            try {
+                const timeObj = new Date(appt.startTime);
+                if (!isNaN(timeObj.getTime())) {
+                    formattedTime = timeObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+                }
+            } catch(e) {}
+
+            const mappedAppointment = {
+                id: appt._id,
+                appointmentId: appt.appointmentId,
+                doctorName: appt.doctor?.user?.name ? `Dr. ${appt.doctor.user.name}` : "Doctor",
+                speciality: appt.doctor?.primarySpecialization || "Specialist",
+                primaryTitle: "You", // Patient is viewing their own record
+                dateTimeLabel: `${formattedDate}  ${formattedTime}`,
+                rawDate: appt.date,
+                prescription: appt.prescription,
+                notes: appt.notes
+            };
+            
+            setAppointmentToView(mappedAppointment);
+            setIsViewPrescriptionOpen(true);
+        } else if (record.fileUrl) {
+            window.open(record.fileUrl, '_blank');
+        } else {
+            showToast.error("Could not open this record.");
         }
     };
 
@@ -219,19 +269,22 @@ const MedicalRecords = () => {
                                         {/* Actions */}
                                         <div className="flex items-center gap-2 mt-4 sm:mt-0 self-end sm:self-center">
                                             <button 
-                                                onClick={() => window.open(record.fileUrl, '_blank')}
+                                                onClick={() => handleView(record)}
                                                 className="p-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors tooltip-trigger relative" 
+
                                                 title="View Document"
                                             >
                                                 <Eye className="w-5 h-5" />
                                             </button>
-                                            <button 
-                                                onClick={() => handleDownload(record.fileUrl, record.title)}
-                                                className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors tooltip-trigger relative" 
-                                                title="Download"
-                                            >
-                                                <Download className="w-5 h-5" />
-                                            </button>
+                                            {!record.isDigital && (
+                                                <button 
+                                                    onClick={() => handleDownload(record.fileUrl, record.title)}
+                                                    className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors tooltip-trigger relative" 
+                                                    title="Download"
+                                                >
+                                                    <Download className="w-5 h-5" />
+                                                </button>
+                                            )}
                                             
                                             {/* 3-Dots Menu Container */}
                                             <div className="relative">
@@ -246,17 +299,19 @@ const MedicalRecords = () => {
                                                 {openMenuId === record._id && (
                                                     <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-10 animate-in fade-in slide-in-from-top-2 duration-100">
                                                         <button 
-                                                            onClick={(e) => { e.stopPropagation(); window.open(record.fileUrl, '_blank'); setOpenMenuId(null); }}
+                                                            onClick={(e) => { e.stopPropagation(); handleView(record); setOpenMenuId(null); }}
                                                             className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                                                         >
                                                             <Eye className="w-4 h-4 text-gray-400" /> View Document
                                                         </button>
-                                                        <button 
-                                                            onClick={(e) => { e.stopPropagation(); handleDownload(record.fileUrl, record.title); setOpenMenuId(null); }}
-                                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                                                        >
-                                                            <Download className="w-4 h-4 text-gray-400" /> Download
-                                                        </button>
+                                                        {!record.isDigital && (
+                                                            <button 
+                                                                onClick={(e) => { e.stopPropagation(); handleDownload(record.fileUrl, record.title); setOpenMenuId(null); }}
+                                                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                                            >
+                                                                <Download className="w-4 h-4 text-gray-400" /> Download
+                                                            </button>
+                                                        )}
                                                         <div className="h-px bg-gray-100 my-1"></div>
                                                         <button 
                                                             onClick={(e) => { 
@@ -318,6 +373,16 @@ const MedicalRecords = () => {
                 isOpen={isUploadModalOpen}
                 onClose={() => setIsUploadModalOpen(false)}
                 onUploadSuccess={() => loadRecords()}
+            />
+
+            {/* View Prescription Modal */}
+            <ViewPrescriptionModal
+                isOpen={isViewPrescriptionOpen}
+                onClose={() => {
+                    setIsViewPrescriptionOpen(false);
+                    setAppointmentToView(null);
+                }}
+                appointment={appointmentToView}
             />
 
             {/* Custom Delete Confirmation Modal */}

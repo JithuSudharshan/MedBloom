@@ -3,7 +3,7 @@ import express from "express";
 import upload from "../config/multer.js";
 import { uploadToCloudinary } from "../middlewares/uploadToCloudinary.js";
 import { onboardPatient } from "../controller/userControllers/patientDashBoard/patientOnboarding.js";
-import { editProfile, fetchPatientAppointments, fetchUserDetails, updateProfilePicture } from "../controller/userControllers/patientDashBoard/patientProfileControllers.js";
+import { editProfile, fetchPatientAppointments, fetchUserDetails, updateProfilePicture, getAppointmentDetailsForConsultation } from "../controller/userControllers/patientDashBoard/patientProfileControllers.js";
 import { createPaymentOrder, verifyPaymentAndBook, cancelAppointment, rescheduleAppointment, bookAppointmentWithWallet } from "../controller/userControllers/patientControllers/bookingController.js";
 import { authenticateToken, authorizeRole } from "../middlewares/authMiddleware.js";
 
@@ -40,6 +40,7 @@ router.post("/appointments/book-wallet", authenticateToken(), authorizeRole("pat
 router.post("/appointments/verify-payment", authenticateToken(), authorizeRole("patient"), verifyPaymentAndBook);
 router.put("/appointments/:id/cancel", authenticateToken(), authorizeRole("patient"), cancelAppointment);
 router.put("/appointments/:id/reschedule", authenticateToken(), authorizeRole("patient"), rescheduleAppointment);
+router.get("/appointments/:id/consultation-details", authenticateToken(), authorizeRole("patient"), getAppointmentDetailsForConsultation);
 
 // Medical Records Routes
 router.post("/records", authenticateToken(), authorizeRole("patient"), upload.single("file"), uploadRecord);
