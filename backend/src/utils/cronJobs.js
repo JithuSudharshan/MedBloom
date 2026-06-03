@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import Appointment from '../model/appointmentModel.js';
 import { sendNotification } from './notificationHelper.js';
+import { sendAppointmentReminderEmail } from './sendEmail.js';
 
 export const initCronJobs = () => {
     // Run every minute
@@ -29,7 +30,36 @@ export const initCronJobs = () => {
                 const diffMs = apptTime.getTime() - now.getTime();
                 const diffMinutes = Math.floor(diffMs / 60000);
 
-                // If it is exactly 5 minutes away
+                // --- 60 MINUTE EMAIL REMINDER ---
+                if (diffMinutes >= 59 && diffMinutes <= 60 && !appt.isEmailReminderSent) {
+                    // Send to Doctor
+                    if (appt.doctor && appt.doctor.user && appt.doctor.user.email) {
+                        await sendAppointmentReminderEmail(
+                            appt.doctor.user.email,
+                            appt.doctor.user.name || appt.doctor.displayName,
+                            appt.patient?.user?.name || "Patient",
+                            appt.startTime,
+                            true
+                        );
+                    }
+
+                    // Send to Patient
+                    if (appt.patient && appt.patient.user && appt.patient.user.email) {
+                        await sendAppointmentReminderEmail(
+                            appt.patient.user.email,
+                            appt.patient.user.name,
+                            appt.doctor?.displayName || "Doctor",
+                            appt.startTime,
+                            false
+                        );
+                    }
+
+                    appt.isEmailReminderSent = true;
+                    await appt.save();
+                    console.log(`Cron: Sent 1-hour email reminders for appointment ${appt._id}`);
+                }
+
+                // --- 5 MINUTE IN-APP NOTIFICATION ---
                 if (diffMinutes === 5) {
                     // Send to Doctor
                     if (appt.doctor && appt.doctor.user) {

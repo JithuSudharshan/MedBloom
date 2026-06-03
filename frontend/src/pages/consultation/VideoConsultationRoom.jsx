@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { io } from 'socket.io-client';
 import { Video, VideoOff, Mic, MicOff, PhoneOff, Save, Loader2, FileText, Plus, Trash2, PanelRightClose, PanelRightOpen, History, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import ReviewModal from '../../components/profile/appointments/ReviewModal';
 import { fetchPatientRecordsForConsultation, completeConsultationApi, savePrescriptionApi } from '../../api/doctorApi';
 import { fetchAppointmentDetailsForConsultation } from '../../api/patientApi';
 
@@ -58,6 +59,7 @@ export default function VideoConsultationRoom() {
 
     // Consultation Details (for patient view)
     const [consultationDetails, setConsultationDetails] = useState(null);
+    const [showReviewModal, setShowReviewModal] = useState(false);
 
     // WebRTC Refs
     const socketRef = useRef(null);
@@ -154,6 +156,15 @@ export default function VideoConsultationRoom() {
                 socketRef.current.on('ice-candidate', handleNewICECandidateMsg);
                 socketRef.current.on('user-left', handleUserLeft);
                 
+                socketRef.current.on('consultation-ended', () => {
+                    toast.success("The doctor has completed the consultation.");
+                    if (!isDoctor) {
+                        setShowReviewModal(true);
+                    } else {
+                        endCall(true);
+                    }
+                });
+
                 socketRef.current.on('call-error', (data) => {
                     toast.error(data.message);
                     endCall(true);
@@ -332,8 +343,8 @@ export default function VideoConsultationRoom() {
         }
     };
 
-    const endCall = (shouldNavigate = true) => {
-        if (isDoctor && !hasSubmittedPrescription && shouldNavigate && callStatus !== 'ended') {
+    const endCall = (shouldNavigate = true, force = false) => {
+        if (isDoctor && !hasSubmittedPrescription && shouldNavigate && callStatus !== 'ended' && !force) {
             toast.error("Please submit a prescription before ending the call.");
             return;
         }
@@ -349,7 +360,7 @@ export default function VideoConsultationRoom() {
         }
         setCallStatus('ended');
         
-        if (shouldNavigate) {
+        if (shouldNavigate && !showReviewModal) {
             navigate(`/${isDoctor ? 'doctor' : 'patient'}/appointments`);
         }
     };
@@ -414,7 +425,10 @@ export default function VideoConsultationRoom() {
         try {
             await completeConsultationApi(appointmentId);
             toast.success("Consultation completed successfully.");
-            endCall(true);
+            if (socketRef.current) {
+                socketRef.current.emit('end-consultation', { appointmentId });
+            }
+            endCall(true, true);
         } catch (error) {
             console.error("Complete consultation error:", error);
             const errMsg = error.response?.data?.message || "Failed to complete consultation.";
@@ -738,6 +752,28 @@ export default function VideoConsultationRoom() {
 
                 </div>
             </div>
+
+            {/* Patient Review Modal */}
+            {!isDoctor && consultationDetails && (
+                <ReviewModal 
+                    isOpen={showReviewModal}
+                    onClose={() => {
+                        setShowReviewModal(false);
+                        navigate('/patient/appointments');
+                    }}
+                    appointment={{
+                        id: appointmentId,
+                        primaryTitle: consultationDetails.doctor?.displayName ? 
+                            (consultationDetails.doctor.displayName.toLowerCase().startsWith('dr') ? 
+                                consultationDetails.doctor.displayName : `Dr. ${consultationDetails.doctor.displayName}`) 
+                            : "Your Doctor"
+                    }}
+                    onSuccess={() => {
+                        setShowReviewModal(false);
+                        navigate('/patient/appointments');
+                    }}
+                />
+            )}
         </div>
     );
 }

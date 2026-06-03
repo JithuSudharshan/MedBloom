@@ -198,3 +198,64 @@ export const sendPrescriptionEmail = async (to, doctorName, pdfBuffer) => {
         console.log("Internal server error while sending prescription mail", error);
     }
 }
+
+export const sendAppointmentReminderEmail = async (to, name, otherPartyName, time, isDoctor = false) => {
+    try {
+        await transporter.sendMail({
+            from: `"MedBloom Reminders" <${ENV.EMAIL_USER}>`,
+            to: to,
+            subject: "Reminder: Your Appointment is in 1 Hour",
+            html: `
+        <div style="
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #fff5e6, #ffe0b2);
+            padding: 50px 0;
+        ">
+            <div style="
+            max-width: 550px;
+            margin: auto;
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(255,152,0,0.15);
+            border-top: 5px solid #FF9800;
+            ">
+            <p style="color: #000000; font-size: 32px; font-weight: bold; margin-bottom: 10px;">
+                MED<span style="color: #00A4A3;">BLOOM</span>
+            </p>
+            
+            <h2 style="color: #111; font-size: 24px; margin-bottom: 25px;">Upcoming Consultation ⏰</h2>
+
+            <p style="color: #555; font-size: 15px; line-height: 1.6; margin-bottom: 30px;">
+                Hello ${name}, this is a gentle reminder that your consultation with <strong>${isDoctor ? 'Patient ' + otherPartyName : 'Dr. ' + otherPartyName}</strong> is scheduled to start in exactly <strong>1 hour</strong> at ${time}.
+            </p>
+            
+            <p style="color: #555; font-size: 15px; line-height: 1.6; margin-bottom: 30px;">
+                Please ensure you have a stable internet connection and find a quiet place for your session.
+            </p>
+
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/${isDoctor ? 'doctor' : 'patient'}/appointments" style="
+                display: inline-block;
+                background: linear-gradient(90deg, #FF9800, #FFB74D);
+                color: white;
+                padding: 14px 35px;
+                border-radius: 10px;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 16px;
+                box-shadow: 0 4px 15px rgba(255,152,0,0.3);
+            ">Join Waiting Room</a>
+
+            <p style="color: #999; font-size: 12px; margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px;">
+                If you have any questions, please contact MedBloom support.
+            </p>
+            </div>
+        </div>
+        `
+        });
+    } catch (error) {
+        console.log("Internal server error while sending reminder mail", error);
+    }
+}
+

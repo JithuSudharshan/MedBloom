@@ -60,6 +60,10 @@ const appointmentSchema = new Schema(
             type: Boolean,
             default: false
         },
+        isEmailReminderSent: {
+            type: Boolean,
+            default: false
+        },
         consultationStartedAt: {
             type: Date
         },

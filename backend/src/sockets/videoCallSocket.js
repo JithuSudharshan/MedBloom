@@ -112,6 +112,11 @@ export const videoCallSocket = (io, socket) => {
         socket.to(appointmentId).emit('user-left', { socketId: socket.id });
     });
 
+    // End Consultation
+    socket.on('end-consultation', ({ appointmentId }) => {
+        socket.to(appointmentId).emit('consultation-ended');
+    });
+
     // Handle disconnection specifically for video calls if needed
     socket.on('disconnect', () => {
         if (socket.appointmentId && socket.userRole) {
