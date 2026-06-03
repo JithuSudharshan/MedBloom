@@ -671,56 +671,98 @@ export const editDepartmentInfo = async (req, res) => {
 export const fetchAppointments = async (req, res) => {
     try {
         const page = parseInt(req.query.page || "1", 10);
-        const limit = parseInt(req.query.limit || "5", 10);
+        const limit = parseInt(req.query.limit || "10", 10);
         const skip = (page - 1) * limit;
 
-        const filter = { status: "pending" }; // will cyhange according to appointmnet schema
+        const matchCondition = {};
+        
+        // Tab / Status filter
+        if (req.query.status && req.query.status !== "All") {
+            matchCondition.status = req.query.status;
+        }
 
-        //here comes the appointment mongoDb logic
-        const totalPages = 3
+        // Search text
+        if (req.query.search) {
+            const searchRegex = new RegExp(req.query.search, 'i');
 
-        //Math.max(1, Math.ceil(total / limit));
+            // 1. Find matching Doctors by displayName
+            const matchedDoctors = await Doctor.find({ displayName: searchRegex }).select('_id');
+            const doctorIds = matchedDoctors.map(d => d._id);
 
+            // 2. Find matching Users by name for Patients
+            const matchedUsers = await User.find({ name: searchRegex }).select('_id');
+            const matchedPatients = await Patient.find({ user: { $in: matchedUsers.map(u => u._id) } }).select('_id');
+            const patientIds = matchedPatients.map(p => p._id);
 
-        const dummyAppointments = [
-            {
-                id: 1,
-                doctorName: "Dr. Arjun Menon",
-                speciality: "Cardiology",
-                dateTimeLabel: "2023-11-10 at 10:00 AM",
-                status: "Upcoming",
-            },
-            {
-                id: 2,
-                doctorName: "Dr. Arjun Menon",
-                speciality: "Cardiology",
-                dateTimeLabel: "2023-11-10 at 10:00 AM",
-                status: "Upcoming",
-            },
-            {
-                id: 3,
-                doctorName: "Dr. Arjun Menon",
-                speciality: "Cardiology",
-                dateTimeLabel: "2023-11-10 at 10:00 AM",
-                status: "Completed",
-            },
-            {
-                id: 4,
-                doctorName: "Dr. Arjun Menon",
-                speciality: "Cardiology",
-                dateTimeLabel: "2023-11-10 at 10:00 AM",
-                status: "Cancelled",
+            matchCondition.$or = [
+                { appointmentId: searchRegex },
+                { doctor: { $in: doctorIds } },
+                { patient: { $in: patientIds } }
+            ];
+        }
+
+        const [appointmentsData, total] = await Promise.all([
+            Appointment.find(matchCondition)
+                .populate("doctor", "displayName primarySpecialization user")
+                .populate({
+                    path: "patient",
+                    populate: {
+                        path: "user",
+                        select: "name email"
+                    }
+                })
+                .sort({ date: -1, startTime: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+            Appointment.countDocuments(matchCondition)
+        ]);
+
+        const totalPages = Math.max(1, Math.ceil(total / limit));
+
+        const formattedAppointments = appointmentsData.map(app => {
+            const patientName = app.patient?.user?.name || "Unknown Patient";
+            const doctorName = app.doctor?.displayName || "Unknown Doctor";
+            const speciality = app.doctor?.primarySpecialization || "N/A";
+            
+            // Format date e.g. "2023-11-10 at 10:00 AM"
+            let dateTimeLabel = "N/A";
+            if (app.date && app.startTime) {
+                const dateObj = new Date(app.date);
+                if (!isNaN(dateObj.getTime())) {
+                    const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    
+                    // Convert startTime (e.g., "14:30") to 12-hour AM/PM
+                    let timeStr = app.startTime;
+                    if (app.startTime.includes(":")) {
+                        const [hours, minutes] = app.startTime.split(":");
+                        const h = parseInt(hours, 10);
+                        const ampm = h >= 12 ? 'PM' : 'AM';
+                        const h12 = h % 12 || 12;
+                        timeStr = `${h12}:${minutes} ${ampm}`;
+                    }
+                    dateTimeLabel = `${formattedDate} at ${timeStr}`;
+                }
             }
-        ];
 
+            return {
+                id: app._id,
+                appointmentId: app.appointmentId,
+                patientName,
+                doctorName,
+                speciality,
+                dateTimeLabel,
+                status: app.status
+            };
+        });
 
         return res.status(200).json({
             success: true,
             data: {
-                appointments: dummyAppointments,
+                appointments: formattedAppointments,
                 page,
                 totalPages,
-                totalCount: dummyAppointments.length
+                totalCount: total
             },
         });
 

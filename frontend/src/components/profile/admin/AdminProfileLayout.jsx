@@ -21,7 +21,7 @@ import ListOfDepartments from "./ListOfDepartments.jsx";
 import AddDepartmentForm from "./AddDepartmentForm";
 import { useDepartmentForm } from "../../../hooks/useDepartmentForm.js"
 import ServiceOverview from "./dashboard/ServiceOverview.jsx";
-import AppointmentsSection from "../appointments/AppointmentsSection.jsx";
+import AdminAppointmentsTable from "./appointments/AdminAppointmentsTable.jsx";
 import NotificationsPage from "../NotificationsPage.jsx";
 import Loader from "../../ui/Loading.jsx";
 
@@ -43,6 +43,8 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
     const [totalPatientPages, setTotalPatientPages] = useState(1)
     const [totalDoctorPages, setTotalDoctorPages] = useState(1)
     const [totalAppointmentPages, setTotalAppointmentPages] = useState(1)
+    const [appointmentSearchTerm, setAppointmentSearchTerm] = useState("")
+    const [appointmentTab, setAppointmentTab] = useState("All")
 
     const [doctors, setDoctors] = useState([])
     const [patients, setPatients] = useState([])
@@ -145,7 +147,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
             setLoading(true);
 
             const res = await fetchAppointmentsForAdmin({
-                params: { page: pageNumber, limit: 5 }
+                params: { page: pageNumber, limit: 10, search: appointmentSearchTerm, status: appointmentTab }
             })
 
             if (!res.data?.success) {
@@ -193,9 +195,12 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
 
     useEffect(() => {
         if (activeKey === "appointments") {
-            fetchAppointments(appointmentPage);
+            const timer = setTimeout(() => {
+                fetchAppointments(appointmentPage);
+            }, 500); // 500ms debounce
+            return () => clearTimeout(timer);
         }
-    }, [activeKey, appointmentPage]);
+    }, [activeKey, appointmentPage, appointmentSearchTerm, appointmentTab]);
 
 
     useEffect(() => {
@@ -368,11 +373,15 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                             totalPages={totalPatientPages}
                         />
                     )}
-                    {activeKey === "appointments" && <AppointmentsSection
+                    {activeKey === "appointments" && <AdminAppointmentsTable
                         appointments={appointments}
                         page={appointmentPage}
                         totalPages={totalAppointmentPages}
                         setPage={setAppointmentPage}
+                        searchTerm={appointmentSearchTerm}
+                        setSearchTerm={setAppointmentSearchTerm}
+                        activeTab={appointmentTab}
+                        setActiveTab={setAppointmentTab}
                     />}
 
                     {activeKey === "departments" && (
