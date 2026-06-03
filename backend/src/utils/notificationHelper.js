@@ -1,5 +1,6 @@
 import Notification from "../model/notificationSchema.js";
 import { getIO } from "../config/socket.IO.js";
+import User from "../model/userModel.js";
 
 /**
  * Creates a notification in the database and emits it via Socket.IO
@@ -42,6 +43,34 @@ export const sendNotification = async ({ senderId, receiverId, message, type, li
         return savedNotification;
     } catch (error) {
         console.error("Failed to send notification:", error);
+        return null;
+    }
+};
+
+/**
+ * Convenience helper to send a notification directly to the Admin
+ * 
+ * @param {Object} options
+ * @param {string} options.message - The notification message
+ * @param {string} options.type - The type of notification (enum)
+ * @param {string} options.link - Optional link for the notification to redirect to
+ */
+export const notifyAdmin = async ({ message, type, link }) => {
+    try {
+        const adminUser = await User.findOne({ role: 'admin' }).select('_id');
+        if (!adminUser) {
+            console.error("Admin user not found, could not send admin notification.");
+            return null;
+        }
+
+        return await sendNotification({
+            receiverId: adminUser._id,
+            message,
+            type,
+            link
+        });
+    } catch (error) {
+        console.error("Failed to notify admin:", error);
         return null;
     }
 };

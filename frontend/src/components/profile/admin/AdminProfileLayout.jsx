@@ -403,7 +403,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                             openModalForEditing={handleEditDepartment}
                         />
                     )}
-                    {activeKey === "notifications" && (<NotificationsPage />)}
+                    {activeKey === "notifications" && (<NotificationsPage userRole="admin" />)}
                 </main>
             </div>
 

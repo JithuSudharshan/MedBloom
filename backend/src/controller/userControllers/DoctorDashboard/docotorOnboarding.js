@@ -1,5 +1,6 @@
 import Doctor from "../../../model/doctorModel.js";
 import User from "../../../model/userModel.js";
+import { notifyAdmin } from "../../../utils/notificationHelper.js";
 
 export const doctorBasicOnboarding = async (req, res) => {
     try {
@@ -135,6 +136,13 @@ export const doctorProffesionalOnboarding = async (req, res) => {
                 success: false,
                 message: "user credentials are not authenticated"
             })
+
+        // Notify Admin
+        await notifyAdmin({
+            message: `New Doctor ${doctor.displayName} has completed onboarding and is awaiting profile approval.`,
+            type: 'admin_approval',
+            link: '/admin/doctors'
+        });
 
         return res.status(200).json({
             success: true,

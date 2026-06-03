@@ -7,7 +7,7 @@ import Transaction from '../../../model/transactionModel.js';
 import { ENV } from '../../../config/env.js';
 import { getIO } from '../../../config/socket.IO.js';
 import { sendAppointmentConfirmationEmail } from '../../../utils/sendEmail.js';
-import { sendNotification } from '../../../utils/notificationHelper.js';
+import { sendNotification, notifyAdmin } from '../../../utils/notificationHelper.js';
 import { formatNotificationDateTime } from '../../../utils/formatters.js';
 
 // 1. Create Payment Order
@@ -169,6 +169,13 @@ export const verifyPaymentAndBook = async (req, res) => {
                     message: `Your appointment with Dr. ${doctorObj.displayName} on ${formattedDateTime} is confirmed.`,
                     type: 'appointment_booked',
                     link: `/patient/appointments/${appointment._id}`
+                });
+
+                // Notify Admin
+                await notifyAdmin({
+                    message: `New appointment booked: ${patientObj.user.name} with Dr. ${doctorObj.displayName} on ${formattedDateTime}.`,
+                    type: 'appointment_booked',
+                    link: `/admin/appointments`
                 });
             }
         } catch (notifErr) {
@@ -464,6 +471,13 @@ export const bookAppointmentWithWallet = async (req, res) => {
                 message: `Your appointment with Dr. ${doctor.displayName} on ${formattedDateTime} is confirmed.`,
                 type: 'appointment_booked',
                 link: `/patient/appointments/${newAppointment._id}`
+            });
+
+            // Notify Admin
+            await notifyAdmin({
+                message: `New appointment booked: ${patient.user.name} with Dr. ${doctor.displayName} on ${formattedDateTime}.`,
+                type: 'appointment_booked',
+                link: `/admin/appointments`
             });
         } catch (notifErr) {
             console.error("Notification failed:", notifErr);

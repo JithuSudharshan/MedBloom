@@ -653,6 +653,25 @@ export const editDepartmentInfo = async (req, res) => {
                 message: "No Record of department found"
             })
 
+        // --- SAFETY CHECK FOR DEPARTMENT INTEGRITY ---
+        const isRenaming = departmentName && departmentName !== department.departmentName;
+        const isDeactivating = status === 'inactive' && department.status !== 'inactive';
+
+        if (isRenaming || isDeactivating) {
+            const activeDoctorsCount = await Doctor.countDocuments({ 
+                primarySpecialization: department.departmentName 
+            });
+
+            if (activeDoctorsCount > 0) {
+                const action = isRenaming ? "rename" : "deactivate";
+                return res.status(400).json({
+                    success: false,
+                    message: `Cannot ${action} department. There are ${activeDoctorsCount} active doctors assigned to this specialization.`
+                });
+            }
+        }
+        // ----------------------------------------------
+
         department.departmentName = departmentName || department.departmentName
         department.departmentDescription = departmentDescription || department.departmentDescription
         department.status = status || department.status
