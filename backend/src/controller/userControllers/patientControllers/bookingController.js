@@ -249,6 +249,24 @@ export const cancelAppointment = async (req, res) => {
             console.error("Notification failed:", notifErr);
         }
 
+        // --- Notify Admin for Last-Minute Cancellation ---
+        try {
+            const appointmentDate = new Date(appointment.date);
+            // Try to extract hours/minutes from startTime if available to be more precise, but date is fine for MVP
+            const now = new Date();
+            const hoursDifference = (appointmentDate - now) / (1000 * 60 * 60);
+
+            if (hoursDifference >= 0 && hoursDifference <= 24) {
+                await notifyAdmin({
+                    message: `Last-Minute Cancellation Alert: Patient ${req.user.name} cancelled their appointment with Dr. ${doctorObj?.displayName || 'Unknown'} scheduled for ${formattedDateTime}.`,
+                    type: 'appointment_cancelled',
+                    link: '/admin/appointments'
+                });
+            }
+        } catch (adminNotifErr) {
+            console.error("Admin notification failed:", adminNotifErr);
+        }
+
         // Send Cancellation Notifications for patient
         try {
             const patientObj = await Patient.findById(appointment.patient).populate('user');

@@ -4,7 +4,7 @@ import { ENV } from '../../config/env.js';
 import Transaction from '../../model/transactionModel.js';
 import Patient from '../../model/patientModel.js';
 import Doctor from '../../model/doctorModel.js';
-import { sendNotification } from '../../utils/notificationHelper.js';
+import { sendNotification, notifyAdmin } from '../../utils/notificationHelper.js';
 
 export const getTransactions = async (req, res) => {
     try {
@@ -118,13 +118,23 @@ export const verifyTopUp = async (req, res) => {
         userProfile.walletBalance = (userProfile.walletBalance || 0) + Number(amount);
         await userProfile.save();
 
-        // Send Notification
+        // Send Notification to User
         await sendNotification({
             receiverId: userProfile.user,
             message: `Your wallet has been topped up with ₹${amount}`,
             type: 'wallet_topup',
             link: `/${userRole}/wallet`
         });
+
+        // Notify Admin of High-Value Transactions
+        const HIGH_VALUE_THRESHOLD = 5000;
+        if (Number(amount) >= HIGH_VALUE_THRESHOLD) {
+            await notifyAdmin({
+                message: `Large Transaction Alert: ${req.user.name} topped up their wallet with ₹${amount}.`,
+                type: 'wallet_topup',
+                link: '/admin/dashboard'
+            });
+        }
 
         res.status(200).json({
             success: true,
