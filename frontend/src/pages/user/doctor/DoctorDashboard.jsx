@@ -10,6 +10,7 @@ import Loader from '../../../components/ui/Loading';
 import doctorProfileConfig from '../../../config/doctorProfileConfig';
 import { loadDoctorData } from '../../../api/doctorApi';
 import IsonboardedWarning from '../../../components/profile/IsonboardedWarning';
+import { Calendar, User, Star } from 'lucide-react';
 
 const dummyAppointments = [
     {
@@ -96,7 +97,15 @@ export default function DcotorProfilePage() {
     return (
         <>
             <Navbar current={"login"} userRole="doctor" />
-            <ProfileBanner userRole="doctor" userDetails={doctorDetails} />
+            <ProfileBanner 
+                userRole="doctor" 
+                userDetails={doctorDetails} 
+                metrics={[
+                    { label: "Today's Consultations", value: doctorDetails.todayConsultations ?? 0, icon: Calendar },
+                    { label: "Rating", value: doctorDetails.rating ? `${doctorDetails.rating} / 5` : "No Ratings", icon: Star },
+                    { label: "Profile Status", value: doctorDetails.profileStatus, icon: User }
+                ]}
+            />
             {!doctorDetails.isOnboarded && < IsonboardedWarning onClick={handleNavigate} />}
             <ProfileLayout
                 user={"doctor"}

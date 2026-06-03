@@ -4,6 +4,8 @@ import Notification from '../../../model/notificationSchema.js';
 import { getIO } from '../../../config/socket.IO.js';
 import Patient from "../../../model/patientModel.js";
 import Department from "../../../model/departmentModel.js";
+import Appointment from "../../../model/appointmentModel.js";
+import Transaction from "../../../model/transactionModel.js";
 
 
 export const fetchPendingDoctorList = async (req, res) => {
@@ -733,50 +735,104 @@ export const fetchAppointments = async (req, res) => {
 
 export const fetchMetrics = async (req, res) => {
     try {
+        const today = new Date();
+        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+        
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+
+        // 1. Basic Counts
+        const [totalPatients, activeDoctors] = await Promise.all([
+            Patient.countDocuments(),
+            Doctor.countDocuments({ status: "approved" })
+        ]);
+
+        // 2. Appointment Metrics
+        // Today's appointments (matching date string YYYY-MM-DD or created today depending on schema)
+        // Since schema uses string date "YYYY-MM-DD"
+        const todayStr = today.toISOString().split('T')[0];
+        
+        const todaysAppointments = await Appointment.countDocuments({ date: todayStr });
+        const monthlyAppointments = await Appointment.countDocuments({
+            createdAt: { $gte: startOfMonth, $lte: endOfMonth }
+        });
 
         const metrics = [
-            { label: "Total Patients", value: 345 },
-            { label: "Active Doctors", value: 56 },
-            { label: "Today's Appointments", value: 125 },
-            { label: "Monthly Appointments", value: 725 },
-        ]
-
-        const monthlyEarnings = 45000;
-
-        const TopRatedDoctors = [
-            {
-                id: 1,
-                name: "Dr. Arathy Krishna",
-                avatar: "https://i.pravatar.cc/40",
-            },
-            {
-                id: 2,
-                name: "Dr. Jayadeep Sunil",
-                avatar: "https://i.pravatar.cc/41",
-            },
-            {
-                id: 3,
-                name: "Dr. Chritina Raichel",
-                avatar: "https://i.pravatar.cc/42",
-            },
-            {
-                id: 4,
-                name: "Dr. Gahana EV",
-                avatar: "https://i.pravatar.cc/43",
-            },
-            {
-                id: 5,
-                name: "Dr. Jagan Laal",
-                avatar: "https://i.pravatar.cc/44",
-            },
+            { label: "Total Patients", value: totalPatients },
+            { label: "Active Doctors", value: activeDoctors },
+            { label: "Today's Appointments", value: todaysAppointments },
+            { label: "Monthly Appointments", value: monthlyAppointments },
         ];
 
-        const graphData = [
-            { "name": "ortho", "value": 120 },
-            { "name": "cardio", "value": 110 },
-            { "name": "Derma", "value": 100 },
-            { "name": "Therapy", "value": 90 }
-        ]
+        // 3. Monthly Earnings
+        const earningsAgg = await Transaction.aggregate([
+            {
+                $match: {
+                    status: "Success",
+                    createdAt: { $gte: startOfMonth, $lte: endOfMonth }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    total: { $sum: "$amount" }
+                }
+            }
+        ]);
+        const monthlyEarnings = earningsAgg.length > 0 ? earningsAgg[0].total : 0;
+
+        // 4. Top Rated Doctors
+        const topDoctorsData = await Doctor.find({ status: "approved" })
+            .sort({ rating: -1, totalReviews: -1 })
+            .limit(5)
+            .select('displayName profilePicture');
+        
+        const TopRatedDoctors = topDoctorsData.map((doc, index) => ({
+            id: index + 1,
+            name: doc.displayName,
+            avatar: doc.profilePicture || "https://i.pravatar.cc/40",
+        }));
+
+        // 5. Graph Data (Top Consulted Specialities)
+        const specialityAgg = await Appointment.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: startOfMonth, $lte: endOfMonth }
+                }
+            },
+            {
+                $lookup: {
+                    from: "doctors",
+                    localField: "doctor",
+                    foreignField: "_id",
+                    as: "doctorDetails"
+                }
+            },
+            { $unwind: "$doctorDetails" },
+            {
+                $group: {
+                    _id: "$doctorDetails.primarySpecialization",
+                    value: { $sum: 1 }
+                }
+            },
+            { $sort: { value: -1 } },
+            { $limit: 4 }
+        ]);
+
+        const graphData = specialityAgg.map(item => ({
+            name: item._id || "Unknown",
+            value: item.value
+        }));
+
+        // Fallback graph data if no appointments
+        if (graphData.length === 0) {
+            graphData.push(
+                { name: "Cardiology", value: 0 },
+                { name: "Neurology", value: 0 },
+                { name: "Dermatology", value: 0 },
+                { name: "Orthopedics", value: 0 }
+            );
+        }
 
         return res.status(200).json({
             success: true,
@@ -791,6 +847,6 @@ export const fetchMetrics = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Internal server error"
-        })
+        });
     }
 }

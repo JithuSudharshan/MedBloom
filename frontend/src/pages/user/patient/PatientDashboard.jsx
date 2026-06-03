@@ -11,6 +11,7 @@ import { loadPatientData } from '../../../api/patientApi';
 import Loader from '../../../components/ui/Loading';
 import IsonboardedWarning from '../../../components/profile/IsonboardedWarning';
 import FindDoctorModal from '../../../components/profile/appointments/FindDoctorModal';
+import { Calendar, Clock, User } from 'lucide-react';
 
 export default function PatientProfilePage() {
     const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -72,6 +73,11 @@ export default function PatientProfilePage() {
             <ProfileBanner 
                 userRole="patient"
                 userDetails={patientDetails} 
+                metrics={[
+                    { label: "Next Appointment", value: patientDetails.nextAppointment, icon: Calendar },
+                    { label: "Last Checkup", value: patientDetails.lastCheckup, icon: Clock },
+                    { label: "Profile Status", value: patientDetails.profileStatus, icon: User }
+                ]}
             />
             {!patientDetails.isOnboarded && <IsonboardedWarning onClick={handleCompleteOnboarding} />}
             <ProfileLayout

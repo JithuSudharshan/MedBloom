@@ -51,6 +51,32 @@ export const fetchUserDetails = async (req, res) => {
         const filledFields = fieldsToCheck.filter(field => field !== undefined && field !== null && field !== "").length;
         const profileStatus = Math.round((filledFields / fieldsToCheck.length) * 100) + "% Complete";
 
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
+        
+        // Find next upcoming appointment
+        const nextAppt = await Appointment.findOne({
+            patient: patient._id,
+            status: { $in: ['confirmed'] },
+            date: { $gte: todayStr }
+        }).sort({ date: 1, startTime: 1 });
+
+        // Find last completed appointment
+        const lastAppt = await Appointment.findOne({
+            patient: patient._id,
+            status: 'completed'
+        }).sort({ date: -1 });
+
+        // Format dates
+        const formatDate = (dateStr) => {
+            if (!dateStr) return "N/A";
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        };
+
+        const nextAppointmentFormatted = nextAppt ? formatDate(nextAppt.date) : "No upcoming";
+        const lastCheckupFormatted = lastAppt ? formatDate(lastAppt.date) : "No records";
+
         res.status(200).json({
             success: true,
             details: {
@@ -81,8 +107,8 @@ export const fetchUserDetails = async (req, res) => {
                 phone: isUser.phone,
                 emergencyNumber: patient.emergencyNumber,
                 profileStatus: profileStatus,
-                nextAppointment: "Oct 24, 2026",
-                lastCheckup: "2 months ago"
+                nextAppointment: nextAppointmentFormatted,
+                lastCheckup: lastCheckupFormatted
             }
         });
 

@@ -115,10 +115,23 @@ export const fetchDoctorDetails = async (req, res) => {
             isOnboarded: user.isOnboarded
         }
 
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
+        
+        const todayConsultations = await Appointment.countDocuments({
+            doctor: doctor._id,
+            date: todayStr,
+            status: { $in: ['confirmed', 'completed'] }
+        });
+
+        // Use totalReviews to compute profile completion ratio roughly (as an example)
+        // Or hardcode profileStatus for doctor for now if not tracked
+        const profileStatus = doctor.status === 'approved' ? '100% Complete' : 'Pending Approval';
+
         res.status(200).json({
             success: true,
             message: "Fetching docotor data successful",
-            details
+            details: { ...details, todayConsultations, profileStatus }
         })
 
     } catch (error) {

@@ -1,9 +1,21 @@
 import React from "react";
 import { Calendar, Clock, User } from "lucide-react";
 
-const ProfileBanner = ({ userRole = 'patient', userDetails }) => {
+const ProfileBanner = ({ userRole = 'patient', userDetails, metrics = [] }) => {
     const { fullName, nextAppointment, lastCheckup, profileStatus } = userDetails || {};
     const isDoctor = userRole === 'doctor';
+    const isAdmin = userRole === 'admin';
+
+    let description = "Here, you can manage your personal details and medical information securely.";
+    let welcomeName = fullName || "Patient";
+    
+    if (isDoctor) {
+        description = "Here, you can manage your appointments, availability, and patients securely.";
+        welcomeName = fullName || "Doctor";
+    } else if (isAdmin) {
+        description = "Here, you can manage platform operations, doctors, patients, and revenue.";
+        welcomeName = fullName || "Admin";
+    }
 
     return (
         <section className={`w-full relative overflow-hidden py-14 px-8 border-b ${
@@ -24,61 +36,39 @@ const ProfileBanner = ({ userRole = 'patient', userDetails }) => {
                     <h1 className={`text-[2.5rem] leading-tight font-medium mb-3 tracking-tight ${
                         isDoctor ? "text-[#6B3B3D]" : "text-[#004d4d]"
                     }`}>
-                        Welcome back, {fullName || (isDoctor ? "Doctor" : "Patient")}!<br/>
-                        This is your {isDoctor ? "Professional Hub" : "Patient Profile"}.
+                        Welcome back, {welcomeName}!<br/>
+                        This is your {isDoctor ? "Professional Hub" : (isAdmin ? "Admin Console" : "Patient Profile")}.
                     </h1>
                     <p className={`text-lg font-medium opacity-80 ${
                         isDoctor ? "text-[#B08B8C]" : "text-[#006D6F]"
                     }`}>
-                        Here, you can manage your personal details and<br/>medical information securely.
+                        {description}
                     </p>
                 </div>
 
                 {/* Stat Cards */}
-                <div className="flex gap-4">
-                    {/* Card 1 */}
-                    <div className={`bg-white rounded-2xl p-5 flex flex-col justify-between min-w-[150px] ${
-                        isDoctor ? "shadow-[0_8px_30px_rgba(176,139,140,0.12)]" : "shadow-[0_8px_30px_rgba(0,109,111,0.06)]"
-                    }`}>
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${
-                            isDoctor ? "bg-[#F8E9EA] text-[#B08B8C]" : "bg-teal-50 text-teal-600"
-                        }`}>
-                            <Calendar size={20} />
-                        </div>
-                        <div>
-                            <p className="text-xs text-gray-500 font-medium mb-1">Next Appointment:</p>
-                            <p className="text-sm font-semibold text-gray-800">{nextAppointment || "N/A"}</p>
-                        </div>
+                {metrics && metrics.length > 0 && (
+                    <div className="flex gap-4">
+                        {metrics.map((metric, index) => {
+                            const Icon = metric.icon;
+                            return (
+                                <div key={index} className={`bg-white rounded-2xl p-5 flex flex-col justify-between min-w-[150px] ${
+                                    isDoctor ? "shadow-[0_8px_30px_rgba(176,139,140,0.12)]" : "shadow-[0_8px_30px_rgba(0,109,111,0.06)]"
+                                }`}>
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${
+                                        isDoctor ? "bg-[#F8E9EA] text-[#B08B8C]" : "bg-teal-50 text-teal-600"
+                                    }`}>
+                                        {Icon && <Icon size={20} />}
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 font-medium mb-1">{metric.label}:</p>
+                                        <p className="text-sm font-semibold text-gray-800">{metric.value || "N/A"}</p>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
-                    {/* Card 2 */}
-                    <div className={`bg-white rounded-2xl p-5 flex flex-col justify-between min-w-[150px] ${
-                        isDoctor ? "shadow-[0_8px_30px_rgba(176,139,140,0.12)]" : "shadow-[0_8px_30px_rgba(0,109,111,0.06)]"
-                    }`}>
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${
-                            isDoctor ? "bg-[#F8E9EA] text-[#B08B8C]" : "bg-teal-50 text-teal-600"
-                        }`}>
-                            <Clock size={20} />
-                        </div>
-                        <div>
-                            <p className="text-xs text-gray-500 font-medium mb-1">Last Checkup:</p>
-                            <p className="text-sm font-semibold text-gray-800">{lastCheckup || "N/A"}</p>
-                        </div>
-                    </div>
-                    {/* Card 3 */}
-                    <div className={`bg-white rounded-2xl p-5 flex flex-col justify-between min-w-[150px] ${
-                        isDoctor ? "shadow-[0_8px_30px_rgba(176,139,140,0.12)]" : "shadow-[0_8px_30px_rgba(0,109,111,0.06)]"
-                    }`}>
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${
-                            isDoctor ? "bg-[#F8E9EA] text-[#B08B8C]" : "bg-teal-50 text-teal-600"
-                        }`}>
-                            <User size={20} />
-                        </div>
-                        <div>
-                            <p className="text-xs text-gray-500 font-medium mb-1">Profile Status:</p>
-                            <p className="text-sm font-semibold text-gray-800">{profileStatus || "N/A"}</p>
-                        </div>
-                    </div>
-                </div>
+                )}
             </div>
         </section>
     );

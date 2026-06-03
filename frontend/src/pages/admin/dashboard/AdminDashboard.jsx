@@ -42,7 +42,7 @@ export default function PatientProfilePage() {
   return (
     <>
       <Navbar current={"adminLogin"} />
-      <ProfileBanner profileOwner={"Admin Profile"} profileDescription={"Manage your personal information and health records"} />
+      <ProfileBanner userRole="admin" />
       <AdminProfileLayout
         sidebarMenu={adminProfileConfig.sidebarMenu}
         onLogout={handleLogout}
