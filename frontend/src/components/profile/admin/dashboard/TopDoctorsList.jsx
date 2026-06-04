@@ -29,11 +29,11 @@ export default function TopDoctorsList({ doctors }) {
                                     {doctor.name}
                                 </p>
                                 <p className="text-gray-400 text-xs mt-0.5">
-                                    {doctor.speciality || "General Physician"}
+                                    {doctor.speciality}
                                 </p>
                             </div>
                             <div className="text-xs font-medium text-amber-500 bg-amber-50 px-2 py-1 rounded-md">
-                                {doctor.rating || "5.0"} ★
+                                {doctor.rating} ★
                             </div>
                         </li>
                     ))}

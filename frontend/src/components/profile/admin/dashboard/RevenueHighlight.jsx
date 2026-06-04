@@ -1,4 +1,7 @@
-export default function RevenueHighlight({ amount }) {
+export default function RevenueHighlight({ amount, growth = 0 }) {
+    const isPositive = growth >= 0;
+    const growthSign = isPositive ? '+' : '';
+
     return (
         <div className="h-full bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl p-6 flex flex-col justify-between shadow-lg relative overflow-hidden">
             {/* Decorative background element */}
@@ -16,8 +19,8 @@ export default function RevenueHighlight({ amount }) {
                 <p className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
                     ₹ {amount?.toLocaleString("en-IN") || "0"}
                 </p>
-                <p className="text-teal-100 text-sm mt-2 font-medium">
-                    +12% from last month
+                <p className={`text-sm mt-2 font-medium ${isPositive ? 'text-teal-100' : 'text-rose-200'}`}>
+                    {growthSign}{growth}% from last month
                 </p>
             </div>
         </div>

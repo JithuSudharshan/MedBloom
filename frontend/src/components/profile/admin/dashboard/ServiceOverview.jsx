@@ -3,7 +3,7 @@ import DashboardMetrics from "./DashboardMetrics";
 import RevenueHighlight from "./RevenueHighlight";
 import TopDoctorsList from "./TopDoctorsList";
 
-export default function ServiceOverview({ metrics, MonthlyEarnings, TopRatedDoctors, graphData }) {
+export default function ServiceOverview({ metrics, MonthlyEarnings, revenueGrowth, TopRatedDoctors, graphData }) {
 
     return (
         <div className="bg-slate-50/50 rounded-3xl p-8 border border-gray-100">
@@ -22,7 +22,7 @@ export default function ServiceOverview({ metrics, MonthlyEarnings, TopRatedDoct
                 
                 {/* Top Row: Revenue Highlight (1 col) and Metrics (2 cols) */}
                 <div className="lg:col-span-1 h-full">
-                    <RevenueHighlight amount={MonthlyEarnings} />
+                    <RevenueHighlight amount={MonthlyEarnings} growth={revenueGrowth} />
                 </div>
                 <div className="lg:col-span-2">
                     <DashboardMetrics metrics={metrics} />

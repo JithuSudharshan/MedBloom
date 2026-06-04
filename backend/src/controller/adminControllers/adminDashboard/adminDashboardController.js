@@ -840,32 +840,42 @@ export const fetchMetrics = async (req, res) => {
         ];
 
         // 3. Monthly Earnings
-        const earningsAgg = await Transaction.aggregate([
-            {
-                $match: {
-                    status: "Success",
-                    createdAt: { $gte: startOfMonth, $lte: endOfMonth }
-                }
-            },
-            {
-                $group: {
-                    _id: null,
-                    total: { $sum: "$amount" }
-                }
-            }
+        const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59, 999);
+
+        const [earningsAgg, lastMonthEarningsAgg] = await Promise.all([
+            Transaction.aggregate([
+                { $match: { status: "Success", createdAt: { $gte: startOfMonth, $lte: endOfMonth } } },
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ]),
+            Transaction.aggregate([
+                { $match: { status: "Success", createdAt: { $gte: lastMonthStart, $lte: lastMonthEnd } } },
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ])
         ]);
+
         const monthlyEarnings = earningsAgg.length > 0 ? earningsAgg[0].total : 0;
+        const lastMonthlyEarnings = lastMonthEarningsAgg.length > 0 ? lastMonthEarningsAgg[0].total : 0;
+        
+        let revenueGrowth = 0;
+        if (lastMonthlyEarnings === 0) {
+            revenueGrowth = monthlyEarnings > 0 ? 100 : 0;
+        } else {
+            revenueGrowth = Math.round(((monthlyEarnings - lastMonthlyEarnings) / lastMonthlyEarnings) * 100);
+        }
 
         // 4. Top Rated Doctors
         const topDoctorsData = await Doctor.find({ status: "approved" })
             .sort({ rating: -1, totalReviews: -1 })
             .limit(5)
-            .select('displayName profilePicture');
+            .select('displayName profilePicture rating primarySpecialization');
         
         const TopRatedDoctors = topDoctorsData.map((doc, index) => ({
             id: index + 1,
             name: doc.displayName,
             avatar: doc.profilePicture || "https://i.pravatar.cc/40",
+            rating: doc.rating || 0,
+            speciality: doc.primarySpecialization || "General Physician"
         }));
 
         // 5. Graph Data (Top Consulted Specialities)
@@ -901,18 +911,24 @@ export const fetchMetrics = async (req, res) => {
 
         // Fallback graph data if no appointments
         if (graphData.length === 0) {
-            graphData.push(
-                { name: "Cardiology", value: 0 },
-                { name: "Neurology", value: 0 },
-                { name: "Dermatology", value: 0 },
-                { name: "Orthopedics", value: 0 }
-            );
+            const activeDepartments = await Department.find({ status: 'active' }).limit(4).select('departmentName');
+            if (activeDepartments.length > 0) {
+                graphData = activeDepartments.map(dept => ({
+                    name: dept.departmentName,
+                    value: 0
+                }));
+            } else {
+                graphData.push(
+                    { name: "General", value: 0 }
+                );
+            }
         }
 
         return res.status(200).json({
             success: true,
             metrics,
             monthlyEarnings,
+            revenueGrowth,
             TopRatedDoctors,
             graphData
         });

@@ -357,9 +357,9 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                         <ServiceOverview
                             metrics={dashboardMetrics?.metrics}
                             MonthlyEarnings={dashboardMetrics?.monthlyEarnings}
+                            revenueGrowth={dashboardMetrics?.revenueGrowth}
                             TopRatedDoctors={dashboardMetrics?.TopRatedDoctors}
                             graphData={dashboardMetrics?.graphData}
-
                         />
                     )}
                     {activeKey === "doctors" && (
