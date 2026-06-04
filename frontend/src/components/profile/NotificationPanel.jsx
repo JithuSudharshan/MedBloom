@@ -1,7 +1,7 @@
 // components/notifications/NotificationsPanel.jsx
 import dayjs from 'dayjs';
 import { twMerge } from 'tailwind-merge';
-import { CheckCheck } from 'lucide-react';
+import { CheckCheck, Wallet, CalendarClock, Video, ShieldCheck, MessageSquare, Bell } from 'lucide-react';
 import { useRef, useCallback } from 'react';
 
 export default function NotificationsPanel({
@@ -16,7 +16,40 @@ export default function NotificationsPanel({
     className = '',
     userRole = 'patient'
 }) {
-    const isDoctor = userRole === 'doctor';
+    const roleThemes = {
+        admin: {
+            bg: 'bg-teal-50/50',
+            border: 'border-teal-500',
+            text: 'text-teal-800',
+            iconBg: 'bg-teal-100',
+            iconColor: 'text-teal-600',
+            btnHover: 'hover:bg-teal-50',
+            btnText: 'text-teal-600',
+            btnIcon: 'text-teal-500'
+        },
+        doctor: {
+            bg: 'bg-rose-50/50',
+            border: 'border-rose-500',
+            text: 'text-rose-800',
+            iconBg: 'bg-rose-100',
+            iconColor: 'text-rose-600',
+            btnHover: 'hover:bg-rose-50',
+            btnText: 'text-rose-600',
+            btnIcon: 'text-rose-500'
+        },
+        patient: {
+            bg: 'bg-cyan-50/50',
+            border: 'border-cyan-500',
+            text: 'text-cyan-800',
+            iconBg: 'bg-cyan-100',
+            iconColor: 'text-cyan-600',
+            btnHover: 'hover:bg-cyan-50',
+            btnText: 'text-cyan-600',
+            btnIcon: 'text-cyan-500'
+        }
+    };
+
+    const currentTheme = roleThemes[userRole] || roleThemes.patient;
 
     const observer = useRef();
     const lastNotificationElementRef = useCallback(node => {
@@ -28,6 +61,7 @@ export default function NotificationsPanel({
         });
         if (node) observer.current.observe(node);
     }, [hasMore, fetchMore]);
+
     return (
         <div
             className={twMerge(
@@ -36,10 +70,10 @@ export default function NotificationsPanel({
             )}
         >
             {/* Heading */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h2 className="text-2xl font-semibold text-slate-800">{title}</h2>
-                    <p className="text-sm text-slate-500 mt-1">
+                    <h2 className={twMerge("text-2xl font-bold tracking-tight", currentTheme.text)}>{title}</h2>
+                    <p className="text-sm font-medium text-slate-500 mt-1">
                         Manage your notifications
                     </p>
                 </div>
@@ -47,56 +81,80 @@ export default function NotificationsPanel({
                 {onMarkAllAsRead && (
                     <button 
                         onClick={onMarkAllAsRead}
-                        className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-xl text-sm font-medium text-slate-600 bg-white hover:bg-slate-50 transition shadow-sm"
+                        className={twMerge(
+                            "flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl text-sm font-semibold transition shadow-sm bg-white",
+                            currentTheme.btnText,
+                            currentTheme.btnHover
+                        )}
                     >
-                        <CheckCheck className="w-4 h-4 text-blue-500" />
+                        <CheckCheck className={twMerge("w-4 h-4", currentTheme.btnIcon)} />
                         <span>Mark All as Read</span>
                     </button>
                 )}
             </div>
 
             {/* Subtitle */}
-            <div className="text-sm font-semibold text-slate-600">
+            <div className="text-sm font-bold text-slate-400 uppercase tracking-wider">
                 {subtitle}
             </div>
 
             {/* Notification List */}
             <div className="flex flex-col gap-4 overflow-y-auto flex-1 pr-2 custom-scrollbar">
                 {isLoading && notifications.length === 0 && (
-                    <div className="text-sm text-slate-400 py-6 text-center">
+                    <div className="text-sm font-medium text-slate-400 py-10 text-center animate-pulse">
                         Loading notifications...
                     </div>
                 )}
 
                 {!isLoading && notifications.length === 0 && (
-                    <div className="text-sm text-slate-400 py-6 text-center">
-                        No notifications yet.
+                    <div className="flex flex-col items-center justify-center py-16 gap-3">
+                        <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center">
+                            <Bell className="w-8 h-8 text-slate-300" />
+                        </div>
+                        <p className="text-sm font-medium text-slate-400">
+                            No notifications yet.
+                        </p>
                     </div>
                 )}
 
                 {notifications.map((n, index) => {
                     const isLast = index === notifications.length - 1;
                     
-                    const getNotificationTitle = (n) => {
-                        if (n.type === 'appointment_update') return 'Appointment Reminder';
-                        if (n.type === 'appointment_booked') return 'Booking Confirmed';
-                        if (n.type === 'appointment_cancelled') return 'Appointment Cancelled';
-                        if (n.type === 'appointment_rescheduled') return 'Appointment Rescheduled';
-                        if (n.type === 'wallet_topup') return 'Wallet Top-up';
-                        if (n.type === 'wallet_deduction') return 'Wallet Deduction';
-                        if (n.type === 'admin_approval') return 'Profile Approval Update';
-                        if (n.type === 'new_message') return 'New Message';
-                        if (n.type === 'video_reminder') return 'Video Consultation Reminder';
-
-                        const msg = (n.message || '').toLowerCase();
-                        if (msg.includes('wallet has been topped up')) return 'Wallet Top-up';
-                        if (msg.includes('appointment') && msg.includes('confirmed')) return 'Booking Confirmed';
-                        if (msg.includes('appointment') && msg.includes('cancelled')) return 'Appointment Cancelled';
-                        if (msg.includes('appointment') && msg.includes('rescheduled')) return 'Appointment Rescheduled';
-                        if (msg.includes('video') || msg.includes('consultation')) return 'Consultation Update';
-
-                        return 'Notification';
+                    const getNotificationDetails = (n) => {
+                        let nTitle = 'Notification';
+                        let Icon = Bell;
+                        
+                        if (n.type === 'appointment_update' || n.type === 'appointment_booked' || n.type === 'appointment_cancelled' || n.type === 'appointment_rescheduled') {
+                            Icon = CalendarClock;
+                            if (n.type === 'appointment_update') nTitle = 'Appointment Reminder';
+                            if (n.type === 'appointment_booked') nTitle = 'Booking Confirmed';
+                            if (n.type === 'appointment_cancelled') nTitle = 'Appointment Cancelled';
+                            if (n.type === 'appointment_rescheduled') nTitle = 'Appointment Rescheduled';
+                        } else if (n.type === 'wallet_topup' || n.type === 'wallet_deduction') {
+                            Icon = Wallet;
+                            nTitle = n.type === 'wallet_topup' ? 'Wallet Top-up' : 'Wallet Deduction';
+                        } else if (n.type === 'admin_approval') {
+                            Icon = ShieldCheck;
+                            nTitle = 'Profile Approval Update';
+                        } else if (n.type === 'new_message') {
+                            Icon = MessageSquare;
+                            nTitle = 'New Message';
+                        } else if (n.type === 'video_reminder') {
+                            Icon = Video;
+                            nTitle = 'Video Consultation Reminder';
+                        } else {
+                            const msg = (n.message || '').toLowerCase();
+                            if (msg.includes('wallet has been topped up') || msg.includes('wallet deduction')) { nTitle = 'Wallet Update'; Icon = Wallet; }
+                            else if (msg.includes('appointment') && msg.includes('confirmed')) { nTitle = 'Booking Confirmed'; Icon = CalendarClock; }
+                            else if (msg.includes('appointment') && msg.includes('cancelled')) { nTitle = 'Appointment Cancelled'; Icon = CalendarClock; }
+                            else if (msg.includes('appointment') && msg.includes('rescheduled')) { nTitle = 'Appointment Rescheduled'; Icon = CalendarClock; }
+                            else if (msg.includes('video') || msg.includes('consultation')) { nTitle = 'Consultation Update'; Icon = Video; }
+                        }
+                        
+                        return { nTitle, Icon };
                     };
+                    
+                    const { nTitle, Icon } = getNotificationDetails(n);
 
                     return (
                         <button
@@ -104,39 +162,54 @@ export default function NotificationsPanel({
                             ref={isLast ? lastNotificationElementRef : null}
                             onClick={() => onItemClick?.(n)}
                             className={twMerge(
-                                'w-full text-left rounded-xl px-5 py-4 border flex flex-col gap-1 transition',
+                                'w-full text-left rounded-2xl p-5 border flex gap-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-md',
                                 n.read
-                                    ? 'bg-slate-100 border-slate-200'
-                                    : isDoctor ? 'bg-[#FCF5F5] border-[#B08B8C]/20' : 'bg-cyan-50 border-cyan-100'
+                                    ? 'bg-white border-slate-200 shadow-sm'
+                                    : `${currentTheme.bg} border-slate-100 border-l-[6px] ${currentTheme.border} shadow-sm`
                             )}
                         >
-                            <div className="flex justify-between items-center w-full">
-                                <span className="text-base font-semibold text-slate-800">
-                                    {getNotificationTitle(n)}
-                                </span>
-
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs text-slate-500">
-                                        {dayjs(n.timestamp).format('MMM DD, hh:mm A')}
-                                    </span>
-                                    <CheckCheck className={twMerge("w-4 h-4", n.read ? "text-blue-500" : "text-slate-300")} />
-                                </div>
+                            <div className={twMerge(
+                                "mt-0.5 w-12 h-12 shrink-0 rounded-xl flex items-center justify-center transition-colors", 
+                                n.read ? "bg-slate-50 text-slate-400 border border-slate-100" : `${currentTheme.iconBg} ${currentTheme.iconColor}`
+                            )}>
+                                <Icon className="w-6 h-6" strokeWidth={2} />
                             </div>
-
-                            <p className="text-sm text-slate-600 leading-relaxed pr-8">
-                                {n.message}
-                            </p>
+                            
+                            <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+                                <div className="flex justify-between items-start w-full gap-2">
+                                    <span className={twMerge(
+                                        "text-base font-bold truncate", 
+                                        n.read ? "text-slate-600" : currentTheme.text
+                                    )}>
+                                        {nTitle}
+                                    </span>
+                                    <div className="flex items-center gap-2 shrink-0 mt-0.5">
+                                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest hidden sm:inline-block">
+                                            {dayjs(n.timestamp).format('MMM DD, hh:mm A')}
+                                        </span>
+                                        <CheckCheck className={twMerge("w-4 h-4", n.read ? "text-blue-500" : "text-slate-300")} />
+                                    </div>
+                                </div>
+                                <p className={twMerge(
+                                    "text-sm leading-relaxed", 
+                                    n.read ? "text-slate-500" : "text-slate-700 font-medium"
+                                )}>
+                                    {n.message}
+                                </p>
+                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest sm:hidden mt-1">
+                                    {dayjs(n.timestamp).format('MMM DD, hh:mm A')}
+                                </span>
+                            </div>
                         </button>
                     )
                 })}
                 
                 {hasMore && notifications.length > 0 && (
-                    <div className="text-center py-4 text-sm text-slate-400">
+                    <div className="text-center py-6 text-sm font-medium text-slate-400 animate-pulse">
                         Loading more...
                     </div>
                 )}
             </div>
         </div>
-
     );
 }
