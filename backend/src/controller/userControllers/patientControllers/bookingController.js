@@ -278,13 +278,11 @@ export const cancelAppointment = async (req, res) => {
             const now = new Date();
             const hoursDifference = (appointmentDate - now) / (1000 * 60 * 60);
 
-            if (hoursDifference >= 0 && hoursDifference <= 24) {
-                await notifyAdmin({
-                    message: `Last-Minute Cancellation Alert: Patient ${req.user.name} cancelled their appointment with Dr. ${doctorObj?.displayName || 'Unknown'} scheduled for ${formattedDateTime}.`,
-                    type: 'appointment_cancelled',
-                    link: '/admin/appointments'
-                });
-            }
+            await notifyAdmin({
+                message: `Cancellation Alert: Patient ${req.user.name} cancelled their appointment with Dr. ${doctorObj?.displayName || 'Unknown'} scheduled for ${formattedDateTime}.`,
+                type: 'appointment_cancelled',
+                link: '/admin/appointments'
+            });
         } catch (adminNotifErr) {
             console.error("Admin notification failed:", adminNotifErr);
         }

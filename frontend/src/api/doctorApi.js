@@ -69,6 +69,16 @@ export const fetchAppointmentsForDoctor = async (config) => {
     }
 }
 
+export const fetchMyPatients = async (config) => {
+    try {
+        const response = await api.get("/doctor/patients", config)
+        return response
+    } catch (error) {
+        console.log("Error while fetching patients", error)
+        throw error
+    }
+}
+
 export const fetchMetricsForDoctor = async () => {
     try {
         const response = await api.get("/doctor/Dashboard-Metrics")

@@ -3,7 +3,7 @@ import express from "express";
 import upload from "../config/multer.js";
 import { uploadToCloudinary } from "../middlewares/uploadToCloudinary.js";
 import { doctorBasicOnboarding, doctorProffesionalOnboarding } from "../controller/userControllers/DoctorDashboard/docotorOnboarding.js";
-import { editDoctorProfile, fetchDoctorDetails, fetchMetricsForDoctor, updateDoctorAvatar, fetchDoctorAppointments, savePrescription, completeConsultation, getPatientRecordsForConsultation } from "../controller/userControllers/DoctorDashboard/doctorProfileControllers.js";
+import { editDoctorProfile, fetchDoctorDetails, fetchMetricsForDoctor, updateDoctorAvatar, fetchDoctorAppointments, fetchDoctorPatients, savePrescription, completeConsultation, getPatientRecordsForConsultation } from "../controller/userControllers/DoctorDashboard/doctorProfileControllers.js";
 import { getAvailability, updateAvailability } from "../controller/userControllers/DoctorDashboard/doctorAvailabilityController.js";
 import { authenticateToken, authorizeRole } from "../middlewares/authMiddleware.js";
 import { getTransactions, initiateTopUp, verifyTopUp } from "../controller/userControllers/walletController.js";
@@ -43,6 +43,7 @@ router.patch(
 )
 router.get("/Dashboard-Metrics", fetchMetricsForDoctor)
 router.get("/appointments", fetchDoctorAppointments)
+router.get("/patients", authenticateToken(), authorizeRole("doctor"), fetchDoctorPatients)
 router.get("/availability", getAvailability)
 router.put("/availability", updateAvailability)
 router.put("/appointments/:id/prescription", savePrescription)

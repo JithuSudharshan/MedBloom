@@ -15,6 +15,7 @@ import AvailabilitySettings from "./doctorDasboard/AvailabilitySettings";
 import MedicalRecords from "./records/MedicalRecords";
 import WalletPage from "./wallet/WalletPage";
 import TransactionsPage from "./transactions/TransactionsPage";
+import DoctorPatientsList from "./doctorDasboard/patients/DoctorPatientsList";
 
 import { useLocation } from "react-router-dom";
 
@@ -51,6 +52,12 @@ const ProfileLayout = ({
     const [appointments, setAppointments] = useState([])
     const [appointmentPage, setAppointmentPage] = useState(1);
     const [totalAppointmentPages, setTotalAppointmentPages] = useState(1)
+
+    const [patients, setPatients] = useState([]);
+    const [patientPage, setPatientPage] = useState(1);
+    const [totalPatientPages, setTotalPatientPages] = useState(1);
+    const [patientSearchTerm, setPatientSearchTerm] = useState('');
+    const [patientStats, setPatientStats] = useState({ totalCount: 0, newPatients: 0, activeVisit: 0 });
 
     const [totalCount, setTotalcount] = useState(0)
 
@@ -113,6 +120,39 @@ const ProfileLayout = ({
             fetchAppointments(appointmentPage);
         }
     }, [activeKey, appointmentPage]);
+
+    const fetchPatientsList = async (pageNumber = 1, search = '') => {
+        try {
+            setLoading(true);
+            const { fetchMyPatients } = await import('../../api/doctorApi');
+            const res = await fetchMyPatients({
+                params: { page: pageNumber, limit: 10, search }
+            });
+
+            if (!res.data?.success) {
+                showToast.error("Failed to fetch patients data");
+            }
+
+            const { patients, page, totalPages, totalNoOfPatients } = res?.data?.data || {};
+            setPatients(patients || []);
+            setPatientPage(page || 1);
+            setTotalPatientPages(totalPages || 1);
+            setPatientStats(prev => ({ ...prev, totalCount: totalNoOfPatients || 0 }));
+            // Note: newPatients and activeVisits would ideally come from the backend payload.
+            
+        } catch (error) {
+            console.error("Failed to fetch patients", error);
+            showToast.error("Error fetching patients list");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (activeKey === "patients" && user === "doctor") {
+            fetchPatientsList(patientPage, patientSearchTerm);
+        }
+    }, [activeKey, patientPage, patientSearchTerm, user]);
 
 
     useEffect(() => {
@@ -187,6 +227,20 @@ const ProfileLayout = ({
                         setPage={setAppointmentPage}
                         userRole={user}
                     />}
+
+                    {activeKey === "patients" && user === "doctor" && (
+                        <DoctorPatientsList
+                            patients={patients}
+                            page={patientPage}
+                            setPage={setPatientPage}
+                            totalPages={totalPatientPages}
+                            patientCount={patientStats.totalCount}
+                            newPatients={patientStats.newPatients}
+                            activeVisit={patientStats.activeVisit}
+                            searchTerm={patientSearchTerm}
+                            setSearchTerm={setPatientSearchTerm}
+                        />
+                    )}
 
 
                     {activeKey === "availability" && <AvailabilitySettings userRole={user} />}

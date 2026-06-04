@@ -55,9 +55,7 @@ const Navbar = ({ current, userRole = 'patient', onBookNow }) => {
                             className={`text-[13px] tracking-wide font-semibold transition-all ${
                                 link.active
                                     ? `text-white px-5 py-2 rounded-full shadow-md ${isDoctor ? "bg-gradient-to-r from-[#B08B8C] to-[#9D7778]" : "bg-teal-600"}`
-                                    : link.label === 'Login'
-                                        ? `px-5 py-2 rounded-full shadow-sm ml-2 ${isDoctor ? "bg-white text-[#6B3B3D] border border-rose-100 hover:bg-[#F8E9EA]" : "bg-teal-50 text-teal-700 hover:bg-teal-100"}`
-                                        : `text-gray-600 px-4 py-2 rounded-full ${isDoctor ? "hover:text-[#6B3B3D] hover:bg-rose-50/50" : "hover:text-teal-600 hover:bg-white/50"}`
+                                    : `text-gray-600 px-4 py-2 rounded-full ${isDoctor ? "hover:text-[#6B3B3D] hover:bg-rose-50/50" : "hover:text-teal-600 hover:bg-white/50"}`
                             }`}
                         >
                             {link.label}

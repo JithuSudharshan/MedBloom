@@ -127,14 +127,11 @@ export const verifyTopUp = async (req, res) => {
         });
 
         // Notify Admin of High-Value Transactions
-        const HIGH_VALUE_THRESHOLD = 5000;
-        if (Number(amount) >= HIGH_VALUE_THRESHOLD) {
-            await notifyAdmin({
-                message: `Large Transaction Alert: ${req.user.name} topped up their wallet with ₹${amount}.`,
-                type: 'wallet_topup',
-                link: '/admin/dashboard'
-            });
-        }
+        await notifyAdmin({
+            message: `Transaction Alert: ${req.user.name} topped up their wallet with ₹${amount}.`,
+            type: 'wallet_topup',
+            link: '/admin/dashboard'
+        });
 
         res.status(200).json({
             success: true,
