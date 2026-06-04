@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Calendar as CalendarIcon, Clock, Wallet, CreditCard } from 'lucide-react';
+import { Lock, Calendar as CalendarIcon, Clock, Wallet, CreditCard, Info } from 'lucide-react';
 import { fetchAvailableSlots } from '../../api/landingPageApi';
+import { toast } from 'sonner';
 import Loader from './Loading';
 
 // Removed global generator, shifted to component scope for dynamic window length
@@ -95,6 +96,22 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
     const handleDateClick = (dateStr) => {
         setSelectedDate(dateStr);
         setActiveSlot(null); // Reset selection on date change
+    };
+
+    const handleConfirmClick = () => {
+        if (!selectedMode) {
+            toast.error("Please select a consultation mode");
+            return;
+        }
+        if (!activeSlot) {
+            toast.error("Please select an available time slot");
+            return;
+        }
+        if (!isReschedule && !paymentMethod) {
+            toast.error("Please select a payment method");
+            return;
+        }
+        onConfirm(activeSlot, selectedDate, selectedMode, isReschedule ? null : paymentMethod);
     };
 
     return (
@@ -258,6 +275,19 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
             {/* Footer / Action Area */}
             <div className="relative z-10 mt-6 pt-6 border-t border-[#00A4A3]/20 flex flex-col gap-4 bg-[#EBFFFF]">
                 
+                {/* Refund Policy Alert */}
+                <div className="bg-white/60 border border-[#00A4A3]/30 rounded-xl p-3 flex gap-3 items-start shadow-sm">
+                    <Info className="w-5 h-5 text-[#00A4A3] shrink-0 mt-0.5" />
+                    <div className="text-xs text-slate-600">
+                        <strong className="text-slate-800 block mb-1">Cancellation Refund Policy</strong>
+                        <ul className="list-disc pl-4 space-y-0.5">
+                            <li><strong>100% refund</strong> if cancelled more than 24 hours before the appointment.</li>
+                            <li><strong>50% refund</strong> if cancelled 1 to 24 hours before the appointment.</li>
+                            <li><strong>No refund</strong> if cancelled less than 1 hour before the appointment.</li>
+                        </ul>
+                    </div>
+                </div>
+                
                 {/* Payment Selection - Hidden if Rescheduling */}
                 {!isReschedule && (
                     <div className="flex flex-col gap-2">
@@ -306,12 +336,11 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
                         <p className="text-2xl font-black text-[#00A4A3]">₹{currentFee}</p>
                     </div>
                     <button 
-                        onClick={() => onConfirm(activeSlot, selectedDate, selectedMode, isReschedule ? null : paymentMethod)}
-                        disabled={!activeSlot || !selectedMode}
+                        onClick={handleConfirmClick}
                         className={`px-8 py-4 rounded-2xl font-bold transition-all duration-300 shadow-md ${
-                            activeSlot && selectedMode
+                            activeSlot && selectedMode && (isReschedule || paymentMethod)
                             ? 'bg-[#00A4A3] hover:bg-[#008A89] text-white cursor-pointer hover:shadow-lg hover:-translate-y-0.5' 
-                            : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
+                            : 'bg-[#00A4A3]/80 hover:bg-[#00A4A3] text-white cursor-pointer hover:shadow-lg'
                         }`}
                     >
                         {isReschedule ? "Confirm Reschedule" : "Confirm Booking"}

@@ -4,7 +4,7 @@ import upload from "../config/multer.js";
 import { uploadToCloudinary } from "../middlewares/uploadToCloudinary.js";
 import { onboardPatient } from "../controller/userControllers/patientDashBoard/patientOnboarding.js";
 import { editProfile, fetchPatientAppointments, fetchUserDetails, updateProfilePicture, getAppointmentDetailsForConsultation } from "../controller/userControllers/patientDashBoard/patientProfileControllers.js";
-import { createPaymentOrder, verifyPaymentAndBook, cancelAppointment, rescheduleAppointment, bookAppointmentWithWallet } from "../controller/userControllers/patientControllers/bookingController.js";
+import { createPaymentOrder, verifyPaymentAndBook, getRefundEstimate, cancelAppointment, rescheduleAppointment, bookAppointmentWithWallet } from "../controller/userControllers/patientControllers/bookingController.js";
 import { authenticateToken, authorizeRole } from "../middlewares/authMiddleware.js";
 
 import { uploadRecord, getRecords, updateRecord, deleteRecord } from "../controllers/medicalRecordController.js";
@@ -44,6 +44,7 @@ router.post("/appointments/create-order", paymentLimiter, authenticateToken(), a
 router.post("/appointments/book-wallet", authenticateToken(), authorizeRole("patient"), bookAppointmentWithWallet);
 router.post("/appointments/verify-payment", paymentLimiter, authenticateToken(), authorizeRole("patient"), verifyPaymentAndBook);
 router.put("/appointments/:id/cancel", authenticateToken(), authorizeRole("patient"), cancelAppointment);
+router.get("/appointments/:id/refund-estimate", authenticateToken(), authorizeRole("patient"), getRefundEstimate);
 router.put("/appointments/:id/reschedule", authenticateToken(), authorizeRole("patient"), rescheduleAppointment);
 router.get("/appointments/:id/consultation-details", authenticateToken(), authorizeRole("patient"), getAppointmentDetailsForConsultation);
 

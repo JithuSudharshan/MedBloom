@@ -218,8 +218,12 @@ export default function AppointmentsSection({
             {/* Cancel Modal */}
             <CancelAppointmentModal 
                 isOpen={isCancelModalOpen}
-                onClose={() => setIsCancelModalOpen(false)}
+                onClose={() => {
+                    setIsCancelModalOpen(false);
+                    setAppointmentToCancel(null);
+                }}
                 onConfirm={handleConfirmCancel}
+                appointment={appointmentToCancel}
             />
 
             {/* Review Modal */}

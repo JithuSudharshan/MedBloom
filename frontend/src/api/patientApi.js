@@ -96,6 +96,16 @@ export const cancelPatientAppointment = async (appointmentId, reason) => {
     }
 }
 
+export const getRefundEstimateApi = async (appointmentId) => {
+    try {
+        const response = await api.get(`/patient/appointments/${appointmentId}/refund-estimate`);
+        return response;
+    } catch (error) {
+        console.error("Error getting refund estimate", error);
+        throw error;
+    }
+}
+
 export const reschedulePatientAppointment = async (appointmentId, newDate, newSlot, mode) => {
     try {
         const response = await api.put(`/patient/appointments/${appointmentId}/reschedule`, { newDate, newSlot, mode });

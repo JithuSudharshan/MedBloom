@@ -228,7 +228,48 @@ export const verifyPaymentAndBook = async (req, res) => {
     }
 };
 
-// 3. Cancel Appointment
+// 3. Get Refund Estimate
+export const getRefundEstimate = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const appointment = await Appointment.findById(id);
+        if (!appointment) return res.status(404).json({ success: false, message: "Appointment not found" });
+
+        if (appointment.status === 'cancelled' || appointment.status === 'completed') {
+            return res.status(400).json({ success: false, message: `Appointment is already ${appointment.status}` });
+        }
+
+        let refundPercentage = 0;
+        let refundAmount = 0;
+
+        if (appointment.status !== 'pending_payment' && appointment.amount) {
+            const appointmentDateStr = new Date(appointment.date).toISOString().split('T')[0];
+            const appointmentDateTime = new Date(`${appointmentDateStr}T${appointment.startTime}`);
+            const now = new Date();
+            const hoursDifference = (appointmentDateTime - now) / (1000 * 60 * 60);
+
+            if (hoursDifference > 24) {
+                refundPercentage = 100;
+            } else if (hoursDifference > 1 && hoursDifference <= 24) {
+                refundPercentage = 50;
+            } else {
+                refundPercentage = 0;
+            }
+            refundAmount = (appointment.amount * refundPercentage) / 100;
+        }
+
+        return res.status(200).json({
+            success: true,
+            refundPercentage,
+            refundAmount
+        });
+    } catch (error) {
+        console.error("Error getting refund estimate", error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// 4. Cancel Appointment
 export const cancelAppointment = async (req, res) => {
     try {
         const { id } = req.params;
@@ -248,6 +289,82 @@ export const cancelAppointment = async (req, res) => {
 
         if (appointment.status === 'cancelled' || appointment.status === 'completed') {
             return res.status(400).json({ success: false, message: `Appointment is already ${appointment.status}` });
+        }
+
+        // --- Calculate Refund Policy ---
+        let refundPercentage = 0;
+        let refundAmount = 0;
+
+        if (appointment.status !== 'pending_payment') {
+            // Safe parse of appointment date/time
+            const appointmentDateStr = new Date(appointment.date).toISOString().split('T')[0];
+            const appointmentDateTime = new Date(`${appointmentDateStr}T${appointment.startTime}`);
+            const now = new Date();
+            const hoursDifference = (appointmentDateTime - now) / (1000 * 60 * 60);
+
+            if (hoursDifference > 24) {
+                refundPercentage = 100;
+            } else if (hoursDifference > 1 && hoursDifference <= 24) {
+                refundPercentage = 50;
+            } else {
+                refundPercentage = 0;
+            }
+
+            refundAmount = (appointment.amount * refundPercentage) / 100;
+
+            if (refundAmount > 0) {
+                // 1. Credit Patient Wallet
+                patient.walletBalance = (patient.walletBalance || 0) + refundAmount;
+                await patient.save();
+
+                await Transaction.create({
+                    userId: patient._id,
+                    userModel: 'Patient',
+                    transactionId: "TXN-" + crypto.randomBytes(4).toString('hex').toUpperCase(),
+                    type: 'credit',
+                    amount: refundAmount,
+                    description: `Refund (${refundPercentage}%) for cancelled appointment ${appointment.appointmentId}`,
+                    status: 'Success'
+                });
+
+                try {
+                    await sendNotification({
+                        receiverId: patient.user,
+                        message: `A refund of ₹${refundAmount} (${refundPercentage}%) has been credited to your wallet for the cancelled appointment ${appointment.appointmentId}.`,
+                        type: 'wallet_topup',
+                        link: `/patient/wallet`
+                    });
+                } catch (notifErr) {
+                    console.error("Patient refund notification failed:", notifErr);
+                }
+
+                // 2. Debit Admin Escrow Wallet
+                try {
+                    const admin = await Admin.findOne();
+                    if (admin) {
+                        admin.walletBalance = Math.max(0, (admin.walletBalance || 0) - refundAmount);
+                        await admin.save();
+
+                        await Transaction.create({
+                            userId: admin._id,
+                            userModel: 'Admin',
+                            transactionId: "TXN-" + crypto.randomBytes(4).toString('hex').toUpperCase(),
+                            type: 'debit',
+                            amount: refundAmount,
+                            description: `Refund issued for cancelled appointment ${appointment.appointmentId}`,
+                            status: 'Success'
+                        });
+
+                        await notifyAdmin({
+                            message: `Refund of ₹${refundAmount} processed for cancelled appointment ${appointment.appointmentId}.`,
+                            type: 'wallet_deduction',
+                            link: `/admin/wallet`
+                        });
+                    }
+                } catch (adminRefundErr) {
+                    console.error("Admin escrow refund failed:", adminRefundErr);
+                }
+            }
         }
 
         appointment.status = 'cancelled';
@@ -305,7 +422,12 @@ export const cancelAppointment = async (req, res) => {
             console.error("Notification failed:", notifErr);
         }
 
-        return res.status(200).json({ success: true, message: "Appointment cancelled successfully" });
+        return res.status(200).json({ 
+            success: true, 
+            message: "Appointment cancelled successfully",
+            refundAmount,
+            refundPercentage
+        });
     } catch (error) {
         console.error("Error cancelling appointment", error);
         return res.status(500).json({ success: false, message: error.message });
