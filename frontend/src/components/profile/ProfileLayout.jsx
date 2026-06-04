@@ -16,6 +16,7 @@ import MedicalRecords from "./records/MedicalRecords";
 import WalletPage from "./wallet/WalletPage";
 import TransactionsPage from "./transactions/TransactionsPage";
 import DoctorPatientsList from "./doctorDasboard/patients/DoctorPatientsList";
+import SymptomChecker from "./patient/SymptomChecker";
 
 import { useLocation } from "react-router-dom";
 
@@ -29,7 +30,7 @@ const ProfileLayout = ({
 
     const location = useLocation();
     const validDoctorKeys = ["dashboard", "personal", "patients", "availability", "appointments", "publications", "notifications", "transactions", "wallet", "settings"];
-    const validPatientKeys = ["dashboard", "personal", "appointments", "records", "notifications", "transactions", "wallet", "settings"];
+    const validPatientKeys = ["dashboard", "personal", "appointments", "records", "triage", "notifications", "transactions", "wallet", "settings"];
     const pathSegments = location.pathname.split("/").filter(Boolean);
     const derivedKey = validDoctorKeys.find(key => pathSegments.includes(key)) ||
         validPatientKeys.find(key => pathSegments.includes(key)) ||
@@ -69,7 +70,7 @@ const ProfileLayout = ({
             const res = (user === "patient" ?
 
                 await fetchAppointmentsForPatient({
-                    params: { page: pageNumber, limit: 5 }
+                    params: { page: pageNumber, limit: 8 }
                 }) : await fetchAppointmentsForDoctor({
                     params: { page: pageNumber, limit: 7 }
                 }))
@@ -180,7 +181,7 @@ const ProfileLayout = ({
             <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 w-full px-6 md:px-10 xl:px-16 mx-auto max-w-[1800px] h-full items-start">
 
                 {/* Sidebar */}
-                <aside className="w-full lg:w-80 shrink-0 h-full">
+                <aside className="w-full lg:w-80 shrink-0">
                     <SidebarMenu
                         menu={sidebarMenu}
                         src={localUser?.avatar?.src}
@@ -248,6 +249,8 @@ const ProfileLayout = ({
                     {activeKey === "records" && <MedicalRecords />}
                     {activeKey === "wallet" && <WalletPage userRole={user} />}
                     {activeKey === "transactions" && <TransactionsPage userRole={user} />}
+
+                    {activeKey === "triage" && user === "patient" && <SymptomChecker />}
 
                 </main>
             </div>
