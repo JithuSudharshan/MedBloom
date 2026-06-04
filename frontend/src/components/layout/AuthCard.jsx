@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import OAuthButton from "../form/OAuthButton";
 import ToggleButtons from "../ui/ToggleButton";
 import SignupForm from "../form/SignupForm";
@@ -22,10 +23,12 @@ const AuthCard = ({ oneLine, onChange, authState, isAdmin }) => {
         }`}>
             <div className="p-8 w-80 sm:w-96">
                 {/* Logo */}
-                <h1 className="text-6xl font-bold mb-1 text-center">
-                    <span className="text-gray-800">MED</span>
-                    <span className={`transition-colors duration-500 ${selected === "Doctor" ? "text-[#B08B8C]" : "text-[#00A4A3]"}`}>BLOOM</span>
-                </h1>
+                <Link to="/homePage" className="block w-fit mx-auto cursor-pointer hover:opacity-90 transition-opacity">
+                    <h1 className="text-6xl font-bold mb-1 text-center">
+                        <span className="text-gray-800">MED</span>
+                        <span className={`transition-colors duration-500 ${selected === "Doctor" ? "text-[#B08B8C]" : "text-[#00A4A3]"}`}>BLOOM</span>
+                    </h1>
+                </Link>
                 <p className="text-gray-500 text-sm text-center mb-4">
                     {oneLine}
                 </p>

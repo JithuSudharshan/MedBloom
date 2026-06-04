@@ -6,34 +6,35 @@ import TopDoctorsList from "./TopDoctorsList";
 export default function ServiceOverview({ metrics, MonthlyEarnings, TopRatedDoctors, graphData }) {
 
     return (
-        <div className="bg-cyan-50 rounded-3xl p-6 shadow-lg">
+        <div className="bg-slate-50/50 rounded-3xl p-8 border border-gray-100">
             {/* Title */}
-            <h2 className="text-teal-700 text-3xl font-semibold mb-6">
-                Service Overview
-            </h2>
-
-            {/* Metrics */}
-            <div className="flex items-start justify-between mb-10">
-                <DashboardMetrics metrics={metrics} />
-            </div>
-
-            {/* Revenue */}
-            <div>
-                <RevenueHighlight amount={MonthlyEarnings} />
-            </div>
-
-            {/* Bottom section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-30">
+            <div className="flex justify-between items-end mb-8">
                 <div>
-                    <h3 className="text-gray-500 font-semibold mb-4">Top Rated Doctors</h3>
-                    <TopDoctorsList doctors={TopRatedDoctors} />
+                    <h2 className="text-gray-800 text-3xl font-bold tracking-tight">
+                        Dashboard Overview
+                    </h2>
+                    <p className="text-gray-500 mt-1 font-medium">Welcome back, Admin. Here's what's happening today.</p>
+                </div>
+            </div>
+
+            {/* Bento Grid Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* Top Row: Revenue Highlight (1 col) and Metrics (2 cols) */}
+                <div className="lg:col-span-1 h-full">
+                    <RevenueHighlight amount={MonthlyEarnings} />
+                </div>
+                <div className="lg:col-span-2">
+                    <DashboardMetrics metrics={metrics} />
                 </div>
 
-                <div>
-                    <h3 className="text-teal-700 font-semibold mb-4">
-                        Top Consulted Specialities
-                    </h3>
+                {/* Bottom Row: Charts and Lists */}
+                <div className="lg:col-span-2">
                     <ConsultationBySpecialityChart graphData={graphData} />
+                </div>
+                
+                <div className="lg:col-span-1">
+                    <TopDoctorsList doctors={TopRatedDoctors} />
                 </div>
             </div>
         </div>

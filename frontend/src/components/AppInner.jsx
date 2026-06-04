@@ -62,6 +62,7 @@ export const AppInner = () => {
                         <Route path="personal" element={<PatientDashboard />} />
                         <Route path="appointments" element={<PatientDashboard />} />
                         <Route path="appointments/:id" element={<PatientDashboard />} />
+                        <Route path="triage" element={<PatientDashboard />} />
                         <Route path="records" element={<PatientDashboard />} />
                         <Route path="notifications" element={<PatientDashboard />} />
                         <Route path="transactions" element={<PatientDashboard />} />

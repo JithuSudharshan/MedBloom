@@ -21,7 +21,6 @@ const adminProfileConfig = {
         { key: "doctors", label: "Doctors", icon: PersonalIcon, path: "/admin/doctors" },
         { key: "patients", label: "Patients", icon: patients, path: "/admin/patients" },
         { key: "appointments", label: "Appointments", icon: Appointment, path: "/admin/appointments" },
-        { key: "publications", label: "Publications", icon: Publications, path: "/admin/publications" },
         { key: "notifications", label: "Notification", icon: Notification_icon, path: "/admin/notifications" },
         { key: "departments", label: "Departments", icon: department_icon, path: "/admin/departments" },
         { key: "wallet", label: "Wallet", icon: Wallet, path: "/admin/wallet" },

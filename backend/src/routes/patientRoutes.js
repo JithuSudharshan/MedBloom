@@ -12,8 +12,12 @@ import { uploadRecord, getRecords, updateRecord, deleteRecord } from "../control
 import { getTransactions, initiateTopUp, verifyTopUp } from "../controller/userControllers/walletController.js";
 import { submitReview } from "../controller/userControllers/patientDashBoard/reviewController.js";
 import { paymentLimiter } from "../middlewares/rateLimiter.js";
+import { analyzeSymptoms } from "../controller/patientControllers/aiController.js";
 
 const router = express.Router();
+
+// AI Symptom Checker
+router.post("/symptom-checker", authenticateToken(), authorizeRole("patient"), analyzeSymptoms);
 
 router.post(
     "/onboarding",

@@ -333,9 +333,9 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
 
 
     return (
-        <div className="min-h-screen max-w-7xl mx-auto w-full">
-            <div className="flex gap-10 py-10">
-                <aside>
+        <div className="h-screen w-full py-6 lg:py-10 overflow-hidden bg-[#F8FDFD]">
+            <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 w-full px-6 md:px-10 xl:px-16 mx-auto max-w-[1800px] h-full items-start">
+                <aside className="w-full lg:w-80 shrink-0">
                     <SidebarMenu
                         isAdmin={true}
                         menu={sidebarMenu}
@@ -348,7 +348,11 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                     />
                 </aside>
 
-                <main className="flex-1 mt-15">
+                <main className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto pr-2
+                    [&::-webkit-scrollbar]:w-2 
+                    [&::-webkit-scrollbar-track]:bg-transparent 
+                    [&::-webkit-scrollbar-thumb]:rounded-full 
+                    [&::-webkit-scrollbar-thumb]:bg-teal-50 hover:[&::-webkit-scrollbar-thumb]:bg-teal-100">
                     {activeKey === "dashboard" && (
                         <ServiceOverview
                             metrics={dashboardMetrics?.metrics}

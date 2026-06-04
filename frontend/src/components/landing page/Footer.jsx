@@ -25,25 +25,14 @@ const Footer = () => {
                 
                 {/* Top Section: Map & Form */}
                 <div className="relative w-full flex flex-col items-center">
-                    {/* Full Width Map Background */}
-                    <div className="absolute top-0 left-0 w-full h-[300px] sm:h-[400px]">
-                        <img
-                            src={mapImg}
-                            alt="Map"
-                            className="w-full h-full object-cover object-center rounded-t-[40px] sm:rounded-b-[40px]"
-                        />
-                        <div className="absolute inset-0 bg-[#03373B]/10 rounded-t-[40px] sm:rounded-b-[40px] pointer-events-none"></div>
+                    {/* Solid Background (Map Removed) */}
+                    <div className="absolute top-0 left-0 w-full h-[300px] sm:h-[400px] bg-white rounded-t-[40px] sm:rounded-b-[40px]">
+                        {/* Subtle decorative pattern/gradient can go here if needed, keeping it clean for now */}
                     </div>
 
                     {/* Constrained Wrapper for Content */}
                     <div className="w-full max-w-7xl mx-auto relative pt-[300px] sm:pt-0 sm:h-[400px] flex sm:block justify-center">
-                        {/* Map Marker */}
-                        <img
-                            src={markerImg}
-                            alt="location marker"
-                            className="absolute left-[10%] sm:left-[20%] top-[100px] sm:top-[132px] w-[50px] sm:w-[65px] h-[55px] sm:h-[72px] z-10"
-                        />
-                        
+                        {/* Content Area */}
                         {/* Form Card */}
                         <div className="sm:absolute sm:right-6 lg:right-4 sm:top-12 md:top-20 bg-gradient-to-br from-[#006868] to-[#00D8D7] rounded-[32px] shadow-xl 
                         w-[90%] sm:w-[380px] md:w-[400px] px-6 sm:px-8 py-6 flex flex-col gap-5 border border-[#0fc9bd] -mt-12 sm:mt-0 relative z-20">

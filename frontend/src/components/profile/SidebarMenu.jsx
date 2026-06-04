@@ -9,7 +9,7 @@ const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, onEd
     const unreadCount = notifications?.filter(n => !n.read)?.length || 0;
 
     return (
-    <nav className="bg-white/80 backdrop-blur-md w-full h-full rounded-[2.5rem] p-8 flex flex-col gap-2 relative z-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60">
+    <nav className="bg-white/80 backdrop-blur-md w-full rounded-[2.5rem] p-8 flex flex-col gap-2 relative z-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60">
 
         <div className="flex flex-col items-center gap-3 py-6 shrink-0">
             <div className="relative">
@@ -42,7 +42,7 @@ const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, onEd
         </div>
 
 
-        <ul className={`flex flex-col gap-5 flex-1 overflow-y-auto pr-2 
+        <ul className={`flex flex-col gap-5 overflow-y-auto pr-2 
             [&::-webkit-scrollbar]:w-1.5 
             [&::-webkit-scrollbar-track]:bg-transparent 
             [&::-webkit-scrollbar-thumb]:rounded-full 
@@ -55,7 +55,7 @@ const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, onEd
 
                 if (isLogout) {
                     return (
-                        <li key={item.key}>
+                        <li key={item.key} className="pt-2">
                             <button
                                 type="button"
                                 onClick={onLogout}

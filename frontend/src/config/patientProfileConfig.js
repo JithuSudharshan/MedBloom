@@ -1,5 +1,5 @@
 import avatar from '../assets/images/avatar-default.png'
-import { User, Calendar, FileText, Bell, CreditCard, Wallet, Settings, LogOut } from 'lucide-react';
+import { User, Calendar, FileText, Bell, CreditCard, Wallet, Settings, LogOut, Activity } from 'lucide-react';
 
 const patientProfileConfig = {
     avatar: {
@@ -9,6 +9,7 @@ const patientProfileConfig = {
     sidebarMenu: [
         { key: "personal", label: "Personal Information", icon: User, path: "/patient/personal" },
         { key: "appointments", label: "My Appointments", icon: Calendar, path: "/patient/appointments" },
+        { key: "triage", label: "AI Symptom Checker", icon: Activity, path: "/patient/triage" },
         { key: "records", label: "Medical Records", icon: FileText, path: "/patient/records" },
         { key: "notifications", label: "Notification", icon: Bell, path: "/patient/notifications" },
         { key: "transactions", label: "Transaction", icon: CreditCard, path: "/patient/transactions" },

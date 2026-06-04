@@ -202,3 +202,13 @@ export const fetchAppointmentDetailsForConsultation = async (appointmentId) => {
         throw error;
     }
 }
+
+export const analyzeSymptomsApi = async (symptoms) => {
+    try {
+        const response = await api.post("/patient/symptom-checker", { symptoms });
+        return response;
+    } catch (error) {
+        console.error("Error analyzing symptoms", error);
+        throw error;
+    }
+}
