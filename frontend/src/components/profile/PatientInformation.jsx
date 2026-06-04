@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Edit3, KeyRound, User, Activity } from "lucide-react";
 import ProfileRow from "./ProfileRow";
 import MedicalGrid from "./MedicalGrid";
 import Modal from "../../components/profile/Modal";
@@ -34,46 +35,59 @@ const PatientInformation = ({ patient, isAdmin = false }) => {
         formState: { errors },
     } = UseChangePassword()
 
-    console.log("patient.authMethod", patient.authMethod)
-
     return (
-        <div className="bg-white rounded-[2.5rem] p-10 lg:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] min-h-full flex flex-col w-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8 flex-1">
-            {/* LEFT COLUMN */}
-            <div>
-                <h2 className="text-2xl font-semibold text-[#008C89] mb-8">Basic Details</h2>
-                <ProfileRow label="Full name" value={patient?.fullName} />
-                <ProfileRow label="Email Address" value={patient?.email} />
+        <div className="bg-white rounded-[2.5rem] p-8 lg:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex-1 shrink-0 flex flex-col w-full h-fit">
+            
+            {/* Header and Actions */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-800">Medical Profile</h1>
+                    <p className="text-gray-500 text-sm mt-1">Manage your personal and clinical details</p>
+                </div>
+                
+                <div className="flex items-center gap-3 shrink-0">
+                    {patient.authMethod !== "google" && !isAdmin && (
+                        <button onClick={handleClick} className="flex items-center gap-2 bg-white border border-teal-200 text-teal-700 px-5 py-2.5 text-sm font-semibold rounded-full hover:bg-teal-50 transition-colors shadow-sm">
+                            <KeyRound className="w-4 h-4" /> <span className="hidden sm:inline">Change Password</span>
+                        </button>
+                    )}
+                    <button onClick={handleEditProfile} className="flex items-center gap-2 bg-teal-600 text-white px-6 py-2.5 text-sm font-semibold rounded-full hover:bg-teal-700 transition-all shadow-md hover:shadow-lg">
+                        <Edit3 className="w-4 h-4" /> Edit Profile
+                    </button>
+                </div>
+            </div>
 
-                <div className='flex gap-4'>
-                    <ProfileRow label="Personal Number" value={patient?.phone} />
-                    <ProfileRow label="Emergency Contact Number" value={patient?.emergencyNumber} />
+            <div className="flex-1 space-y-8">
+                {/* Identity & Contact Card */}
+                <div className="bg-slate-50/50 border border-slate-100 rounded-3xl p-8">
+                    <h2 className="text-xl font-bold text-[#008C89] mb-6 flex items-center gap-2">
+                        <User className="w-5 h-5" />
+                        Identity & Contact
+                    </h2>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <ProfileRow label="Full Name" value={patient?.fullName} />
+                        <ProfileRow label="Email Address" value={patient?.email} />
+                        <ProfileRow label="Date Of Birth" value={patient?.dob ? new Date(patient.dob).toLocaleDateString() : "-"} />
+                        
+                        <ProfileRow label="Personal Number" value={patient?.phone} />
+                        <ProfileRow label="Emergency Contact" value={patient?.emergencyNumber} />
+                        <ProfileRow label="Gender" value={patient?.gender} />
+                        
+                        <div className="sm:col-span-2 lg:col-span-3">
+                            <ProfileRow label="Address" value={patient?.address} />
+                        </div>
+                    </div>
                 </div>
 
-                <ProfileRow label="Date Of Birth" value={patient?.dob} />
-                <ProfileRow label="Gender" value={patient?.gender} />
-                <ProfileRow label="Address" value={patient?.address} />
-
-            </div>
-
-            {/* RIGHT COLUMN */}
-            <div>
-                <h2 className="text-2xl font-semibold text-[#008C89] mb-8">Medical Information</h2>
-                <MedicalGrid userDetails={patient} user={"patient"} />
-            </div>
-
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-4 mt-8 pt-8 border-t border-teal-50/60">
-                {patient.authMethod !== "google" && !isAdmin && (
-                    <button onClick={handleClick} className="bg-white border border-[#008C89] text-[#008C89] px-6 py-2.5 text-sm font-medium rounded-full hover:bg-teal-50 transition-colors shadow-sm">
-                        Change Password
-                    </button>
-                )}
-                <button onClick={handleEditProfile} className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-8 py-2.5 text-sm font-medium rounded-full hover:from-teal-600 hover:to-cyan-600 transition-all shadow-md hover:shadow-lg">
-                    Edit Profile
-                </button>
+                {/* Medical Information Section */}
+                <div className="bg-teal-50/30 border border-teal-50 rounded-3xl p-8">
+                    <h2 className="text-xl font-bold text-[#008C89] mb-6 flex items-center gap-2">
+                        <Activity className="w-5 h-5" />
+                        Clinical Vitals & Health History
+                    </h2>
+                    <MedicalGrid userDetails={patient} user={"patient"} />
+                </div>
             </div>
 
             {/* Modal */}

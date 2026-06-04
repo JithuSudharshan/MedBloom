@@ -3,9 +3,9 @@ const MedicalItem = ({ label, value, unit, highlight, isDoctor }) => {
     const displayValue = value ? `${value} ${unit || ""}` : "-";
 
     return (
-        <div>
-            <p className="text-gray-400 text-sm">{label}</p>
-            <p className={`font-semibold ${highlight ? (isDoctor ? "text-[#6B3B3D]" : "text-[#00737A]") : "text-gray-800"}`}>
+        <div className="flex flex-col w-full">
+            <p className="text-gray-400 mb-1 text-[11px] sm:text-xs font-medium uppercase tracking-wider">{label}</p>
+            <p className={`font-bold text-sm sm:text-base ${highlight ? (isDoctor ? "text-[#6B3B3D]" : "text-[#00737A]") : "text-gray-800"}`}>
                 {displayValue}
             </p>
         </div>
@@ -17,24 +17,46 @@ const MedicalGrid = ({ userDetails, user, showBio }) => (
 
     < section >
         {user === "patient" && (
-            <div>
-                <div className="grid grid-cols-2 gap-x-15 gap-y-12">
-
-                    <MedicalItem label="Blood Type" value={userDetails?.bloodType} />
-                    <MedicalItem label="Cholestrol" value={userDetails?.cholesterol} unit="mmHg" />
-
-                    <MedicalItem label="Height" value={userDetails?.height} unit="Cm" />
-                    <MedicalItem label="Weight" value={userDetails?.weight} unit="kg" />
-
+            <div className="space-y-8">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+                    <div className="bg-white p-5 rounded-2xl border border-teal-100/60 shadow-sm flex flex-col items-center justify-center text-center">
+                        <MedicalItem label="Blood Type" value={userDetails?.bloodType} />
+                    </div>
+                    <div className="bg-white p-5 rounded-2xl border border-teal-100/60 shadow-sm flex flex-col items-center justify-center text-center">
+                        <MedicalItem label="Cholesterol" value={userDetails?.cholesterol} unit="mmHg" />
+                    </div>
+                    <div className="bg-white p-5 rounded-2xl border border-teal-100/60 shadow-sm flex flex-col items-center justify-center text-center">
+                        <MedicalItem label="Height" value={userDetails?.height} unit="Cm" />
+                    </div>
+                    <div className="bg-white p-5 rounded-2xl border border-teal-100/60 shadow-sm flex flex-col items-center justify-center text-center">
+                        <MedicalItem label="Weight" value={userDetails?.weight} unit="kg" />
+                    </div>
+                    <div className="bg-white p-5 rounded-2xl border border-teal-100/60 shadow-sm flex flex-col items-center justify-center text-center">
+                        <MedicalItem label="Blood Pressure" value={userDetails?.bloodPressure} unit="mmHg" />
+                    </div>
+                    <div className="bg-white p-5 rounded-2xl border border-teal-100/60 shadow-sm flex flex-col items-center justify-center text-center">
+                        <MedicalItem label="Glucose Level" value={userDetails?.glucoseLevel} unit="mg/dL" />
+                    </div>
                 </div>
-                <div className="flex mt-10 flex-col gap-x-12 gap-y-12">
 
-                    <MedicalItem label="Blood Pressure" value={userDetails?.bloodPressure} unit="mmHg" />
-                    <MedicalItem label="Glucose level" value={userDetails?.glucoseLevel} unit="mg/dL" />
+                <div className="flex mt-12 flex-col gap-y-8">
+                    <div className="bg-teal-50/50 p-6 rounded-2xl border border-teal-100">
+                        <h4 className="text-[#008C89] font-medium mb-6">Conditions & Allergies</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <MedicalItem label="Allergies" value={userDetails?.allergies} />
+                            <MedicalItem label="Medical Condition" value={userDetails?.medicalCondition} />
+                            <MedicalItem label="Food/Drug Intolerances" value={userDetails?.Food_or_Drug_Intolerances} />
+                            <MedicalItem label="Mental Health History" value={userDetails?.Mental_Health_History} />
+                        </div>
+                    </div>
 
-                    <MedicalItem label="Allergies" value={userDetails?.allergies} />
-                    <MedicalItem label="Medical Condition" value={userDetails?.medicalCondition} />
-
+                    <div className="bg-teal-50/50 p-6 rounded-2xl border border-teal-100">
+                        <h4 className="text-[#008C89] font-medium mb-6">Lifestyle Habits</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <MedicalItem label="Smoking" value={userDetails?.smoking} />
+                            <MedicalItem label="Drinking" value={userDetails?.drinking} />
+                        </div>
+                    </div>
                 </div>
             </div>
         )}
