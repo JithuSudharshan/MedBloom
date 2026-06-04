@@ -49,3 +49,13 @@ export const fetchDoctorReviewsApi = async (id) => {
         throw error;
     }
 };
+
+export const publicAnalyzeSymptomsApi = async (symptoms) => {
+    try {
+        const response = await api.post("/doctors/symptom-checker", { symptoms });
+        return response;
+    } catch (error) {
+        console.error("Error analyzing symptoms (public):", error);
+        throw error;
+    }
+};

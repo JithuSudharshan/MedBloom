@@ -23,3 +23,15 @@ export const paymentLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
 });
+
+// Limiter for public AI Symptom Checker
+export const aiTriageLimiter = rateLimit({
+    windowMs: 24 * 60 * 60 * 1000, // 24 hours
+    max: 3, // Limit each IP to 3 AI requests per 24 hours
+    message: {
+        success: false,
+        message: "You have reached your daily limit for free public AI triage. Please sign up for a free MEDBLOOM account for unlimited access!"
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
