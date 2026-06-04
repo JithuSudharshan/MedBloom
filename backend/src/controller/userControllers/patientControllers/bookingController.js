@@ -34,16 +34,21 @@ export const createPaymentOrder = async (req, res) => {
 
         if (existingAppointment) {
             if (existingAppointment.status === 'pending_payment') {
-                // Check if it's older than 10 minutes (TTL)
-                const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
-                if (existingAppointment.createdAt > tenMinutesAgo) {
-                    return res.status(409).json({
-                        success: false,
-                        message: "Slot is currently being booked by someone else. Please try again in a few minutes."
-                    });
-                } else {
-                    // Lock expired, previous user abandoned cart. Free it up.
+                if (existingAppointment.patient.toString() === patientId.toString()) {
+                    // Current user is retrying, clear their old lock
                     await Appointment.deleteOne({ _id: existingAppointment._id });
+                } else {
+                    // Check if it's older than 10 minutes (TTL)
+                    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+                    if (existingAppointment.createdAt > tenMinutesAgo) {
+                        return res.status(409).json({
+                            success: false,
+                            message: "Slot is currently being booked by someone else. Please try again in a few minutes."
+                        });
+                    } else {
+                        // Lock expired, previous user abandoned cart. Free it up.
+                        await Appointment.deleteOne({ _id: existingAppointment._id });
+                    }
                 }
             } else {
                 // Confirmed or completed
@@ -464,11 +469,15 @@ export const rescheduleAppointment = async (req, res) => {
 
         if (existingAppointment) {
             if (existingAppointment.status === 'pending_payment') {
-                const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
-                if (existingAppointment.createdAt > tenMinutesAgo) {
-                    return res.status(409).json({ success: false, message: "Slot is currently unavailable." });
-                } else {
+                if (existingAppointment.patient.toString() === patient._id.toString()) {
                     await Appointment.deleteOne({ _id: existingAppointment._id });
+                } else {
+                    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+                    if (existingAppointment.createdAt > tenMinutesAgo) {
+                        return res.status(409).json({ success: false, message: "Slot is currently unavailable." });
+                    } else {
+                        await Appointment.deleteOne({ _id: existingAppointment._id });
+                    }
                 }
             } else {
                 return res.status(409).json({ success: false, message: "This slot is already booked." });
@@ -544,11 +553,15 @@ export const bookAppointmentWithWallet = async (req, res) => {
 
         if (existingAppointment) {
             if (existingAppointment.status === 'pending_payment') {
-                const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
-                if (existingAppointment.createdAt > tenMinutesAgo) {
-                    return res.status(409).json({ success: false, message: "Slot is currently being booked by someone else." });
-                } else {
+                if (existingAppointment.patient.toString() === patient._id.toString()) {
                     await Appointment.deleteOne({ _id: existingAppointment._id });
+                } else {
+                    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+                    if (existingAppointment.createdAt > tenMinutesAgo) {
+                        return res.status(409).json({ success: false, message: "Slot is currently being booked by someone else." });
+                    } else {
+                        await Appointment.deleteOne({ _id: existingAppointment._id });
+                    }
                 }
             } else {
                 return res.status(409).json({ success: false, message: "This slot is already booked." });

@@ -5,7 +5,7 @@ import Lottie from 'lottie-react';
 import successAnimation from '../../assets/animations/Success.json';
 import { createOrderForAppointment, verifyPaymentForAppointment, reschedulePatientAppointment, fetchPatientWallet, bookAppointmentWithWalletApi } from '../../api/patientApi';
 import { motion } from 'framer-motion';
-import { Star, Award, Users, MapPin, BadgeCheck, Loader2 } from 'lucide-react';
+import { Star, Award, Users, MapPin, BadgeCheck, Loader2, AlertCircle } from 'lucide-react';
 import PatientSlotPicker from '../../components/ui/PatientSlotPicker';
 import { fetchPublicDoctorProfile, fetchDoctorReviewsApi } from '../../api/landingPageApi';
 import Loader from '../../components/ui/Loading';
@@ -30,6 +30,8 @@ export default function PublicDoctorProfile() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [walletBalance, setWalletBalance] = useState(0);
+    const [isPaymentFailed, setIsPaymentFailed] = useState(false);
+    const [retryContext, setRetryContext] = useState(null);
 
     // Dynamic Razorpay Script Load
     useEffect(() => {
@@ -86,6 +88,8 @@ export default function PublicDoctorProfile() {
     const doctor = doctorData;
 
     const handleConfirmBooking = async (slotIso, selectedDate, mode, paymentMethod = 'razorpay') => {
+        setRetryContext({ slotIso, selectedDate, mode, paymentMethod });
+        
         if (!isAuthenticated) {
             toast.error("Please login to book an appointment");
             navigate('/login', { state: { from: location } });
@@ -184,7 +188,7 @@ export default function PublicDoctorProfile() {
 
             const rzp = new window.Razorpay(options);
             rzp.on('payment.failed', function (response){
-                toast.error("Payment failed. Please try again.");
+                setIsPaymentFailed(true);
                 setIsProcessing(false);
             });
             rzp.open();
@@ -345,6 +349,43 @@ export default function PublicDoctorProfile() {
                         />
                         <h2 className="text-3xl font-bold text-[#00A4A3] mt-4">Booking Confirmed!</h2>
                         <p className="text-slate-500 mt-2">Redirecting to your dashboard...</p>
+                    </div>
+                </div>
+            )}
+
+            {/* Payment Failed Overlay */}
+            {isPaymentFailed && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-md w-full mx-4">
+                        <AlertCircle className="w-16 h-16 text-rose-500 mb-4" />
+                        <h2 className="text-2xl font-bold text-slate-800">Payment Failed</h2>
+                        <p className="text-slate-500 mt-2 text-center">
+                            We couldn't process your payment. Would you like to try again?
+                        </p>
+                        <div className="flex gap-4 mt-8 w-full">
+                            <button 
+                                onClick={() => setIsPaymentFailed(false)}
+                                className="flex-1 py-3 border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={() => {
+                                    setIsPaymentFailed(false);
+                                    if (retryContext) {
+                                        handleConfirmBooking(
+                                            retryContext.slotIso, 
+                                            retryContext.selectedDate, 
+                                            retryContext.mode, 
+                                            retryContext.paymentMethod
+                                        );
+                                    }
+                                }}
+                                className="flex-1 py-3 bg-[#00A4A3] text-white rounded-xl font-bold hover:bg-[#008A89] transition shadow-md"
+                            >
+                                Retry Payment
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
