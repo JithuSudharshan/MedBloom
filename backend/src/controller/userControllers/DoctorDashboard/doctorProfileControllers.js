@@ -116,7 +116,9 @@ export const fetchDoctorDetails = async (req, res) => {
             consultationFeesOnline: doctor.consultationFees.online,
             consultationFeesOffline: doctor.consultationFees.offline,
             authMethod: user.authMethod,
-            isOnboarded: user.isOnboarded
+            isOnboarded: user.isOnboarded,
+            status: doctor.status,
+            hasSeenApprovalWelcome: doctor.hasSeenApprovalWelcome
         }
 
         const now = new Date();
@@ -810,5 +812,26 @@ export const fetchDoctorPatients = async (req, res) => {
     } catch (error) {
         console.error("Error fetching doctor patients:", error);
         res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+export const markWelcomeAsSeen = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        const doctor = await Doctor.findOneAndUpdate(
+            { user: userId },
+            { hasSeenApprovalWelcome: true },
+            { new: true }
+        );
+
+        if (!doctor) {
+            return res.status(404).json({ success: false, message: "Doctor profile not found" });
+        }
+
+        res.status(200).json({ success: true, message: "Welcome screen marked as seen" });
+    } catch (error) {
+        console.error("Error marking welcome screen as seen:", error);
+        res.status(500).json({ success: false, message: "Server error" });
     }
 };

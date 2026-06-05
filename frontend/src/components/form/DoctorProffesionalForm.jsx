@@ -27,7 +27,7 @@ export default function DoctorProfessionalForm({
             try {
                 const response = await fetchDepartmentsList();
                 if (response?.data?.success) {
-                    const options = response.data.departments.map(dept => ({
+                    const options = response.data.data.map(dept => ({
                         label: dept.departmentName,
                         value: dept.departmentName
                     }));
@@ -54,6 +54,7 @@ export default function DoctorProfessionalForm({
                         error={errors[field.name]}
                         placeholder={field.placeholder}
                         type={field.inputType || "text"}
+                        role="doctor"
                     />
                 );
             case "file":
@@ -65,6 +66,7 @@ export default function DoctorProfessionalForm({
                         register={register}
                         error={errors[field.name]}
                         setValue={setValue}
+                        role="doctor"
                     />
                 );
             case "textarea":
@@ -77,6 +79,7 @@ export default function DoctorProfessionalForm({
                         error={errors[field.name]}
                         placeholder={field.placeholder}
                         rows={field.rows}
+                        role="doctor"
                     />
                 );
             case "select":
@@ -96,6 +99,7 @@ export default function DoctorProfessionalForm({
                         error={errors[field.name]}
                         placeholder={field.placeholder}
                         options={options}
+                        role="doctor"
                     />
                 );
             default:
@@ -108,7 +112,7 @@ export default function DoctorProfessionalForm({
             onSubmit={handleSubmit(onSubmit)}
             className="max-w-4xl mx-auto p-6 bg-white rounded shadow"
         >
-            <h2 className="text-2xl font-semibold text-teal-700 mb-6">
+            <h2 className="text-2xl font-semibold text-[#6B3B3D] mb-6">
                 Professional Details
             </h2>
 
@@ -128,6 +132,7 @@ export default function DoctorProfessionalForm({
                     error={errors.consultationFeesOnline}
                     placeholder="e.g., 500"
                     type="number"
+                    role="doctor"
                 />
             )}
 
@@ -139,6 +144,7 @@ export default function DoctorProfessionalForm({
                     error={errors.consultationFeesOffline}
                     placeholder="e.g., 700"
                     type="number"
+                    role="doctor"
                 />
             )}
 
@@ -155,8 +161,9 @@ export default function DoctorProfessionalForm({
                 )}
                 <Button
                     loading={isSubmitting}
-                    className="px-10 py-3 hover:bg-teal-600"
+                    className="px-10 py-3"
                     type="submit"
+                    role="doctor"
                 >
                     {isSubmitting
                         ? "Saving..."

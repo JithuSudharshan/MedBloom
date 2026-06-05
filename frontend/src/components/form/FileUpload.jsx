@@ -38,8 +38,11 @@ export default function FileUpload({ label, name, register, error, setValue, rol
         setPreview(null);
         setFileName('');
         setValue(name, null);
-        // Reset the input field
-        document.getElementById(name).value = '';
+        // Reset the input field if it exists
+        const fileInput = document.getElementById(name);
+        if (fileInput) {
+            fileInput.value = '';
+        }
     };
 
     return (
@@ -59,7 +62,7 @@ export default function FileUpload({ label, name, register, error, setValue, rol
                             />
 
                             {/* File Info */}
-                            <div className="flex-1">
+                            <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-gray-700 truncate">
                                     {fileName}
                                 </p>

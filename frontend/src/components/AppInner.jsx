@@ -28,6 +28,7 @@ import AdminLogin from '../pages/admin/auth/AdminLogin';
 import AdminDashboard from '../pages/admin/dashboard/AdminDashboard';
 import PatientOnboardingForm from '../pages/user/patient/PatientOnboardingForm';
 import VideoConsultationRoom from '../pages/consultation/VideoConsultationRoom';
+import DoctorWelcomeCelebration from '../pages/user/doctor/DoctorWelcomeCelebration';
 import ApplicationReviewPage from '../pages/admin/dashboard/ApplicationReviewPage';
 
 export const AppInner = () => {
@@ -76,6 +77,7 @@ export const AppInner = () => {
                 <Route element={<ProtectedRoute allowedRoles={['doctor']} />}>
                     <Route path="/doctor">
                         <Route index element={<Navigate to="dashboard" replace />} />
+                        <Route path="welcome" element={<DoctorWelcomeCelebration />} />
                         <Route path="dashboard" element={<DoctorDashboard />} />
                         <Route path="personal" element={<DoctorDashboard />} />
                         <Route path="patients" element={<DoctorDashboard />} />

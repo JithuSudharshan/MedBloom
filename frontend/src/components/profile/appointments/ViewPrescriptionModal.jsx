@@ -31,7 +31,7 @@ export default function ViewPrescriptionModal({ isOpen, onClose, appointment }) 
                     {/* Header */}
                     <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-slate-50/50">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-[#E6F4F4] text-[#00A4A3] rounded-xl">
+                            <div className="p-2 bg-[#FCF5F5] text-[#6B3B3D] rounded-xl">
                                 <FileText className="w-6 h-6" />
                             </div>
                             <div>
@@ -72,7 +72,7 @@ export default function ViewPrescriptionModal({ isOpen, onClose, appointment }) 
                         {/* Medications */}
                         <div className="mb-8">
                             <div className="flex items-center gap-2 mb-6">
-                                <Activity className="w-5 h-5 text-[#00A4A3]" />
+                                <Activity className="w-5 h-5 text-[#6B3B3D]" />
                                 <h3 className="text-lg font-bold text-slate-800">Prescribed Medications</h3>
                             </div>
 
@@ -83,10 +83,10 @@ export default function ViewPrescriptionModal({ isOpen, onClose, appointment }) 
                             ) : (
                                 <div className="flex flex-col gap-4">
                                     {appointment.prescription.map((med, index) => (
-                                        <div key={index} className="flex flex-col p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-[#00A4A3]/30 transition-all">
+                                        <div key={index} className="flex flex-col p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-[#B08B8C]/50 transition-all">
                                             <div className="flex justify-between items-start mb-3">
                                                 <h4 className="font-bold text-slate-800 text-lg">{med.medication}</h4>
-                                                <span className="px-3 py-1 bg-[#E6F4F4] text-[#00A4A3] text-xs font-bold rounded-full uppercase tracking-wider">
+                                                <span className="px-3 py-1 bg-[#FCF5F5] text-[#6B3B3D] text-xs font-bold rounded-full uppercase tracking-wider">
                                                     {med.duration}
                                                 </span>
                                             </div>

@@ -14,7 +14,7 @@ export const fetchDoctorData = async (req, res) => {
         } = req.query;
 
         // 1. Build Query Object
-        const query = {};
+        const query = { status: 'approved' };
 
         // Search by name or location
         if (search) {

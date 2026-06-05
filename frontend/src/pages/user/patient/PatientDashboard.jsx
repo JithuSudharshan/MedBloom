@@ -89,13 +89,7 @@ export default function PatientProfilePage() {
                 profileData={patientDetails}
                 onLogout={handleLogout}
                 isLoggingOut={isLoggingOut}
-            >
-                <div className="mb-6">
-                    <Button onClick={handleLogout} variant="danger" size="sm">
-                        {isLoggingOut ? "Logging out..." : "Logout"}
-                    </Button>
-                </div>
-            </ProfileLayout>
+            />
             {loading && <Loader />}
             <FindDoctorModal 
                 isOpen={isNavbarModalOpen} 

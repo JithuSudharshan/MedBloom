@@ -18,15 +18,19 @@ import TransactionsPage from "./transactions/TransactionsPage";
 import DoctorPatientsList from "./doctorDasboard/patients/DoctorPatientsList";
 import SymptomChecker from "./patient/SymptomChecker";
 
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Lock } from "lucide-react";
+import Button from "../ui/Button";
 
 const ProfileLayout = ({
     user,
     sidebarMenu,
     profileData,
     onLogout,
-    isLoggingOut
+    isLoggingOut,
+    children
 }) => {
+    const navigate = useNavigate();
 
     const location = useLocation();
     const validDoctorKeys = ["dashboard", "personal", "patients", "availability", "appointments", "publications", "notifications", "transactions", "wallet", "settings"];
@@ -201,7 +205,24 @@ const ProfileLayout = ({
                     [&::-webkit-scrollbar-track]:bg-transparent 
                     [&::-webkit-scrollbar-thumb]:rounded-full 
                     ${user === 'doctor' ? "[&::-webkit-scrollbar-thumb]:bg-[#F5EBEB] hover:[&::-webkit-scrollbar-thumb]:bg-[#E8D3D4]" : "[&::-webkit-scrollbar-thumb]:bg-teal-50 hover:[&::-webkit-scrollbar-thumb]:bg-teal-100"}`}>
-                    {activeKey === "dashboard" && (
+                    
+                    {user === "doctor" && !profileData?.isOnboarded && activeKey !== "dashboard" ? (
+                        <div className="flex flex-col items-center justify-center h-full bg-white rounded-[2.5rem] p-10 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60">
+                            <div className="w-24 h-24 bg-rose-50 rounded-full flex items-center justify-center mb-6">
+                                <Lock className="w-10 h-10 text-rose-500" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-800 mb-4">Action Required</h2>
+                            <p className="text-gray-500 max-w-md mb-8">
+                                You must complete your professional onboarding process before you can access {activeKey.replace('-', ' ')}. 
+                                This ensures your profile is fully verified for patients.
+                            </p>
+                            <Button role={user} onClick={() => navigate("/doctor/basic-onboarding")} className="px-8">
+                                Complete Onboarding Now
+                            </Button>
+                        </div>
+                    ) : (
+                        <>
+                            {activeKey === "dashboard" && (
                         <DoctorOverview
                             doctorName={localUser?.fullName}
                             metrics={dashboardMetrics?.metrics}
@@ -246,15 +267,15 @@ const ProfileLayout = ({
                             setSearchTerm={setPatientSearchTerm}
                         />
                     )}
-
-
                     {activeKey === "availability" && <AvailabilitySettings userRole={user} />}
                     {activeKey === "notifications" && <NotificationsPage userRole={user} />}
                     {activeKey === "records" && <MedicalRecords />}
                     {activeKey === "wallet" && <WalletPage userRole={user} />}
                     {activeKey === "transactions" && <TransactionsPage userRole={user} />}
-
                     {activeKey === "triage" && user === "patient" && <SymptomChecker />}
+                    {children}
+                        </>
+                    )}
 
                 </main>
             </div>

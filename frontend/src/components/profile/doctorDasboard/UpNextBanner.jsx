@@ -55,7 +55,7 @@ export default function UpNextBanner({ appointment }) {
 
                 <div className="flex items-center gap-3">
                     <Link 
-                        to="/doctor/dashboard" // Should route to consultation room or appointment details
+                        to={`/doctor/appointments/${appointment.id || appointment._id}`}
                         className="bg-white text-[#8C6264] px-6 py-3 rounded-xl font-bold text-sm shadow-sm hover:shadow-md transition-all flex items-center gap-2 hover:-translate-y-0.5"
                     >
                         {isOnline ? "Join Room" : "View Details"}

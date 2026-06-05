@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import User from "../model/userModel.js";
 import { ENV } from "./env.js";
+import { sendNotification } from "../utils/notificationHelper.js";
 
 passport.use(
     new GoogleStrategy(
@@ -100,6 +101,15 @@ passport.use(
                     isVerified: true,
                     role: requestedRole
                 });
+
+                if (user.role === 'doctor') {
+                    await sendNotification({
+                        receiverId: user._id,
+                        message: "Welcome to MedBloom! To start receiving patients, please complete your professional onboarding from the dashboard.",
+                        type: 'system_alert',
+                        link: '/doctor/basic-onboarding'
+                    });
+                }
 
                 console.log('New user created with role:', user.role);
                 return done(null, user);

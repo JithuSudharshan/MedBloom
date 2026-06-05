@@ -63,7 +63,12 @@ export default function DcotorProfilePage() {
 
             const response = await loadDoctorData()
             if (response) {
-                setDoctorDetails(response?.data?.details)
+                const details = response?.data?.details;
+                setDoctorDetails(details);
+
+                if (details?.status === 'approved' && details?.hasSeenApprovalWelcome === false) {
+                    navigate('/doctor/welcome');
+                }
             }
 
         } catch (error) {
@@ -117,14 +122,7 @@ export default function DcotorProfilePage() {
                 appointments={dummyAppointments}
                 onLogout={handleLogout}
                 isLoggingOut={isLoggingOut}
-            >
-                {/* Slot: Pass dashboard-specific content for greeting/etc */}
-                <div className="mb-6">
-                    <Button onClick={handleLogout} variant="danger" size="sm">
-                        {isLoggingOut ? "Logging out..." : "Logout"}
-                    </Button>
-                </div>
-            </ProfileLayout>
+            />
             {loading && <Loader />}
 
         </>

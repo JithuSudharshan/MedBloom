@@ -3,6 +3,7 @@ import bcrypt from "bcrypt"
 import { generateAndStoreToken } from "../../../utils/tokenService.js";
 import { sendVerificationEmail } from "../../../utils/sendEmail.js"
 import { ENV } from "../../../config/env.js"
+import { sendNotification } from "../../../utils/notificationHelper.js";
 
 export const signUp = async (req, res) => {
 
@@ -42,6 +43,15 @@ export const signUp = async (req, res) => {
             authMethod: 'local'
         })
         const response = await newUser.save()
+
+        if (role === 'doctor') {
+            await sendNotification({
+                receiverId: response._id,
+                message: "Welcome to MedBloom! To start receiving patients, please complete your professional onboarding from the dashboard.",
+                type: 'system_alert',
+                link: '/doctor/basic-onboarding'
+            });
+        }
 
         //generating token with crypto
         const token = await generateAndStoreToken(response._id)

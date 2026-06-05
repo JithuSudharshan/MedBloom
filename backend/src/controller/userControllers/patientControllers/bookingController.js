@@ -60,6 +60,10 @@ export const createPaymentOrder = async (req, res) => {
         const doctor = await Doctor.findById(doctorId);
         if (!doctor) return res.status(404).json({ success: false, message: "Doctor not found" });
 
+        if (doctor.status !== 'approved') {
+            return res.status(403).json({ success: false, message: "Doctor profile is not active for booking." });
+        }
+
         // Calculate end time (Assuming 30-minute slots)
         const [hour, minute] = slot.split(':');
         let dateObj = new Date();
@@ -570,6 +574,10 @@ export const bookAppointmentWithWallet = async (req, res) => {
 
         const doctor = await Doctor.findById(doctorId).populate('user');
         if (!doctor) return res.status(404).json({ success: false, message: "Doctor not found" });
+
+        if (doctor.status !== 'approved') {
+            return res.status(403).json({ success: false, message: "Doctor profile is not active for booking." });
+        }
 
         // Calculate end time
         const [hour, minute] = slot.split(':');

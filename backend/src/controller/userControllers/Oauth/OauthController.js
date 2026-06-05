@@ -164,7 +164,7 @@ export const checkAuthStatus = (req, res) => {
                 email: req.user.email,
                 name: req.user.name,
                 role: req.user.role,
-                profilePicture: req.user.profilePicture
+                avatar: req.user.profile_url
             }
         })
     }
@@ -192,7 +192,7 @@ export const verifyToken = async (req, res) => {
                 email: req.user.email,
                 name: req.user.name,
                 role: req.user.role,
-                profilePicture: req.user.profilePicture,
+                avatar: req.user.profile_url,
                 isOnboarded: req.user.isOnboarded || false
             }
         })

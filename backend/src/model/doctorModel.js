@@ -114,6 +114,11 @@ const DoctorSchema = new Schema(
             default: false
         },
 
+        hasSeenApprovalWelcome: {
+            type: Boolean,
+            default: false
+        },
+
         onboardingStep: {
             type: String,
             enum: ["basic", "completed"],
