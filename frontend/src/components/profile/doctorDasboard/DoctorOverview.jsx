@@ -2,37 +2,70 @@ import RevenueHighlight from "./RevenueHighlight";
 import ReviewsList from "./ReviewsList";
 import DashboardMetrics from "../admin/dashboard/DashboardMetrics";
 import TodayAppointments from "./TodayAppointments";
+import UpNextBanner from "./UpNextBanner";
+import ConsultationModeChart from "./ConsultationModeChart";
+import QuickActionHub from "./QuickActionHub";
 
-export default function DoctorOverview({ doctorName, metrics, TotalEarnigs, TodaysAppointments, topReviews, ratingStats }) {
+export default function DoctorOverview({
+    doctorName,
+    metrics,
+    TotalEarnigs,
+    monthlyEarnings,
+    revenueGrowth,
+    TodaysAppointments,
+    nextAppointment,
+    consultationModeRatio,
+    topReviews,
+    ratingStats
+}) {
     return (
-        <div className="bg-[#FCF5F5] rounded-[2.5rem] p-8 lg:p-12 shadow-[0_20px_60px_-15px_rgba(176,139,140,0.2)] min-h-full flex flex-col w-full">
+        <div className="min-h-full flex flex-col w-full gap-8">
 
-            {/* Header */}
-            <div className="mb-10 flex flex-col lg:flex-row justify-between lg:items-end gap-6">
-                <div>
-                    <h2 className="text-3xl font-semibold text-[#6B3B3D]">
-                        Service Overview
-                    </h2>
-                    <p className="text-gray-500 mt-2 text-sm">
-                        Welcome back, <span className="font-semibold text-[#B08B8C]">Dr. {doctorName}</span> 👋
-                        Here's a quick overview of your past activity.
-                    </p>
+            {/* Header & UpNext */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                <div className="xl:col-span-2 flex flex-col justify-between gap-6">
+                    <div>
+                        <h2 className="text-3xl font-bold text-[#6B3B3D] tracking-tight">
+                            Service Overview
+                        </h2>
+
+                    </div>
+                    <UpNextBanner appointment={nextAppointment} />
                 </div>
-                <RevenueHighlight amount={TotalEarnigs} />
+
+                <div className="xl:col-span-1 flex flex-col items-stretch h-full w-full">
+                    <RevenueHighlight amount={monthlyEarnings} growth={revenueGrowth} />
+                </div>
             </div>
 
             {/* Metrics */}
-            <div className="mb-10">
+            <div>
                 <DashboardMetrics metrics={metrics} theme="doctor" />
             </div>
 
-            {/* Bottom Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 flex-1 min-h-0">
-                <div className="overflow-y-auto pr-2 h-full [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#E8D3D4] hover:[&::-webkit-scrollbar-thumb]:bg-[#D4B8B9]">
-                    <TodayAppointments appointments={TodaysAppointments} />
+            {/* Middle Section: Chart & Quick Actions */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-1 min-h-[300px]">
+                    <ConsultationModeChart consultationModeRatio={consultationModeRatio} />
                 </div>
-                <div className="overflow-y-auto pr-2 h-full [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#E8D3D4] hover:[&::-webkit-scrollbar-thumb]:bg-[#D4B8B9]">
-                    <ReviewsList reviews={topReviews} ratingStats={ratingStats} variant="dashboard" />
+                <div className="lg:col-span-2 min-h-[300px]">
+                    <QuickActionHub />
+                </div>
+            </div>
+
+            {/* Bottom Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 flex-1 min-h-0">
+                <div className="bg-white rounded-3xl p-6 shadow-[0_4px_20px_rgba(176,139,140,0.06)] border border-rose-50 h-full flex flex-col">
+                    <h3 className="text-gray-800 font-bold text-lg mb-4">Today's Appointments</h3>
+                    <div className="flex-1 overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#E8D3D4] hover:[&::-webkit-scrollbar-thumb]:bg-[#D4B8B9]">
+                        <TodayAppointments appointments={TodaysAppointments} />
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-3xl p-6 shadow-[0_4px_20px_rgba(176,139,140,0.06)] border border-rose-50 h-full flex flex-col">
+                    <div className="flex-1 overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#E8D3D4] hover:[&::-webkit-scrollbar-thumb]:bg-[#D4B8B9]">
+                        <ReviewsList reviews={topReviews} ratingStats={ratingStats} variant="dashboard" />
+                    </div>
                 </div>
             </div>
 

@@ -274,69 +274,136 @@ export const editDoctorProfile = async (req, res) => {
 
 export const fetchMetricsForDoctor = async (req, res) => {
     try {
-
-        const metrics = [
-            { label: "Total Appointments", value: 125 },
-            { label: "Total Consultations", value: 79 }
-        ]
-
-        const TotalEarnigs = 45000
-
-        const TodaysAppointments = [
-            { name: "Rajesh kumar", time: "10:30 AM", type: "Online" },
-            { name: "Rajesh kumar", time: "10:30 AM", type: "Online" },
-            { name: "Rajesh kumar", time: "10:30 AM", type: "Online" },
-            { name: "Rajesh kumar", time: "10:30 AM", type: "Clinic" },
-            { name: "Rajesh kumar", time: "10:30 AM", type: "Clinic" },
-            { name: "Rajesh kumar", time: "10:30 AM", type: "Clinic" },
-        ];
-
         const userId = req.user._id;
         const doctor = await Doctor.findOne({ user: userId });
 
-        let reviews = [];
+        if (!doctor) {
+            return res.status(404).json({ success: false, message: "Doctor not found" });
+        }
+
+        // 1. Basic Metrics
+        const [totalAppointments, totalConsultations] = await Promise.all([
+            Appointment.countDocuments({ doctor: doctor._id }),
+            Appointment.countDocuments({ doctor: doctor._id, status: 'completed' })
+        ]);
+
+        const metrics = [
+            { label: "Total Appointments", value: totalAppointments },
+            { label: "Total Consultations", value: totalConsultations }
+        ];
+
+        // 2. Earnings and Growth
+        const today = new Date();
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+        const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59, 999);
+
+        const [earningsAgg, lastMonthEarningsAgg, totalEarningsAgg] = await Promise.all([
+            Transaction.aggregate([
+                { $match: { userId: doctor._id, userModel: 'Doctor', type: 'credit', status: 'Success', createdAt: { $gte: startOfMonth, $lte: endOfMonth } } },
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ]),
+            Transaction.aggregate([
+                { $match: { userId: doctor._id, userModel: 'Doctor', type: 'credit', status: 'Success', createdAt: { $gte: lastMonthStart, $lte: lastMonthEnd } } },
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ]),
+            Transaction.aggregate([
+                { $match: { userId: doctor._id, userModel: 'Doctor', type: 'credit', status: 'Success' } },
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ])
+        ]);
+
+        const monthlyEarnings = earningsAgg.length > 0 ? earningsAgg[0].total : 0;
+        const lastMonthlyEarnings = lastMonthEarningsAgg.length > 0 ? lastMonthEarningsAgg[0].total : 0;
+        const TotalEarnigs = totalEarningsAgg.length > 0 ? totalEarningsAgg[0].total : 0;
+
+        let revenueGrowth = 0;
+        if (lastMonthlyEarnings === 0) {
+            revenueGrowth = monthlyEarnings > 0 ? 100 : 0;
+        } else {
+            revenueGrowth = Math.round(((monthlyEarnings - lastMonthlyEarnings) / lastMonthlyEarnings) * 100);
+        }
+
+        // 3. Today's Appointments & Up Next
+        const todayStr = today.toISOString().split('T')[0];
+        const todaysAppointmentsData = await Appointment.find({ doctor: doctor._id, date: todayStr, status: { $in: ['confirmed', 'in_progress', 'completed'] } })
+            .populate({ path: 'patient', populate: { path: 'user', select: 'name profile_url' } })
+            .sort({ startTime: 1 });
+
+        let nextAppointment = null;
+        const nowTimeStr = today.toTimeString().substring(0, 5); // "HH:MM"
+
+        const TodaysAppointments = todaysAppointmentsData.map(app => {
+            const isFuture = app.startTime >= nowTimeStr && app.status !== 'completed';
+            if (isFuture && !nextAppointment) {
+                nextAppointment = {
+                    id: app._id,
+                    appointmentId: app.appointmentId,
+                    name: app.patient?.user?.name || "Patient",
+                    time: app.startTime,
+                    mode: app.mode === 'online' ? 'Online' : 'Clinic',
+                    status: app.status,
+                    avatar: app.patient?.user?.profile_url
+                };
+            }
+
+            return {
+                name: app.patient?.user?.name || "Patient",
+                time: app.startTime,
+                type: app.mode === 'online' ? 'Online' : 'Clinic',
+                status: app.status
+            };
+        });
+
+        // 4. Consultation Mode Ratio
+        const modeAgg = await Appointment.aggregate([
+            { $match: { doctor: doctor._id } },
+            { $group: { _id: "$mode", count: { $sum: 1 } } }
+        ]);
+        
+        let onlineCount = 0, offlineCount = 0;
+        modeAgg.forEach(item => {
+            if (item._id === 'online') onlineCount = item.count;
+            if (item._id === 'offline') offlineCount = item.count;
+        });
+        const consultationModeRatio = { online: onlineCount, offline: offlineCount };
+
+        // 5. Reviews
+        let reviews = await Review.find({ doctor: doctor._id })
+            .populate({ path: 'patient', select: 'name profile_url user', populate: { path: 'user', select: 'name profile_url' } })
+            .sort({ createdAt: -1 })
+            .limit(5);
+
         let ratingStats = {
-            overallRating: 0,
-            totalReviews: 0,
+            overallRating: doctor.rating || 0,
+            totalReviews: doctor.totalReviews || 0,
             breakdown: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
         };
 
-        if (doctor) {
-            reviews = await Review.find({ doctor: doctor._id })
-                .populate({
-                    path: 'patient',
-                    select: 'name profile_url user',
-                    populate: { path: 'user', select: 'name profile_url' }
-                })
-                .sort({ createdAt: -1 })
-                .limit(5); // Recent 5 reviews
-
-            // Fetch breakdown
-            const allReviews = await Review.find({ doctor: doctor._id }).select('rating');
-            allReviews.forEach(r => {
-                if (r.rating >= 1 && r.rating <= 5) {
-                    ratingStats.breakdown[r.rating]++;
-                }
-            });
-            ratingStats.overallRating = doctor.rating;
-            ratingStats.totalReviews = doctor.totalReviews;
-        }
+        const allReviews = await Review.find({ doctor: doctor._id }).select('rating');
+        allReviews.forEach(r => {
+            if (r.rating >= 1 && r.rating <= 5) {
+                ratingStats.breakdown[Math.floor(r.rating)]++;
+            }
+        });
 
         return res.status(200).json({
             success: true,
             metrics,
             TotalEarnigs,
+            monthlyEarnings,
+            revenueGrowth,
             TodaysAppointments,
+            nextAppointment,
+            consultationModeRatio,
             reviews,
             ratingStats
         });
 
     } catch (error) {
         console.error("Error while fetching dashboard data:", error);
-        res.status(500).json({
-            success: false,
-            message: "Internal server error"
-        })
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
 

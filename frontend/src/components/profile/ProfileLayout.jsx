@@ -206,7 +206,11 @@ const ProfileLayout = ({
                             doctorName={localUser?.fullName}
                             metrics={dashboardMetrics?.metrics}
                             TotalEarnigs={dashboardMetrics?.TotalEarnigs}
+                            monthlyEarnings={dashboardMetrics?.monthlyEarnings}
+                            revenueGrowth={dashboardMetrics?.revenueGrowth}
                             TodaysAppointments={dashboardMetrics?.TodaysAppointments}
+                            nextAppointment={dashboardMetrics?.nextAppointment}
+                            consultationModeRatio={dashboardMetrics?.consultationModeRatio}
                             topReviews={dashboardMetrics?.reviews}
                             ratingStats={dashboardMetrics?.ratingStats}
                         />
