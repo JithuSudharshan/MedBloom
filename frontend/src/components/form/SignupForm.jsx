@@ -16,8 +16,9 @@ const SignupForm = ({ selected }) => {
         formState: { errors },
     } = useSignup()
 
-    const switchToSignin = () => {
-        navigate('/login')
+    const switchToSignin = (e) => {
+        e.preventDefault();
+        navigate('/login', { state: { role: selected } })
     }
 
     return (

@@ -8,14 +8,18 @@ const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, onEd
     const { notifications } = useNotifications() || { notifications: [] };
     const unreadCount = notifications?.filter(n => !n.read)?.length || 0;
 
+    // Default avatar fallback
+    const defaultAvatar = "https://media.istockphoto.com/id/1451587807/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-vector.jpg?s=612x612&w=0&k=20&c=yDJ4ITX1cHMh25Lt1vI1zBn2cAKKAlByHBvPJ8gEiIg=";
+    const currentSrc = src || defaultAvatar;
+
     return (
         <nav className="bg-white/80 backdrop-blur-md w-full h-full rounded-[2.5rem] p-8 flex flex-col gap-2 relative z-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60">
 
             <div className="flex flex-col items-center gap-3 py-6 shrink-0">
                 <div className="relative">
                     <img
-                        src={src}
-                        alt={alt}
+                        src={currentSrc}
+                        alt={alt || "Profile Picture"}
                         className="rounded-full w-40 h-40 object-cover border-[4px] border-white shadow-sm relative z-10"
                     />
                     {!isAdmin && (<button

@@ -1,10 +1,12 @@
 // components/form/DoctorProfessionalForm.jsx
+import { useState, useEffect } from "react";
 import Input from "../form/Input";
 import Button from "../landing page/Button";
 import TextArea from "../form/TextArea";
 import Select from "../form/Select";
 import { professionalFields } from "../../config/doctorOnboardingForm";
 import FileUpload from "./FileUpload";
+import { fetchDepartmentsList } from "../../api/landingPageApi";
 
 export default function DoctorProfessionalForm({
     mode = "onboarding",
@@ -17,8 +19,26 @@ export default function DoctorProfessionalForm({
     isSubmitting,
     submitError,
 }) {
-
+    const [departmentOptions, setDepartmentOptions] = useState([]);
     const consultationMode = watch("consultationMode");
+
+    useEffect(() => {
+        const getDepartments = async () => {
+            try {
+                const response = await fetchDepartmentsList();
+                if (response?.data?.success) {
+                    const options = response.data.departments.map(dept => ({
+                        label: dept.departmentName,
+                        value: dept.departmentName
+                    }));
+                    setDepartmentOptions(options);
+                }
+            } catch (error) {
+                console.error("Failed to load departments:", error);
+            }
+        };
+        getDepartments();
+    }, []);
 
     const renderField = (field) => {
         if (!field.showIn.includes(mode)) return null;
@@ -60,6 +80,13 @@ export default function DoctorProfessionalForm({
                     />
                 );
             case "select":
+                let options = field.options;
+                if (field.name === "primarySpecialization") {
+                    options = departmentOptions.length > 0 
+                        ? departmentOptions 
+                        : [{ label: "Loading departments...", value: "" }];
+                }
+                
                 return (
                     <Select
                         key={field.name}
@@ -68,7 +95,7 @@ export default function DoctorProfessionalForm({
                         register={register}
                         error={errors[field.name]}
                         placeholder={field.placeholder}
-                        options={field.options}
+                        options={options}
                     />
                 );
             default:

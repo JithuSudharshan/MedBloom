@@ -18,8 +18,9 @@ const LoginForm = ({ selected, isAdmin }) => {
         formState: { errors },
     } = useLogin()
 
-    const switchToSignup = () => {
-        navigate('/signup')
+    const switchToSignup = (e) => {
+        e.preventDefault();
+        navigate('/signup', { state: { role: selected } })
     }
     const naviagteToForgotPassword = () => {
         navigate('/forgot-password')

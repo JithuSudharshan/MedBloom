@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import OAuthButton from "../form/OAuthButton";
 import ToggleButtons from "../ui/ToggleButton";
 import SignupForm from "../form/SignupForm";
 import LoginForm from "../form/LoginForm";
 
-
 const AuthCard = ({ oneLine, onChange, authState, isAdmin }) => {
-    const [selected, setSelected] = useState("Patient")
+    const location = useLocation();
+    const [selected, setSelected] = useState(location.state?.role || "Patient");
 
     useEffect(() => {
         sendRole();
