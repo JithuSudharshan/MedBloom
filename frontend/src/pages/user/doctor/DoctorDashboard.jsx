@@ -101,16 +101,18 @@ export default function DcotorProfilePage() {
     }
     return (
         <>
-            <Navbar current={"login"} userRole="doctor" />
-            <ProfileBanner 
-                userRole="doctor" 
-                userDetails={doctorDetails} 
-                metrics={[
-                    { label: "Today's Consultations", value: doctorDetails.todayConsultations ?? 0, icon: Calendar },
-                    { label: "Rating", value: doctorDetails.rating ? `${doctorDetails.rating} / 5` : "No Ratings", icon: Star },
-                    { label: "Profile Status", value: doctorDetails.profileStatus, icon: User }
-                ]}
-            />
+            <div className="hidden lg:block">
+                <Navbar current={"login"} userRole="doctor" />
+                <ProfileBanner 
+                    userRole="doctor" 
+                    userDetails={doctorDetails} 
+                    metrics={[
+                        { label: "Today's Consultations", value: doctorDetails.todayConsultations ?? 0, icon: Calendar },
+                        { label: "Rating", value: doctorDetails.rating ? `${doctorDetails.rating} / 5` : "No Ratings", icon: Star },
+                        { label: "Profile Status", value: doctorDetails.profileStatus, icon: User }
+                    ]}
+                />
+            </div>
             {!doctorDetails.isOnboarded && < IsonboardedWarning onClick={handleNavigate} />}
             <ProfileLayout
                 user={"doctor"}

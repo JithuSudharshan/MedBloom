@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Lock, Menu, X } from "lucide-react";
 import SidebarMenu from "./SidebarMenu";
 import PatientInformation from "./PatientInformation";
@@ -66,6 +66,43 @@ const ProfileLayout = ({
     const [patientStats, setPatientStats] = useState({ totalCount: 0, newPatients: 0, activeVisit: 0 });
 
     const [totalCount, setTotalcount] = useState(0)
+
+    const [isNavVisible, setIsNavVisible] = useState(true);
+    const lastScrollY = useRef(0);
+
+    const handleScroll = (e) => {
+        const currentScrollY = e.target.scrollTop;
+        const scrollHeight = e.target.scrollHeight;
+        const clientHeight = e.target.clientHeight;
+
+        // iOS overscroll bounce protection
+        if (currentScrollY <= 0) {
+            setIsNavVisible(true);
+            lastScrollY.current = currentScrollY;
+            return;
+        }
+
+        // Reached bottom
+        if (currentScrollY + clientHeight >= scrollHeight - 10) {
+            setIsNavVisible(true);
+        } 
+        // Scrolling down
+        else if (currentScrollY > lastScrollY.current + 10) {
+            setIsNavVisible(false);
+        } 
+        // Scrolling up
+        else if (currentScrollY < lastScrollY.current - 10) {
+            setIsNavVisible(true);
+        }
+
+        lastScrollY.current = currentScrollY;
+    };
+
+    const handleMainClick = () => {
+        if (!isNavVisible && window.innerWidth < 1024) {
+            setIsNavVisible(true);
+        }
+    };
 
     const fetchAppointments = async (pageNumber = 1) => {
         try {
@@ -184,7 +221,7 @@ const ProfileLayout = ({
         <div className={`flex flex-col h-screen w-full overflow-hidden ${user === 'doctor' ? "bg-[#FCF8F8]" : "bg-[#F8FDFD]"}`}>
             
             {/* Mobile App Bar */}
-            <div className={`lg:hidden sticky top-0 z-40 flex items-center justify-between px-6 py-4 border-b shadow-sm backdrop-blur-xl ${user === 'doctor' ? 'bg-white/80 border-rose-100/50' : 'bg-white/80 border-teal-100/50'}`}>
+            <div className={`lg:hidden sticky top-0 z-40 flex items-center justify-between px-6 py-4 border-b shadow-[0_4px_30px_rgba(0,0,0,0.03)] backdrop-blur-3xl transition-colors duration-300 ${user === 'doctor' ? 'bg-white/40 border-white/60' : 'bg-white/40 border-white/60'}`}>
                 <div className="flex items-center gap-3">
                     <img 
                         src={localUser?.avatar?.src || "https://media.istockphoto.com/id/1451587807/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-vector.jpg?s=612x612&w=0&k=20&c=yDJ4ITX1cHMh25Lt1vI1zBn2cAKKAlByHBvPJ8gEiIg="} 
@@ -246,7 +283,10 @@ const ProfileLayout = ({
                 </aside>
 
                 {/* Main cards and dashboard content */}
-                <main className={`flex-1 flex flex-col min-w-0 h-full overflow-y-auto pr-2 pb-24 lg:pb-0
+                <main 
+                    onScroll={handleScroll}
+                    onClick={handleMainClick}
+                    className={`flex-1 flex flex-col min-w-0 h-full overflow-y-auto pr-2 pb-24 lg:pb-0 scroll-smooth
                     [&::-webkit-scrollbar]:w-2 
                     [&::-webkit-scrollbar-track]:bg-transparent 
                     [&::-webkit-scrollbar-thumb]:rounded-full 
@@ -326,25 +366,33 @@ const ProfileLayout = ({
                 </main>
             </div>
 
-            {/* Bottom Navigation Bar for Patient */}
-            {user === 'patient' && (
-                <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-xl border-t border-teal-100/50 shadow-[0_-8px_30px_rgba(0,109,111,0.06)] px-6 py-3 flex items-center justify-between pb-safe">
-                    {sidebarMenu.filter(item => ['personal', 'appointments', 'triage', 'records'].includes(item.key)).map(item => {
-                        const Icon = item.icon;
-                        const isActive = activeKey === item.key;
-                        return (
-                            <button 
-                                key={item.key} 
-                                onClick={() => navigate(item.path)} 
-                                className={`flex flex-col items-center gap-1.5 p-2 transition-all duration-300 ${isActive ? 'text-teal-600 scale-105' : 'text-slate-400 hover:text-slate-600'}`}
-                            >
-                                <Icon className={`w-6 h-6 ${isActive ? 'fill-teal-50 stroke-[2.5px]' : 'stroke-2'}`} />
-                                <span className={`text-[10px] ${isActive ? 'font-bold' : 'font-medium'}`}>{item.label}</span>
-                            </button>
-                        )
-                    })}
-                </div>
-            )}
+            {/* Mobile Bottom Navigation Bar */}
+            <div className={`lg:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-3xl border-t shadow-[0_-8px_30px_rgba(0,0,0,0.05)] px-6 py-3 flex items-center justify-between pb-safe transform transition-transform duration-300 ease-in-out ${isNavVisible ? 'translate-y-0' : 'translate-y-full'} ${user === 'doctor' ? 'bg-white/40 border-white/60' : 'bg-white/40 border-white/60'}`}>
+                {sidebarMenu.filter(item => {
+                    if (user === 'doctor') return ['dashboard', 'appointments', 'Patients', 'personal'].includes(item.key);
+                    return ['personal', 'appointments', 'triage', 'records'].includes(item.key);
+                }).map(item => {
+                    const Icon = item.icon;
+                    const isActive = activeKey === item.key;
+                    
+                    return (
+                        <button 
+                            key={item.key} 
+                            onClick={() => navigate(item.path)} 
+                            className={`flex flex-col items-center gap-1.5 p-2 transition-all duration-300 ${
+                                isActive 
+                                    ? (user === 'doctor' ? 'text-[#B08B8C] scale-105' : 'text-teal-600 scale-105') 
+                                    : 'text-slate-400 hover:text-slate-600'
+                            }`}
+                        >
+                            <Icon className={`w-6 h-6 ${isActive ? (user === 'doctor' ? 'fill-rose-50 stroke-[2.5px]' : 'fill-teal-50 stroke-[2.5px]') : 'stroke-2'}`} />
+                            <span className={`text-[10px] ${isActive ? 'font-bold' : 'font-medium'}`}>
+                                {item.label === 'Your Dashboard' ? 'Dashboard' : item.label}
+                            </span>
+                        </button>
+                    )
+                })}
+            </div>
 
             <Modal
                 isOpen={isAvatarModalOpen}
