@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Edit3, KeyRound, User, Activity } from "lucide-react";
+import { Edit3, KeyRound, User, Activity, Calendar, Clock } from "lucide-react";
 import ProfileRow from "./ProfileRow";
 import MedicalGrid from "./MedicalGrid";
 import Modal from "../../components/profile/Modal";
@@ -36,12 +36,26 @@ const PatientInformation = ({ patient, isAdmin = false }) => {
     } = UseChangePassword()
 
     return (
-        <div className="bg-white rounded-[2.5rem] p-8 lg:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex-1 shrink-0 flex flex-col w-full h-fit">
+        <div className="bg-white/80 backdrop-blur-3xl border border-white/60 rounded-[2rem] lg:rounded-[2.5rem] p-6 lg:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex-1 shrink-0 flex flex-col w-full h-fit">
             
+            {/* Mobile Glance Metrics (Replaces Banner on Mobile) */}
+            <div className="lg:hidden grid grid-cols-2 gap-3 mb-8">
+                <div className="bg-gradient-to-br from-teal-50 to-teal-100/50 p-4 rounded-2xl border border-teal-100 shadow-sm">
+                    <Calendar className="w-5 h-5 text-teal-600 mb-2" />
+                    <div className="text-[11px] text-teal-600/80 font-semibold uppercase tracking-wider mb-1">Next Appt</div>
+                    <div className="text-sm font-bold text-teal-900">{patient?.nextAppointment || 'None'}</div>
+                </div>
+                <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 p-4 rounded-2xl border border-slate-200 shadow-sm">
+                    <Clock className="w-5 h-5 text-slate-500 mb-2" />
+                    <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider mb-1">Last Checkup</div>
+                    <div className="text-sm font-bold text-slate-800">{patient?.lastCheckup || 'None'}</div>
+                </div>
+            </div>
+
             {/* Header and Actions */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-5 mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Medical Profile</h1>
+                    <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Medical Profile</h1>
                     <p className="text-gray-500 text-sm mt-1">Manage your personal and clinical details</p>
                 </div>
                 
@@ -59,9 +73,11 @@ const PatientInformation = ({ patient, isAdmin = false }) => {
 
             <div className="flex-1 space-y-8">
                 {/* Identity & Contact Card */}
-                <div className="bg-slate-50/50 border border-slate-100 rounded-3xl p-8">
-                    <h2 className="text-xl font-bold text-[#008C89] mb-6 flex items-center gap-2">
-                        <User className="w-5 h-5" />
+                <div className="bg-white border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] rounded-3xl p-6 lg:p-8 transition-shadow hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)]">
+                    <h2 className="text-[1.15rem] font-bold text-[#008C89] mb-6 flex items-center gap-2.5">
+                        <div className="bg-teal-50 p-2 rounded-xl">
+                            <User className="w-5 h-5 text-teal-600" />
+                        </div>
                         Identity & Contact
                     </h2>
                     
@@ -81,9 +97,11 @@ const PatientInformation = ({ patient, isAdmin = false }) => {
                 </div>
 
                 {/* Medical Information Section */}
-                <div className="bg-teal-50/30 border border-teal-50 rounded-3xl p-8">
-                    <h2 className="text-xl font-bold text-[#008C89] mb-6 flex items-center gap-2">
-                        <Activity className="w-5 h-5" />
+                <div className="bg-gradient-to-br from-teal-50/40 to-white border border-teal-100/50 shadow-[0_4px_20px_rgb(0,0,0,0.03)] rounded-3xl p-6 lg:p-8 transition-shadow hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)]">
+                    <h2 className="text-[1.15rem] font-bold text-[#008C89] mb-6 flex items-center gap-2.5">
+                        <div className="bg-teal-50 p-2 rounded-xl">
+                            <Activity className="w-5 h-5 text-teal-600" />
+                        </div>
                         Clinical Vitals & Health History
                     </h2>
                     <MedicalGrid userDetails={patient} user={"patient"} />

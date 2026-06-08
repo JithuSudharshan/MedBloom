@@ -24,7 +24,7 @@ export default function AppointmentCard({
     const isCancelled = status === "Cancelled";
 
     return (
-        <div className={`flex items-stretch justify-between rounded-3xl border border-transparent bg-white px-8 py-6 shadow-sm hover:scale-[1.01] transition-all duration-300 ${
+        <div className={`flex flex-col sm:flex-row items-start sm:items-stretch justify-between rounded-3xl border border-transparent bg-white px-5 sm:px-8 py-5 sm:py-6 gap-4 sm:gap-0 shadow-sm hover:scale-[1.01] transition-all duration-300 ${
             isDoctor ? "hover:border-[#B08B8C] hover:shadow-[0_0_20px_rgba(176,139,140,0.2)]" : "hover:border-cyan-300 hover:shadow-[0_0_20px_rgba(34,211,238,0.2)]"
         } ${isCancelled ? 'opacity-60 grayscale-[0.5]' : ''}`}>
             {/* LEFT: doctor + time */}
@@ -43,7 +43,7 @@ export default function AppointmentCard({
             </div>
 
             {/* RIGHT: status + action */}
-            <div className="flex flex-col items-end justify-between gap-3">
+            <div className="flex flex-col items-start sm:items-end justify-between gap-4 w-full sm:w-auto mt-2 sm:mt-0">
                 <div
                     className={`inline-flex rounded-full px-4 py-1 text-[12px] font-medium ${statusStyles[status]}`}
                 >
@@ -75,7 +75,7 @@ export default function AppointmentCard({
                         )}
                     </div>
                 ) : (
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
                         {!isDoctor && !isCancelled && (
                             <>
                                 <button

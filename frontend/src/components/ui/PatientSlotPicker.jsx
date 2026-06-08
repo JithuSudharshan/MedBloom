@@ -115,7 +115,7 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
     };
 
     return (
-        <div className="bg-[#EBFFFF] rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,164,163,0.08)] backdrop-blur-md border border-[#00A4A3]/10 h-full flex flex-col relative overflow-hidden">
+        <div className="bg-[#EBFFFF] rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-8 shadow-[0_8px_30px_rgb(0,164,163,0.08)] backdrop-blur-md border border-[#00A4A3]/10 h-full flex flex-col relative overflow-hidden">
             {/* Decorative Blobs */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#00A4A3]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#00A4A3]/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3 pointer-events-none"></div>
@@ -147,7 +147,7 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => setSelectedMode('online')}
-                                className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${
+                                className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl sm:rounded-2xl border-2 transition-all ${
                                     selectedMode === 'online'
                                     ? 'border-[#00A4A3] bg-[#00A4A3] text-white shadow-md'
                                     : 'border-transparent bg-white/80 hover:bg-white text-slate-600 hover:border-[#00A4A3]/30'
@@ -160,7 +160,7 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
                             </button>
                             <button
                                 onClick={() => setSelectedMode('offline')}
-                                className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${
+                                className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl sm:rounded-2xl border-2 transition-all ${
                                     selectedMode === 'offline'
                                     ? 'border-[#00A4A3] bg-[#00A4A3] text-white shadow-md'
                                     : 'border-transparent bg-white/80 hover:bg-white text-slate-600 hover:border-[#00A4A3]/30'
@@ -190,7 +190,7 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
                                 key={index}
                                 onClick={() => !isBlocked && handleDateClick(d.isoDate)}
                                 disabled={isBlocked}
-                                className={`flex flex-col items-center justify-center min-w-[70px] py-3 rounded-2xl transition-all duration-300 border 
+                                className={`flex flex-col items-center justify-center min-w-[60px] sm:min-w-[70px] py-2 sm:py-3 rounded-xl sm:rounded-2xl transition-all duration-300 border 
                                     ${isBlocked 
                                         ? 'bg-slate-100/50 text-slate-300 border-transparent cursor-not-allowed opacity-50'
                                         : isSelected 
@@ -198,17 +198,17 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
                                             : 'bg-white text-slate-600 border-white hover:border-[#00A4A3]/30 hover:bg-[#E0F7F7]'
                                     }`}
                             >
-                                <span className={`text-xs font-bold uppercase tracking-wider mb-1 
+                                <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 
                                     ${isBlocked ? 'text-slate-300' : isSelected ? 'text-teal-100' : 'text-slate-400'}`}>
                                     {d.dayName}
                                 </span>
-                                <span className="text-xl font-bold mb-1 relative">
+                                <span className="text-lg sm:text-xl font-bold mb-1 relative">
                                     {d.dayNumber}
                                     {isBlocked && (
                                         <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-0.5 bg-slate-300 rotate-45 rounded-full"></span>
                                     )}
                                 </span>
-                                <span className={`text-[10px] font-semibold 
+                                <span className={`text-[9px] sm:text-[10px] font-semibold 
                                     ${isBlocked ? 'text-slate-300' : isSelected ? 'text-teal-100' : 'text-slate-400'}`}>
                                     {d.month}
                                 </span>
@@ -225,7 +225,7 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
                         </h3>
                     </div>
 
-                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
                         {loading ? (
                             <div className="col-span-full py-8 flex justify-center">
                                 <Loader />
@@ -243,7 +243,7 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
                                     return (
                                         <div
                                             key={`booked-${index}`}
-                                            className="py-3 px-2 rounded-xl text-sm font-bold bg-white/50 text-slate-400 border border-transparent flex items-center justify-center gap-1.5 cursor-not-allowed opacity-70"
+                                            className="py-2 sm:py-3 px-1 sm:px-2 rounded-lg sm:rounded-xl text-[12px] sm:text-sm font-bold bg-white/50 text-slate-400 border border-transparent flex items-center justify-center gap-1.5 cursor-not-allowed opacity-70"
                                         >
                                             <Lock className="w-3.5 h-3.5" />
                                             <span className="line-through">{slot.displayTime}</span>
@@ -257,7 +257,7 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
                                         whileTap={{ scale: 0.98 }}
                                         key={`avail-${index}`}
                                         onClick={() => setActiveSlot(slot.isoStart)}
-                                        className={`py-3 px-2 rounded-xl text-sm font-bold transition-all duration-200 flex items-center justify-center
+                                        className={`py-2 sm:py-3 px-1 sm:px-2 rounded-lg sm:rounded-xl text-[12px] sm:text-sm font-bold transition-all duration-200 flex items-center justify-center
                                             ${isSelected 
                                                 ? 'bg-white text-[#00A4A3] border-2 border-[#00A4A3] shadow-[0_4px_12px_rgba(0,164,163,0.2)]' 
                                                 : 'bg-white text-slate-600 border-2 border-transparent hover:border-[#00A4A3]/30 hover:bg-[#F0FDFD]'
@@ -273,7 +273,7 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
             </div>
 
             {/* Footer / Action Area */}
-            <div className="relative z-10 mt-6 pt-6 border-t border-[#00A4A3]/20 flex flex-col gap-4 bg-[#EBFFFF]">
+            <div className="relative z-10 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-[#00A4A3]/20 flex flex-col gap-3 sm:gap-4 bg-[#EBFFFF]">
                 
                 {/* Refund Policy Alert */}
                 <div className="bg-white/60 border border-[#00A4A3]/30 rounded-xl p-3 flex gap-3 items-start shadow-sm">
@@ -295,7 +295,7 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => setPaymentMethod('razorpay')}
-                                className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                                className={`flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-all ${
                                     paymentMethod === 'razorpay'
                                     ? 'border-[#00A4A3] bg-white shadow-sm'
                                     : 'border-transparent bg-white/60 hover:bg-white text-slate-500'
@@ -310,7 +310,7 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
                                     if (isWalletSufficient) setPaymentMethod('wallet');
                                 }}
                                 disabled={!isWalletSufficient}
-                                className={`flex flex-col items-start p-3 rounded-xl border-2 transition-all ${
+                                className={`flex flex-col items-center sm:items-start p-2 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-all ${
                                     paymentMethod === 'wallet'
                                     ? 'border-[#00A4A3] bg-white shadow-sm'
                                     : !isWalletSufficient 
@@ -337,7 +337,7 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
                     </div>
                     <button 
                         onClick={handleConfirmClick}
-                        className={`px-8 py-4 rounded-2xl font-bold transition-all duration-300 shadow-md ${
+                        className={`px-4 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-[13px] sm:text-base font-bold transition-all duration-300 shadow-md ${
                             activeSlot && selectedMode && (isReschedule || paymentMethod)
                             ? 'bg-[#00A4A3] hover:bg-[#008A89] text-white cursor-pointer hover:shadow-lg hover:-translate-y-0.5' 
                             : 'bg-[#00A4A3]/80 hover:bg-[#00A4A3] text-white cursor-pointer hover:shadow-lg'

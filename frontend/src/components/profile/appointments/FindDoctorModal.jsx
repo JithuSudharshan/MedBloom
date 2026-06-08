@@ -98,12 +98,12 @@ export default function FindDoctorModal({ isOpen, onClose }) {
             <div className="relative w-full max-w-6xl max-h-[90vh] bg-[#f8fafc] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-slide-up">
 
                 {/* Header */}
-                <div className="flex items-center justify-between px-8 py-6 bg-white border-b border-gray-100 shrink-0">
+                <div className="flex items-start sm:items-center justify-between px-5 sm:px-8 py-5 sm:py-6 bg-white border-b border-gray-100 shrink-0 gap-4">
                     <div>
-                        <h2 className="text-2xl font-semibold text-[#006D6F]">
+                        <h2 className="text-[20px] sm:text-2xl font-semibold text-[#006D6F]">
                             Find a Specialist
                         </h2>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-[12px] sm:text-sm text-gray-500 mt-1">
                             Search and book appointments with top doctors
                         </p>
                     </div>
@@ -117,7 +117,7 @@ export default function FindDoctorModal({ isOpen, onClose }) {
                 </div>
 
                 {/* Content Area */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 sm:p-8 scrollbar-hide">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-8 scrollbar-hide w-full">
                     {/* Search Section */}
                     <div className="mb-6">
                         <SearchBar
@@ -129,7 +129,7 @@ export default function FindDoctorModal({ isOpen, onClose }) {
 
                     {/* Department Filter Pills */}
                     {!isLoading && departments.length > 0 && (
-                        <div className="mb-8 flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                        <div className="mb-8 flex items-center gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-hide w-full">
                             <button
                                 onClick={() => setSelectedDepartment("All")}
                                 className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${selectedDepartment === "All"

@@ -92,12 +92,12 @@ export default function AppointmentsSection({
     const selectedAppointment = id ? appointments.find(app => app.id === id || app._id === id) : null;
 
     return (
-        <section className={`bg-white rounded-[3rem] px-8 py-10 w-full flex-1 flex flex-col ${
+        <section className={`bg-white rounded-[2rem] sm:rounded-[3rem] px-5 sm:px-8 py-6 sm:py-10 w-full flex-1 flex flex-col ${
             isDoctor ? "shadow-[0_20px_60px_-15px_rgba(176,139,140,0.2)]" : "shadow-[0_20px_60px_-15px_rgba(0,109,111,0.2)]"
         }`}>
 
             {/* Header */}
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <h2 className={`text-[20px] font-semibold ${isDoctor ? "text-[#6B3B3D]" : "text-[#006D6F]"}`}>
                     My Appointments
                 </h2>
@@ -105,7 +105,7 @@ export default function AppointmentsSection({
                 {!isDoctor && (
                     <button 
                         onClick={() => setIsFindDoctorOpen(true)}
-                        className="rounded-full bg-[#008C89] px-6 py-2 text-[13px] font-medium text-white shadow-sm hover:bg-[#006e6b] transition"
+                        className="rounded-full bg-[#008C89] px-6 py-2.5 text-[13px] font-medium text-white shadow-sm hover:bg-[#006e6b] transition w-full sm:w-auto text-center"
                     >
                         Book New Appointment
                     </button>

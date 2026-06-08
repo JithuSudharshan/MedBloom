@@ -97,7 +97,7 @@ export default function TransactionsPage({ userRole }) {
     if (loading) return <Loader />;
 
     return (
-        <div className="w-full flex flex-col gap-6 font-sans h-full">
+        <div className="w-full flex flex-col gap-6 font-sans min-h-full pb-8 sm:pb-0">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
@@ -237,7 +237,7 @@ export default function TransactionsPage({ userRole }) {
 
                         {/* Pagination */}
                         {totalPages > 1 && (
-                            <div className="px-6 py-6 bg-white border-t border-gray-100 flex justify-center">
+                            <div className="px-6 py-6 pb-20 sm:pb-6 bg-white border-t border-gray-100 flex justify-center">
                                 <Pagination
                                     current={currentPage}
                                     total={totalPages}

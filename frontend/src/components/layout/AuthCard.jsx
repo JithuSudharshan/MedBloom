@@ -18,13 +18,13 @@ const AuthCard = ({ oneLine, onChange, authState, isAdmin }) => {
     }
 
     return (
-        <div className={`flex flex-col justify-center items-center w-full md:w-1/2 py-10 transition-colors duration-500 ${
+        <div className={`flex flex-col justify-center items-center w-full md:w-1/2 py-10 transition-colors duration-500 min-h-screen md:min-h-0 ${
             selected === "Doctor" ? "bg-[#FCF8F8]" : "bg-[#EBFFFF]"
         }`}>
-            <div className="p-8 w-80 sm:w-96">
+            <div className="px-6 sm:p-8 w-full max-w-[22rem] sm:max-w-sm">
                 {/* Logo */}
                 <Link to="/homePage" className="block w-fit mx-auto cursor-pointer hover:opacity-90 transition-opacity">
-                    <h1 className="text-6xl font-bold mb-1 text-center">
+                    <h1 className="text-[2.5rem] sm:text-5xl lg:text-6xl font-bold mb-1 text-center tracking-tight">
                         <span className="text-gray-800">MED</span>
                         <span className={`transition-colors duration-500 ${selected === "Doctor" ? "text-[#B08B8C]" : "text-[#00A4A3]"}`}>BLOOM</span>
                     </h1>

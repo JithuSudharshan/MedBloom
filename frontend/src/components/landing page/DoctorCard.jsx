@@ -28,7 +28,7 @@ export default function DoctorCard({ doctor }) {
                     src={doctor.profilePicture}
                     alt={doctor.displayName}
                     className="
-                        w-full h-56 object-cover object-top
+                        w-full h-44 sm:h-52 object-cover object-top
                         transition-transform duration-500 group-hover:scale-105
                     "
                 />

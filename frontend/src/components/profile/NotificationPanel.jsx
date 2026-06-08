@@ -65,7 +65,7 @@ export default function NotificationsPanel({
     return (
         <div
             className={twMerge(
-                'bg-white rounded-[32px] shadow-lg p-8 flex flex-col gap-6 w-full h-full',
+                'bg-white rounded-[2rem] sm:rounded-[32px] shadow-lg p-5 sm:p-8 flex flex-col gap-4 sm:gap-6 w-full h-full',
                 className
             )}
         >
@@ -162,23 +162,23 @@ export default function NotificationsPanel({
                             ref={isLast ? lastNotificationElementRef : null}
                             onClick={() => onItemClick?.(n)}
                             className={twMerge(
-                                'w-full text-left rounded-2xl p-5 border flex gap-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-md',
+                                'w-full text-left rounded-[1rem] sm:rounded-2xl p-4 sm:p-5 border flex gap-3 sm:gap-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-md',
                                 n.read
                                     ? 'bg-white border-slate-200 shadow-sm'
-                                    : `${currentTheme.bg} border-slate-100 border-l-[6px] ${currentTheme.border} shadow-sm`
+                                    : `${currentTheme.bg} border-slate-100 border-l-[4px] sm:border-l-[6px] ${currentTheme.border} shadow-sm`
                             )}
                         >
                             <div className={twMerge(
-                                "mt-0.5 w-12 h-12 shrink-0 rounded-xl flex items-center justify-center transition-colors", 
+                                "mt-0.5 w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-xl flex items-center justify-center transition-colors", 
                                 n.read ? "bg-slate-50 text-slate-400 border border-slate-100" : `${currentTheme.iconBg} ${currentTheme.iconColor}`
                             )}>
-                                <Icon className="w-6 h-6" strokeWidth={2} />
+                                <Icon className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2} />
                             </div>
                             
                             <div className="flex-1 flex flex-col gap-1.5 min-w-0">
                                 <div className="flex justify-between items-start w-full gap-2">
                                     <span className={twMerge(
-                                        "text-base font-bold truncate", 
+                                        "text-[15px] sm:text-base font-bold truncate", 
                                         n.read ? "text-slate-600" : currentTheme.text
                                     )}>
                                         {nTitle}
@@ -191,7 +191,7 @@ export default function NotificationsPanel({
                                     </div>
                                 </div>
                                 <p className={twMerge(
-                                    "text-sm leading-relaxed", 
+                                    "text-[13px] sm:text-sm leading-relaxed", 
                                     n.read ? "text-slate-500" : "text-slate-700 font-medium"
                                 )}>
                                     {n.message}

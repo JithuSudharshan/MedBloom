@@ -3,7 +3,9 @@ const Button = ({
     variant = 'primary',
     size = 'md',
     onClick,
-    className = ''
+    type = 'button',
+    className = '',
+    ...props
 }) => {
     const getVariantClasses = () => {
         switch (variant) {
@@ -32,8 +34,10 @@ const Button = ({
     }
     return (
         <button
+            type={type}
             onClick={onClick}
-            className={`font-medium rounded-full transition-all duration-200 hover:shadow-lg ${getVariantClasses()} ${getSizeClasses()} ${className}`}
+            className={`font-medium rounded-full transition-all duration-200 hover:shadow-lg flex items-center justify-center gap-2 ${getVariantClasses()} ${getSizeClasses()} ${className}`}
+            {...props}
         >
             {children}
         </button>

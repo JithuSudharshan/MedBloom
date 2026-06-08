@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Lock, Menu, X } from "lucide-react";
 import SidebarMenu from "./SidebarMenu";
 import PatientInformation from "./PatientInformation";
 import AppointmentsSection from "./appointments/AppointmentsSection";
@@ -19,7 +20,6 @@ import DoctorPatientsList from "./doctorDasboard/patients/DoctorPatientsList";
 import SymptomChecker from "./patient/SymptomChecker";
 
 import { useLocation, useNavigate } from "react-router-dom";
-import { Lock } from "lucide-react";
 import Button from "../ui/Button";
 
 const ProfileLayout = ({
@@ -51,6 +51,7 @@ const ProfileLayout = ({
 
     const [loading, setLoading] = useState(false)
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [localUser, setLocalUser] = useState(profileData)
     const [dashboardMetrics, setDashboardMetrics] = useState([])
 
@@ -180,27 +181,72 @@ const ProfileLayout = ({
     };
 
     return (
-        <div className={`h-screen w-full py-6 lg:py-10 overflow-hidden ${user === 'doctor' ? "bg-[#FCF8F8]" : "bg-[#F8FDFD]"
-            }`}>
-            <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 w-full px-6 md:px-10 xl:px-16 mx-auto max-w-[1800px] h-full items-start">
-
-                {/* Sidebar */}
-                <aside className="w-full lg:w-80 shrink-0">
-                    <SidebarMenu
-                        menu={sidebarMenu}
-                        src={localUser?.avatar?.src}
-                        alt={localUser?.avatar?.alt}
-                        name={localUser?.fullName}
-                        onLogout={onLogout}
-                        isLoggingOut={isLoggingOut}
-                        onEditAvatar={() => setIsAvatarModalOpen(true)}
-                        userRole={user}
+        <div className={`flex flex-col h-screen w-full overflow-hidden ${user === 'doctor' ? "bg-[#FCF8F8]" : "bg-[#F8FDFD]"}`}>
+            
+            {/* Mobile App Bar */}
+            <div className={`lg:hidden sticky top-0 z-40 flex items-center justify-between px-6 py-4 border-b shadow-sm backdrop-blur-xl ${user === 'doctor' ? 'bg-white/80 border-rose-100/50' : 'bg-white/80 border-teal-100/50'}`}>
+                <div className="flex items-center gap-3">
+                    <img 
+                        src={localUser?.avatar?.src || "https://media.istockphoto.com/id/1451587807/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-vector.jpg?s=612x612&w=0&k=20&c=yDJ4ITX1cHMh25Lt1vI1zBn2cAKKAlByHBvPJ8gEiIg="} 
+                        alt="avatar" 
+                        className={`w-10 h-10 rounded-full object-cover border-2 ${user === 'doctor' ? 'border-[#B08B8C]' : 'border-teal-500'}`} 
                     />
+                    <div className={`font-bold text-lg tracking-tight ${user === 'doctor' ? 'text-[#6B3B3D]' : 'text-teal-800'}`}>
+                        Hi, {localUser?.fullName?.split(' ')[0] || 'User'}
+                    </div>
+                </div>
+                <button 
+                    onClick={() => setIsMobileMenuOpen(true)}
+                    className={`p-2 rounded-xl shadow-sm border transition-all active:scale-95 ${user === 'doctor' ? 'text-[#B08B8C] bg-white/50 hover:bg-white border-rose-200' : 'text-teal-700 bg-white/50 hover:bg-white border-teal-100'}`}
+                >
+                    <Menu size={22} />
+                </button>
+            </div>
 
+            <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 w-full px-4 sm:px-6 md:px-10 xl:px-16 mx-auto max-w-[1800px] flex-1 min-h-0 items-stretch lg:items-start relative py-6 lg:py-10">
+
+                {/* Overlay for mobile drawer */}
+                {isMobileMenuOpen && (
+                    <div 
+                        className="fixed inset-0 bg-black/40 z-50 lg:hidden backdrop-blur-sm transition-opacity"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    />
+                )}
+
+                {/* Sidebar Drawer */}
+                <aside className={`
+                    fixed inset-y-0 left-0 z-[60] w-[85%] max-w-sm transform transition-transform duration-300 ease-in-out bg-transparent
+                    lg:relative lg:w-80 lg:translate-x-0 lg:z-auto lg:block shrink-0
+                    ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+                `}>
+                    <div className="h-full w-full p-4 lg:p-0">
+                        {/* Close button inside drawer for mobile */}
+                        <button 
+                            className="absolute top-8 right-8 z-50 p-2 bg-white rounded-full shadow-md text-slate-500 lg:hidden"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            <X size={20} />
+                        </button>
+
+                        <SidebarMenu
+                            menu={sidebarMenu}
+                            src={localUser?.avatar?.src}
+                            alt={localUser?.avatar?.alt}
+                            name={localUser?.fullName}
+                            onLogout={onLogout}
+                            isLoggingOut={isLoggingOut}
+                            onEditAvatar={() => {
+                                setIsAvatarModalOpen(true);
+                                setIsMobileMenuOpen(false);
+                            }}
+                            userRole={user}
+                            onCloseMobileMenu={() => setIsMobileMenuOpen(false)}
+                        />
+                    </div>
                 </aside>
 
                 {/* Main cards and dashboard content */}
-                <main className={`flex-1 flex flex-col min-w-0 h-full overflow-y-auto  pr-2 
+                <main className={`flex-1 flex flex-col min-w-0 h-full overflow-y-auto pr-2 pb-24 lg:pb-0
                     [&::-webkit-scrollbar]:w-2 
                     [&::-webkit-scrollbar-track]:bg-transparent 
                     [&::-webkit-scrollbar-thumb]:rounded-full 
@@ -279,6 +325,26 @@ const ProfileLayout = ({
 
                 </main>
             </div>
+
+            {/* Bottom Navigation Bar for Patient */}
+            {user === 'patient' && (
+                <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-xl border-t border-teal-100/50 shadow-[0_-8px_30px_rgba(0,109,111,0.06)] px-6 py-3 flex items-center justify-between pb-safe">
+                    {sidebarMenu.filter(item => ['personal', 'appointments', 'triage', 'records'].includes(item.key)).map(item => {
+                        const Icon = item.icon;
+                        const isActive = activeKey === item.key;
+                        return (
+                            <button 
+                                key={item.key} 
+                                onClick={() => navigate(item.path)} 
+                                className={`flex flex-col items-center gap-1.5 p-2 transition-all duration-300 ${isActive ? 'text-teal-600 scale-105' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                <Icon className={`w-6 h-6 ${isActive ? 'fill-teal-50 stroke-[2.5px]' : 'stroke-2'}`} />
+                                <span className={`text-[10px] ${isActive ? 'font-bold' : 'font-medium'}`}>{item.label}</span>
+                            </button>
+                        )
+                    })}
+                </div>
+            )}
 
             <Modal
                 isOpen={isAvatarModalOpen}
