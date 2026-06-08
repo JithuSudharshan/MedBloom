@@ -5,9 +5,9 @@ export const DoctorRow = ({ doctor, viewDetails, onOpenBlock, onOpenUnblock }) =
 
 
     return (
-        <div className="flex items-stretch justify-between rounded-2xl bg-white shadow-sm border  border-slate-100 px-6 py-4 mb-4">
+        <div className="flex flex-col lg:flex-row lg:items-stretch justify-between rounded-2xl bg-white shadow-sm border border-slate-100 px-4 sm:px-6 py-4 mb-4 gap-4">
             {/* Left: avatar + basic info */}
-            <div className="flex items-center  gap-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 lg:gap-6">
                 <img
                     src={doctor.profilePicture}
                     alt={doctor.displayName}
@@ -24,7 +24,7 @@ export const DoctorRow = ({ doctor, viewDetails, onOpenBlock, onOpenUnblock }) =
                             {doctor.contactNumber}
                         </span>
                     </p>
-                    <div className="flex gap-8 text-xs text-slate-400">
+                    <div className="flex flex-wrap gap-4 sm:gap-8 text-xs text-slate-400 mt-2">
                         <p>
                             Experience{" "}
                             <span className="text-slate-800 font-semibold">
@@ -48,8 +48,8 @@ export const DoctorRow = ({ doctor, viewDetails, onOpenBlock, onOpenUnblock }) =
             </div>
 
             {/* Right: availability + actions */}
-            <div className="flex flex-col items-end justify-between gap-2 text-right">
-                <div className="flex items-center gap-5">
+            <div className="flex flex-col items-start lg:items-end justify-between gap-3 text-left lg:text-right mt-2 lg:mt-0 pt-4 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+                <div className="flex items-center gap-4 lg:gap-5">
                     <span
                         className={`text-sm font-semibold ${isBlocked ? "text-rose-500" : "text-emerald-500"
                             }`}
@@ -69,7 +69,7 @@ export const DoctorRow = ({ doctor, viewDetails, onOpenBlock, onOpenUnblock }) =
                         {doctor.nextAvailableLabel}
                     </span>
                 </p>
-                <div className="flex items-center gap-6 text-xs font-medium">
+                <div className="flex items-center gap-4 lg:gap-6 text-xs font-medium w-full lg:w-auto justify-between lg:justify-end">
                     <button onClick={() => viewDetails(doctor)} className="text-teal-600 hover:text-teal-700">
                         View Profile
                     </button>

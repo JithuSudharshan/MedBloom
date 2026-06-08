@@ -9,7 +9,7 @@ const StatCard = ({ label, value, actionLabel, onAction }) => {
 
 
     return (
-        <div className="flex items-center justify-between rounded-2xl bg-white shadow-sm px-8 py-5 border border-slate-100">
+        <div className="flex items-center justify-between rounded-2xl bg-white shadow-sm px-5 sm:px-6 lg:px-8 py-5 border border-slate-100">
             <div>
                 <p className="text-sm text-teal-600 font-medium">{label}</p>
                 <p className="mt-1 text-3xl font-semibold text-slate-800">{value}</p>

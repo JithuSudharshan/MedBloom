@@ -88,7 +88,7 @@ export default function AddDepartmentForm({
                     <Button
                         type="button"
                         variant="outline"
-                        onClick={() => window.history.back()}
+                        onClick={() => setIsModalOpen(false)}
                     >
                         Cancel
                     </Button>

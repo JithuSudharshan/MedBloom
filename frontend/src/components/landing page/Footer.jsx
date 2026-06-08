@@ -33,6 +33,7 @@ const Footer = () => {
                     {/* Constrained Wrapper for Content */}
                     <div className="w-full max-w-7xl mx-auto relative pt-[300px] sm:pt-0 sm:h-[400px] flex sm:block justify-center">
                         {/* Content Area */}
+
                         {/* Form Card */}
                         <div className="sm:absolute sm:right-6 lg:right-4 sm:top-12 md:top-20 bg-gradient-to-br from-[#006868] to-[#00D8D7] rounded-[32px] shadow-xl 
                         w-[90%] sm:w-[380px] md:w-[400px] px-6 sm:px-8 py-6 flex flex-col gap-5 border border-[#0fc9bd] -mt-12 sm:mt-0 relative z-20">
@@ -67,7 +68,7 @@ const Footer = () => {
                                     className={`${loading ? "opacity-70 cursor-not-allowed" : ""} w-full py-3 rounded-xl mt-2
                                     text-white bg-[#03373B] hover:bg-[#095f64] transition-colors font-medium`}
                                 >
-                                    {loading ? "Submitting..." : "Submit an application"}
+                                    {loading ? "Submitting..." : "Submit Inquiry"}
                                 </button>
                             </form>
                         </div>
@@ -86,6 +87,7 @@ const Footer = () => {
                             <Link to="/doctors"><li className="cursor-pointer px-4 py-1.5 rounded-full hover:bg-white/20 md:hover:bg-gray-100 transition-colors">Find Doctors</li></Link>
                             <Link to="/login"><li className="cursor-pointer px-4 py-1.5 rounded-full hover:bg-white/20 md:hover:bg-gray-100 transition-colors">Login</li></Link>
                             <Link to="/admin/login"><li className="cursor-pointer px-4 py-1.5 rounded-full hover:bg-white/20 md:hover:bg-gray-100 transition-colors">Admin</li></Link>
+                            <Link to="/articles"><li className="cursor-pointer px-4 py-1.5 rounded-full hover:bg-white/20 md:hover:bg-gray-100 transition-colors">Articles</li></Link>
                         </ul>
                     </div>
 
@@ -105,6 +107,11 @@ const Footer = () => {
                     <span className="text-[15vw] sm:text-[120px] md:text-[180px] lg:text-[200px] font-bold tracking-[0.1em] sm:tracking-[0.15em] text-white/5 sm:text-white/10 md:text-white whitespace-nowrap bg-clip-text">
                         MEDBLOOM
                     </span>
+                </div>
+                
+                {/* Copyright Line */}
+                <div className="w-full text-center pb-6">
+                    <p className="text-white/60 text-sm font-medium">© 2026 MedBloom. All rights reserved.</p>
                 </div>
             </div>
         </section>

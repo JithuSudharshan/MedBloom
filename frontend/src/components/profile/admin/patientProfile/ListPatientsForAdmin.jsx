@@ -2,26 +2,27 @@ import React from 'react'
 import DataTable from '../TableData';
 import { Pagination } from '../../../ui/Pagination';
 import { PatientStats } from './PatientStats';
+import { Search } from "lucide-react";
 
 const ListPatientsForAdmin = ({ patients, page, setPage, totalPages, onViewPatient, onBlockPatient, patientCount, newPatients, activeVisit, searchTerm, setSearchTerm }) => {
     const patientColumns = [
         { key: "name", header: "Name" },
         { key: "email", header: "Email" },
-        { key: "gender", header: "Gender" },
+        { key: "gender", header: "Gender", render: (val) => <span className="capitalize">{val}</span> },
         {
             key: "totalVisits",
             header: "Total Visits",
             render: (_, patient) => (
-                <span className="text-gray-700 font-medium">{patient.totalVisits || 0}</span>
+                <span className="text-slate-700 font-medium">{patient.totalVisits || 0}</span>
             )
         },
         {
             key: "actions",
             header: "Actions",
             render: (_, patient) => (
-                <div className="flex gap-3 text-xs">
+                <div className="flex gap-3 text-xs font-medium">
                     <button
-                        className="text-teal-600 hover:text-teal-700"
+                        className="text-teal-600 hover:underline hover:text-teal-700"
                         onClick={(e) => {
                             e.stopPropagation();
                             onViewPatient(patient);
@@ -29,8 +30,9 @@ const ListPatientsForAdmin = ({ patients, page, setPage, totalPages, onViewPatie
                     >
                         View Profile
                     </button>
+                    <span className="text-slate-300">|</span>
                     <button
-                        className="text-rose-500 hover:text-rose-600"
+                        className="text-rose-500 hover:underline hover:text-rose-600"
                         onClick={(e) => {
                             e.stopPropagation();
                             onBlockPatient(patient);
@@ -43,30 +45,45 @@ const ListPatientsForAdmin = ({ patients, page, setPage, totalPages, onViewPatie
         },
     ]
     return (
-        <section className='max-w-7xl mx-auto px-6'>
+        <div className="p-4 md:p-10 bg-white min-h-[85vh] rounded-[32px] shadow-sm border border-slate-100 flex flex-col min-w-0 w-full shrink-0">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Patients Directory</h1>
+                    <p className="text-slate-500 text-sm mt-1">Manage and monitor all registered patients.</p>
+                </div>
+            </div>
+
+            {/* Metrics Section */}
             <PatientStats patientCount={patientCount} newPatients={newPatients} activeVisit={activeVisit} />
             
-            {/* Search / Filter */}
-            <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center mt-6 mb-4">
-                <div className="flex-1">
+            {/* Search Row */}
+            <div className="flex gap-4 mb-6">
+                <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <input
                         type="text"
-                        placeholder="Search Patients by name or email...."
+                        placeholder="Search patients by name or email..."
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value);
                             setPage(1); // Reset page on search
                         }}
-                        className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 text-sm transition-all"
                     />
                 </div>
             </div>
 
-            <DataTable columns={patientColumns} rows={patients} />
-            <div>
-                <Pagination current={page} total={totalPages} onChange={setPage} />
+            {/* Table Section */}
+            <div className="bg-white border border-slate-100 rounded-2xl shadow-sm flex flex-col min-w-0 w-full overflow-hidden shrink-0">
+                <div className="overflow-x-auto min-w-0 w-full">
+                    <DataTable columns={patientColumns} rows={patients} />
+                </div>
+                <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex justify-end">
+                    <Pagination current={page} total={totalPages} onChange={setPage} />
+                </div>
             </div>
-        </section>
+        </div>
     )
 }
 

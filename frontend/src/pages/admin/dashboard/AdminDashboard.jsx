@@ -4,7 +4,6 @@ import adminProfileConfig from "../../../config/adminProfileConfig";
 import Navbar from "../../../components/landing page/Navbar";
 import Button from "../../../components/ui/Button";
 import { showToast } from "../../../components/ui/Toast";
-import ProfileBanner from '../../../components/profile/ProfileBanner';
 import { useAuth } from '../../../context/AuthContext';
 import Loader from '../../../components/ui/Loading';
 import AdminProfileLayout from '../../../components/profile/admin/AdminProfileLayout';
@@ -42,7 +41,6 @@ export default function PatientProfilePage() {
   return (
     <>
       <Navbar current={"adminLogin"} />
-      <ProfileBanner userRole="admin" />
       <AdminProfileLayout
         sidebarMenu={adminProfileConfig.sidebarMenu}
         onLogout={handleLogout}

@@ -175,9 +175,9 @@ export const addNewDepartment = async (data) => {
     }
 }
 
-export const fetchDataForTable = async () => {
+export const fetchDataForTable = async (config) => {
     try {
-        const response = await api.get("/admin/department/table-info")
+        const response = await api.get("/admin/department/table-info", config)
         return response
 
     } catch (error) {

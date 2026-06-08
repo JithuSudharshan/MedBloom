@@ -592,25 +592,56 @@ export const addNewDepartment = async (req, res) => {
 }
 
 export const fetchDataForDepartmentTable = async (req, res) => {
-
-    const { page, } = req.params
     try {
-        const departments = await Department.find();
+        const page = parseInt(req.query.page || "1", 10);
+        const limit = parseInt(req.query.limit || "10", 10);
+        const skip = (page - 1) * limit;
+
+        const filter = {};
+
+        if (req.query.search) {
+            filter.departmentName = new RegExp(req.query.search, 'i');
+        }
+
+        if (req.query.status && req.query.status !== 'all') {
+            filter.status = req.query.status;
+        }
+
+        const [departments, total, totalOverall, activeCount, inactiveCount] = await Promise.all([
+            Department.find(filter)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            Department.countDocuments(filter),
+            Department.countDocuments({}),
+            Department.countDocuments({ status: 'active' }),
+            Department.countDocuments({ status: 'inactive' })
+        ]);
+
+        const totalPages = Math.max(1, Math.ceil(total / limit));
+
         const formattedData = departments.map((dept) => ({
             id: dept._id,
             departmentName: dept.departmentName,
             departmentDescription: dept.departmentDescription,
-            doctorCount: dept.doctors.length,
+            doctorCount: dept.doctors ? dept.doctors.length : 0,
             status: dept.status
         }));
-
-        if (!formattedData)
-            return res.status(400).json({ success: false, message: "Failed to fetch data" })
 
         res.status(200).json({
             success: true,
             message: "succesfully fetched department data for displaying in the frontend",
-            departments: formattedData
+            data: {
+                departments: formattedData,
+                page,
+                totalPages,
+                totalCount: total,
+                metrics: {
+                    total: totalOverall,
+                    active: activeCount,
+                    inactive: inactiveCount
+                }
+            }
         })
 
     } catch (error) {

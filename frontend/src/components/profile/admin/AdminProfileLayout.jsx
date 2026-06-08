@@ -4,6 +4,7 @@ import ListDoctorsForAdmin from "./doctorProfile/ListDoctorsForAdmin";
 import SidebarMenu from "../SidebarMenu";
 import adminPic from '../../../assets/images/admin.jpg'
 import Modal from "../Modal";
+import { Menu, X } from "lucide-react";
 import ConfirmDialog from "../../ui/ConfirmDialogue";
 import { showToast } from "../../ui/Toast";
 import {
@@ -37,6 +38,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
 
     const [openApproval, setOpenApproval] = useState(false);
     const [dashboardMetrics, setDashboardMetrics] = useState([])
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const [doctorPage, setDoctorPage] = useState(1);
     const [patientPage, setPatientPage] = useState(1);
@@ -48,6 +50,11 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
     const [appointmentTab, setAppointmentTab] = useState("All")
     const [doctorSearchTerm, setDoctorSearchTerm] = useState("")
     const [patientSearchTerm, setPatientSearchTerm] = useState("")
+    const [departmentSearchTerm, setDepartmentSearchTerm] = useState("")
+    const [departmentFilter, setDepartmentFilter] = useState("all")
+    const [departmentPage, setDepartmentPage] = useState(1);
+    const [totalDepartmentPages, setTotalDepartmentPages] = useState(1);
+    const [departmentMetrics, setDepartmentMetrics] = useState({ total: 0, active: 0, inactive: 0 });
 
     const [doctors, setDoctors] = useState([])
     const [patients, setPatients] = useState([])
@@ -71,17 +78,31 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
 
     const [loading, setLoading] = useState(false)
 
-    const [departmentData, setDepartmentData] = useState(null)
+    const [departmentData, setDepartmentData] = useState([])
 
 
-    useEffect(() => {
-        const getData = async () => {
-            const fetchedData = await fetchDataForTable();
-            console.log("fetcghed data", fetchedData.data.departments)
-            setDepartmentData(fetchedData.data.departments);
-        };
-        getData();
-    }, []);
+    const fetchDepartments = async (pageNumber = 1) => {
+        try {
+            setLoading(true);
+            const res = await fetchDataForTable({
+                params: { page: pageNumber, limit: 10, search: departmentSearchTerm, status: departmentFilter }
+            });
+
+            if (res?.data?.success) {
+                setDepartmentData(res.data.data.departments || []);
+                setDepartmentPage(res.data.data.page);
+                setTotalDepartmentPages(res.data.data.totalPages);
+                if (res.data.data.metrics) setDepartmentMetrics(res.data.data.metrics);
+            } else {
+                showToast.error("Failed to fetch departments");
+            }
+        } catch (error) {
+            console.error("Failed to load departments:", error);
+            showToast.error("Something went wrong while fetching data");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const fetchApprovedDoctors = async (pageNumber = 1) => {
         try {
@@ -226,9 +247,12 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
             return () => clearTimeout(timer);
         }
         if (activeKey === "departments") {
-            console.log(departmentData)
+            const timer = setTimeout(() => {
+                fetchDepartments(departmentPage);
+            }, 500);
+            return () => clearTimeout(timer);
         }
-    }, [activeKey, doctorPage, patientPage, doctorSearchTerm, patientSearchTerm]);
+    }, [activeKey, doctorPage, patientPage, departmentPage, doctorSearchTerm, patientSearchTerm, departmentSearchTerm, departmentFilter]);
 
     useEffect(() => {
         if (activeKey === "dashboard") {
@@ -333,22 +357,59 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
 
 
     return (
-        <div className="h-screen w-full py-6 lg:py-10 overflow-hidden bg-[#F8FDFD]">
-            <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 w-full px-6 md:px-10 xl:px-16 mx-auto max-w-[1800px] h-full items-start">
-                <aside className="w-full lg:w-80 shrink-0">
-                    <SidebarMenu
-                        isAdmin={true}
-                        menu={sidebarMenu}
-                        src={adminPic}
-                        alt={"admin Photo"}
-                        name={"Admin"}
-                        activeKey={activeKey}
-                        onLogout={onLogout}
-                        isLoggingOut={isLoggingOut}
+        <div className="flex flex-col h-screen w-full overflow-hidden bg-[#F8FDFD]">
+            
+            {/* Mobile App Bar */}
+            <div className="lg:hidden sticky top-0 z-40 flex items-center justify-between px-6 py-4 border-b border-white/40 bg-white/70 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,109,111,0.06)]">
+                <div className="font-bold text-xl text-[#006D6F] tracking-tight">MEDBLOOM Admin</div>
+                <button 
+                    onClick={() => setIsMobileMenuOpen(true)}
+                    className="p-2 -mr-2 text-teal-700 bg-white/50 hover:bg-white rounded-xl shadow-sm border border-teal-100 transition-all active:scale-95"
+                >
+                    <Menu size={22} />
+                </button>
+            </div>
+
+            <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 w-full px-4 sm:px-6 md:px-10 xl:px-16 mx-auto max-w-[1800px] flex-1 min-h-0 items-stretch lg:items-start relative py-6 lg:py-10">
+                
+                {/* Overlay for mobile */}
+                {isMobileMenuOpen && (
+                    <div 
+                        className="fixed inset-0 bg-black/40 z-40 lg:hidden backdrop-blur-sm transition-opacity"
+                        onClick={() => setIsMobileMenuOpen(false)}
                     />
+                )}
+
+                {/* Sidebar Drawer */}
+                <aside className={`
+                    fixed inset-y-0 left-0 z-50 w-[85%] max-w-sm transform transition-transform duration-300 ease-in-out bg-transparent
+                    lg:relative lg:w-80 lg:translate-x-0 lg:z-auto
+                    ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+                `}>
+                    <div className="h-full w-full p-4 lg:p-0">
+                        {/* Close button inside drawer for mobile */}
+                        <button 
+                            className="absolute top-8 right-8 z-50 p-2 bg-white rounded-full shadow-md text-slate-500 lg:hidden"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            <X size={20} />
+                        </button>
+                        
+                        <SidebarMenu
+                            isAdmin={true}
+                            menu={sidebarMenu}
+                            src={adminPic}
+                            alt={"admin Photo"}
+                            name={"Admin"}
+                            activeKey={activeKey}
+                            onLogout={onLogout}
+                            isLoggingOut={isLoggingOut}
+                            onCloseMobileMenu={() => setIsMobileMenuOpen(false)}
+                        />
+                    </div>
                 </aside>
 
-                <main className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto pr-2
+                <main className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto pr-2 pb-6 lg:pb-0
                     [&::-webkit-scrollbar]:w-2 
                     [&::-webkit-scrollbar-track]:bg-transparent 
                     [&::-webkit-scrollbar-thumb]:rounded-full 
@@ -414,6 +475,14 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                             data={departmentData}
                             openModalForAdding={handleAddDpt}
                             openModalForEditing={handleEditDepartment}
+                            page={departmentPage}
+                            totalPages={totalDepartmentPages}
+                            setPage={setDepartmentPage}
+                            searchTerm={departmentSearchTerm}
+                            setSearchTerm={setDepartmentSearchTerm}
+                            filter={departmentFilter}
+                            setFilter={setDepartmentFilter}
+                            metrics={departmentMetrics}
                         />
                     )}
                     {activeKey === "notifications" && (<NotificationsPage userRole="admin" />)}
@@ -476,7 +545,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
             >
                 <AddDepartmentForm
                     cardTitle="Add new Department"
-                    setDepartmentData={setDepartmentData}
+                    setDepartmentData={() => fetchDepartments(departmentPage)}
                     setIsModalOpen={setIsAddModalOpen}
                     mode="addDepartment"
                     register={register}
@@ -500,9 +569,9 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
             >
                 <AddDepartmentForm
                     cardTitle="Edit Department"
-                    setDepartmentData={setDepartmentData}
+                    setDepartmentData={() => fetchDepartments(departmentPage)}
                     setIsModalOpen={setIsEditModalOpen}
-                    department_id={selectedDepartment?.id}
+                    department_id={selectedDepartment?._id || selectedDepartment?.id}
                     mode="edit"
                     register={register}
                     handleSubmit={handleSubmit}

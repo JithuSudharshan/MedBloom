@@ -4,6 +4,7 @@ import Button from './Button';
 const Navbar = ({ current, userRole = 'patient', onBookNow }) => {
     const [isScrolled, setIsScrolled] = useState(false);
     const isDoctor = userRole === 'doctor';
+    const isAdmin = userRole === 'admin' || window.location.pathname.startsWith('/admin');
 
     useEffect(() => {
         const handleScroll = () => {
@@ -31,8 +32,10 @@ const Navbar = ({ current, userRole = 'patient', onBookNow }) => {
     return (
         <nav 
             className={`sticky top-0 z-50 transition-all duration-300 ease-in-out px-8 ${
+                isAdmin ? 'hidden lg:block' : ''
+            } ${
                 isScrolled 
-                    ? `bg-white/30 backdrop-blur-xl py-3 border-b border-white/60 ${isDoctor ? "shadow-[0_8px_30px_rgba(176,139,140,0.12)]" : "shadow-[0_8px_30px_rgba(0,109,111,0.08)]"}` 
+                    ? `bg-white/90 backdrop-blur-xl py-3 border-b border-white/60 ${isDoctor ? "shadow-[0_8px_30px_rgba(176,139,140,0.12)]" : "shadow-[0_8px_30px_rgba(0,109,111,0.08)]"}` 
                     : "bg-transparent py-4 border-b border-transparent"
             }`}
         >
@@ -43,7 +46,7 @@ const Navbar = ({ current, userRole = 'patient', onBookNow }) => {
                 </div>
 
                 {/* Navigation Links */}
-                <div className={`flex items-center py-1.5 px-3 rounded-full gap-2 transition-all duration-300 ${
+                <div className={`hidden lg:flex items-center py-1.5 px-3 rounded-full gap-2 transition-all duration-300 ${
                     isDoctor 
                         ? "bg-white/60 backdrop-blur-md border border-[#B08B8C]/15 shadow-[0_4px_20px_rgba(176,139,140,0.08)]" 
                         : "bg-[#DBFFFF] shadow-sm"
@@ -64,7 +67,7 @@ const Navbar = ({ current, userRole = 'patient', onBookNow }) => {
                 </div>
 
                 {/* CTA Button */}
-                {!isDoctor && (
+                {!isDoctor && !isAdmin && (
                     <button 
                         onClick={() => {
                             if (onBookNow) {

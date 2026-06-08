@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../../components/landing page/Navbar";
-import ProfileBanner from "../../../components/profile/ProfileBanner";
 import AdminDoctorDetails from "../../../components/profile/admin/doctorProfile/AdminDoctorDetails";
 
 const AdminDoctorDetailsPage = () => {
@@ -10,7 +9,6 @@ const AdminDoctorDetailsPage = () => {
     return (
         <>
             <Navbar />
-            <ProfileBanner profileOwner={"Admin Profile"} profileDescription={"Manage the patients information and records"} />
             <div className="min-h-screen mt-15 mb-15 max-w-7xl mx-auto w-full">
                 <AdminDoctorDetails
                     doctorId={DoctorId}

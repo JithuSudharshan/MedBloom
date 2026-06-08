@@ -59,7 +59,7 @@ export const useDepartmentForm = (initialData = null) => {
     }, [initialData, reset]);
 
 
-    const onSubmit = async (data, setDepartmentData, setIsAddModalOpen, mode, department_id) => {
+    const onSubmit = async (data, fetchDepartments, setIsAddModalOpen, mode, department_id) => {
         setIsSubmitting(true);
         setSubmitError(null);
 
@@ -68,13 +68,11 @@ export const useDepartmentForm = (initialData = null) => {
             let response;
 
             if (mode === "edit") {
-
                 const departmentData = {
                     ...data,
                     id: department_id
                 }
-
-                response = await editDepartmentInfo(data)
+                response = await editDepartmentInfo(departmentData)
             } else {
                 response = await addNewDepartment(data)
             }
@@ -87,7 +85,7 @@ export const useDepartmentForm = (initialData = null) => {
                 return;
             }
 
-            navigate("/admin/dashboard")
+            // Do not navigate to dashboard
 
             if (mode === "edit") {
                 showToast.success('Deaprtment edited successfully');
@@ -95,7 +93,7 @@ export const useDepartmentForm = (initialData = null) => {
                 showToast.success('New department Added on to the List');
             }
             console.log("latestData", response.data.latestData)
-            setDepartmentData(response.data.latestData)
+            if (fetchDepartments) fetchDepartments();
             setIsAddModalOpen(false)
 
             reset();

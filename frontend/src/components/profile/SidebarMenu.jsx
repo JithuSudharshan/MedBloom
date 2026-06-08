@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { useNotifications } from '../../context/NotificationContex';
 
-const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, onEditAvatar, isAdmin = false, userRole = 'patient' }) => {
+const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, onEditAvatar, isAdmin = false, userRole = 'patient', onCloseMobileMenu }) => {
     const isDoctor = userRole === 'doctor';
 
     // For Notifications Badge
@@ -76,6 +76,9 @@ const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, onEd
                         <li key={item.key}>
                             <NavLink
                                 to={item.path || "#"}
+                                onClick={() => {
+                                    if (onCloseMobileMenu) onCloseMobileMenu();
+                                }}
                                 end
                                 className={({ isActive }) =>
                                     `${baseStyles} ${isActive

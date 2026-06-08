@@ -18,13 +18,13 @@ const ProfileBanner = ({ userRole = 'patient', userDetails, metrics = [] }) => {
     }
 
     return (
-        <section className={`w-full relative overflow-hidden py-14 px-8 border-b ${
+        <section className={`w-full relative overflow-hidden py-10 px-6 md:py-14 md:px-8 border-b ${
             isDoctor 
                 ? "bg-gradient-to-br from-[#FCF5F5] via-[#FDF9F9] to-[#FFFFFF] border-[#B08B8C]/20" 
                 : "bg-gradient-to-br from-[#E0FAFA] via-[#F2FCFC] to-[#FFFFFF] border-teal-50/50"
         }`}>
             {/* Background Watermark */}
-            <div className={`absolute top-1/2 -translate-y-1/2 -left-10 text-[18rem] font-bold select-none pointer-events-none tracking-tighter ${
+            <div className={`absolute top-1/2 -translate-y-1/2 -left-10 text-[10rem] md:text-[18rem] font-bold select-none pointer-events-none tracking-tighter ${
                 isDoctor ? "text-rose-900/5" : "text-teal-900/5"
             }`}>
                 bloom
@@ -32,14 +32,14 @@ const ProfileBanner = ({ userRole = 'patient', userDetails, metrics = [] }) => {
 
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between relative z-10 gap-8">
                 {/* Text Content */}
-                <div className="max-w-2xl">
-                    <h1 className={`text-[2.5rem] leading-tight font-medium mb-3 tracking-tight ${
+                <div className="max-w-2xl text-center md:text-left">
+                    <h1 className={`text-2xl md:text-[2.5rem] leading-tight font-medium mb-3 tracking-tight ${
                         isDoctor ? "text-[#6B3B3D]" : "text-[#004d4d]"
                     }`}>
                         Welcome back, {welcomeName}!<br/>
                         This is your {isDoctor ? "Professional Hub" : (isAdmin ? "Admin Console" : "Patient Profile")}.
                     </h1>
-                    <p className={`text-lg font-medium opacity-80 ${
+                    <p className={`text-base md:text-lg font-medium opacity-80 ${
                         isDoctor ? "text-[#B08B8C]" : "text-[#006D6F]"
                     }`}>
                         {description}
@@ -48,7 +48,7 @@ const ProfileBanner = ({ userRole = 'patient', userDetails, metrics = [] }) => {
 
                 {/* Stat Cards */}
                 {metrics && metrics.length > 0 && (
-                    <div className="flex gap-4">
+                    <div className="flex flex-wrap md:flex-nowrap justify-center md:justify-end gap-4 w-full md:w-auto">
                         {metrics.map((metric, index) => {
                             const Icon = metric.icon;
                             return (

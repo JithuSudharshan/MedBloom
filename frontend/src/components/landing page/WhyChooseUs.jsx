@@ -41,7 +41,7 @@ const WhyChooseSection = () => {
                 {/* Heading */}
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <h2 className="text-gray-900 font-extrabold text-4xl md:text-5xl lg:text-6xl mb-6 tracking-tight">
-                        Why <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-600">choose</span> our service
+                        Why <span className="text-teal-600">choose</span> our service
                     </h2>
                     <p className="text-gray-500 text-lg md:text-xl">
                         Experience healthcare that revolves around you, combining expert medical professionals with seamless technology.
@@ -69,7 +69,7 @@ const WhyChooseSection = () => {
                             <div className="flex -space-x-3">
                                 <img className="w-10 h-10 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=100&h=100" alt="Doctor" />
                                 <img className="w-10 h-10 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=100&h=100" alt="Doctor" />
-                                <img className="w-10 h-10 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1594824432258-2ebbc0570494?auto=format&fit=crop&q=80&w=100&h=100" alt="Doctor" />
+                                <img className="w-10 h-10 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=100&h=100" alt="Doctor" />
                             </div>
                             <div className="text-sm">
                                 <p className="text-gray-900 font-semibold">Trusted by thousands</p>

@@ -5,6 +5,7 @@ import HomePage_image from '../../assets/images/DrImage_homePage.png'
 import ServicesSection from '../../components/landing page/ServiceSection';
 import VdoCallPromoSection from '../../components/landing page/VdoCallPromoSection';
 import PatientReviewPromo from '../../components/landing page/PatientReviewPromo';
+import FAQSection from '../../components/landing page/FAQSection';
 import Footer from '../../components/landing page/Footer';
 
 const HomePage = () => {
@@ -21,6 +22,7 @@ const HomePage = () => {
             <ServicesSection />
             <VdoCallPromoSection />
             <PatientReviewPromo />
+            <FAQSection />
             <Footer />
         </div>
     );

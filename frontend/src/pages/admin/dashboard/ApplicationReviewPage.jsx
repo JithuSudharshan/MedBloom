@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from '../../../components/landing page/Navbar'
-import ProfileBanner from '../../../components/profile/ProfileBanner'
 import ReviewDetails from '../../../components/profile/admin/doctorProfile/ReviewDetails'
 import { useNavigate, useParams } from 'react-router-dom'
 import { acceptDoctor, FetchDoctorInfoForReview, rejectDoctor } from '../../../api/adminApi'
@@ -51,10 +50,6 @@ const ApplicationReviewPage = () => {
     return (
         <>
             <Navbar />
-            <ProfileBanner
-                profileOwner={"Review Application"}
-                profileDescription={"Carefully verify professional credentials and onboarding documents to ensure platform safety."}
-            />
             <ReviewDetails
                 doctorId={doctorId}
                 doctorDetails={doctorInfo}

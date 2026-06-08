@@ -69,16 +69,20 @@ export default function PatientProfilePage() {
     }
     return (
         <>
-            <Navbar current={"login"} onBookNow={() => setIsNavbarModalOpen(true)} />
-            <ProfileBanner 
-                userRole="patient"
-                userDetails={patientDetails} 
-                metrics={[
-                    { label: "Next Appointment", value: patientDetails.nextAppointment, icon: Calendar },
-                    { label: "Last Checkup", value: patientDetails.lastCheckup, icon: Clock },
-                    { label: "Profile Status", value: patientDetails.profileStatus, icon: User }
-                ]}
-            />
+            <div className="hidden lg:block">
+                <Navbar current={"login"} onBookNow={() => setIsNavbarModalOpen(true)} />
+            </div>
+            <div className="hidden lg:block">
+                <ProfileBanner 
+                    userRole="patient"
+                    userDetails={patientDetails} 
+                    metrics={[
+                        { label: "Next Appointment", value: patientDetails.nextAppointment, icon: Calendar },
+                        { label: "Last Checkup", value: patientDetails.lastCheckup, icon: Clock },
+                        { label: "Profile Status", value: patientDetails.profileStatus, icon: User }
+                    ]}
+                />
+            </div>
             {!patientDetails.isOnboarded && <IsonboardedWarning onClick={handleCompleteOnboarding} />}
             <ProfileLayout
                 user={"patient"}

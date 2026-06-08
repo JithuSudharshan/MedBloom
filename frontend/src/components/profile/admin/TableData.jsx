@@ -1,7 +1,7 @@
 const DataTable = ({ columns, rows, onRowClick }) => {
 
     return (
-        <div className="border border-slate-200 rounded-xl overflow-hidden h-full">
+        <div className="border border-slate-200 rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
 
