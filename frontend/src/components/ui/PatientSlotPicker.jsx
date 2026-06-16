@@ -46,18 +46,17 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
 
     // Consultation Mode logic
     const docMode = doctorData?.consultationMode || 'offline';
-    // If lockedMode is provided (e.g. during reschedule), don't show toggle
     const hasBoth = docMode === 'both' && !lockedMode;
     const [selectedMode, setSelectedMode] = useState(lockedMode || (hasBoth ? null : docMode));
 
-    // Dynamic fee calculation
-    const currentFee = selectedMode === 'online' 
-        ? doctorData?.consultationFees?.online || 500 
+    // Dynamic fee calculation — Bug #26: show null fee when no mode
+    const currentFee = selectedMode === 'online'
+        ? doctorData?.consultationFees?.online || 500
         : selectedMode === 'offline'
             ? doctorData?.consultationFees?.offline || 500
-            : 0;
+            : null;
 
-    const isWalletSufficient = walletBalance >= currentFee;
+    const isWalletSufficient = currentFee !== null && walletBalance >= currentFee;
 
     useEffect(() => {
         if (!doctorId) return;
@@ -79,23 +78,46 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
         loadSlots();
     }, [doctorId, selectedDate]);
 
-    // Check if slot isoStart exists in bookedSlots
-    const isBooked = (slotIso) => {
-        return bookedSlots.some(b => {
-            let bookedTime = b.startTime;
-            if (bookedTime && bookedTime.includes('T')) {
-                // Extract HH:mm from ISO string for backward compatibility
-                const d = new Date(bookedTime);
-                const pad = (n) => n.toString().padStart(2, '0');
-                bookedTime = `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
-            }
-            return bookedTime === slotIso;
-        });
+    // Bug #27: Filter client-side to hide past slots for today
+    const nowMins = React.useMemo(() => {
+        const n = new Date();
+        return n.getHours() * 60 + n.getMinutes();
+    }, []);
+    const todayIso = React.useMemo(() => {
+        const n = new Date();
+        return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+    }, []);
+    const isSlotInPast = (isoStart) => {
+        if (selectedDate !== todayIso) return false;
+        const [h, m] = isoStart.split(':').map(Number);
+        return h * 60 + m <= nowMins;
     };
+
+    // Check if slot isoStart exists in bookedSlots (HH:mm comparison)
+    const isBooked = (slotIso) =>
+        bookedSlots.some(b => {
+            let t = b.startTime || '';
+            if (t.includes('T')) {
+                const d = new Date(t);
+                t = `${String(d.getUTCHours()).padStart(2,'0')}:${String(d.getUTCMinutes()).padStart(2,'0')}`;
+            }
+            return t === slotIso;
+        });
+
+    // Bug #28: Group slots into Morning / Afternoon / Evening
+    const groupedSlots = React.useMemo(() => {
+        const groups = { Morning: [], Afternoon: [], Evening: [] };
+        availableSlots.forEach(slot => {
+            const [h] = slot.isoStart.split(':').map(Number);
+            const g = h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : 'Evening';
+            groups[g].push(slot);
+        });
+        return groups;
+    }, [availableSlots]);
 
     const handleDateClick = (dateStr) => {
         setSelectedDate(dateStr);
-        setActiveSlot(null); // Reset selection on date change
+        setActiveSlot(null);
     };
 
     const handleConfirmClick = () => {
@@ -217,59 +239,70 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
                     })}
                 </div>
 
-                {/* Time Chips Grid */}
+                {/* Bug #25: Gate slots behind mode selection */}
+                {hasBoth && !selectedMode ? (
+                    <div className="flex-1 flex flex-col items-center justify-center py-12 text-center bg-white/60 rounded-3xl border-2 border-dashed border-[#00A4A3]/20">
+                        <Clock className="w-10 h-10 text-[#00A4A3]/40 mb-3" />
+                        <p className="text-slate-500 font-semibold">Select a consultation mode above</p>
+                        <p className="text-xs text-slate-400 mt-1">Slots will appear once you choose Online or In-Clinic</p>
+                    </div>
+                ) : (
                 <div className="flex-1 overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#00A4A3]/20">
-                    <div className="flex items-center justify-between mb-4 mt-2">
+                    <div className="flex items-center justify-between mb-3 mt-1">
                         <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
                             <Clock className="w-4 h-4 text-[#00A4A3]" /> Available Slots
                         </h3>
                     </div>
 
-                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-                        {loading ? (
-                            <div className="col-span-full py-8 flex justify-center">
-                                <Loader />
-                            </div>
-                        ) : availableSlots.length === 0 ? (
-                            <div className="col-span-full text-center py-8 text-slate-400 bg-white/50 rounded-2xl border border-dashed border-slate-200">
-                                No slots available on this date.
-                            </div>
-                        ) : (
-                            availableSlots.map((slot, index) => {
-                                const booked = isBooked(slot.isoStart);
-                                const isSelected = activeSlot === slot.isoStart;
-
-                                if (booked) {
-                                    return (
-                                        <div
-                                            key={`booked-${index}`}
-                                            className="py-2 sm:py-3 px-1 sm:px-2 rounded-lg sm:rounded-xl text-[12px] sm:text-sm font-bold bg-white/50 text-slate-400 border border-transparent flex items-center justify-center gap-1.5 cursor-not-allowed opacity-70"
-                                        >
-                                            <Lock className="w-3.5 h-3.5" />
-                                            <span className="line-through">{slot.displayTime}</span>
-                                        </div>
-                                    );
-                                }
-
+                    {loading ? (
+                        <div className="py-8 flex justify-center"><Loader /></div>
+                    ) : availableSlots.length === 0 ? (
+                        <div className="text-center py-8 text-slate-400 bg-white/50 rounded-2xl border border-dashed border-slate-200">
+                            No slots available on this date.
+                        </div>
+                    ) : (
+                        /* Bug #28: Grouped slots */
+                        <div className="flex flex-col gap-4">
+                            {['Morning', 'Afternoon', 'Evening'].map(group => {
+                                const slots = groupedSlots[group];
+                                if (!slots.length) return null;
                                 return (
-                                    <motion.button
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        key={`avail-${index}`}
-                                        onClick={() => setActiveSlot(slot.isoStart)}
-                                        className={`py-2 sm:py-3 px-1 sm:px-2 rounded-lg sm:rounded-xl text-[12px] sm:text-sm font-bold transition-all duration-200 flex items-center justify-center
-                                            ${isSelected 
-                                                ? 'bg-white text-[#00A4A3] border-2 border-[#00A4A3] shadow-[0_4px_12px_rgba(0,164,163,0.2)]' 
-                                                : 'bg-white text-slate-600 border-2 border-transparent hover:border-[#00A4A3]/30 hover:bg-[#F0FDFD]'
-                                            }`}
-                                    >
-                                        {slot.displayTime}
-                                    </motion.button>
+                                    <div key={group}>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{group}</p>
+                                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                                            {slots.map((slot, idx) => {
+                                                const past = isSlotInPast(slot.isoStart);
+                                                const booked = isBooked(slot.isoStart);
+                                                const locked = past || booked;
+                                                const isSelected = activeSlot === slot.isoStart;
+
+                                                if (locked) return (
+                                                    <div key={`locked-${idx}`}
+                                                        className="py-2 px-2 rounded-xl text-[11px] font-bold bg-white/50 text-slate-300 border border-transparent flex flex-col items-center justify-center cursor-not-allowed opacity-60">
+                                                        <Lock className="w-3 h-3 mb-0.5" />
+                                                        <span className="line-through">{slot.displayTime}</span>
+                                                    </div>
+                                                );
+                                                return (
+                                                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                                                        key={`avail-${idx}`}
+                                                        onClick={() => setActiveSlot(slot.isoStart)}
+                                                        className={`py-2 px-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 flex items-center justify-center text-center leading-tight
+                                                            ${isSelected
+                                                                ? 'bg-white text-[#00A4A3] border-2 border-[#00A4A3] shadow-[0_4px_12px_rgba(0,164,163,0.2)]'
+                                                                : 'bg-white text-slate-600 border-2 border-transparent hover:border-[#00A4A3]/30 hover:bg-[#F0FDFD]'}`}>
+                                                        {slot.displayTime}
+                                                    </motion.button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
                                 );
-                            })
-                        )}
-                    </div>
+                            })}
+                        </div>
+                    )}
                 </div>
+                )}
             </div>
 
             {/* Footer / Action Area */}
@@ -333,7 +366,10 @@ export default function PatientSlotPicker({ doctorId, availabilityConfig, doctor
                 <div className="flex items-center justify-between mt-2">
                     <div>
                         <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Consultation Fee</p>
-                        <p className="text-2xl font-black text-[#00A4A3]">₹{currentFee}</p>
+                        {/* Bug #26: show dash when no mode selected */}
+                        <p className="text-2xl font-black text-[#00A4A3]">
+                            {currentFee === null ? <span className="text-slate-300">—</span> : `₹${currentFee}`}
+                        </p>
                     </div>
                     <button 
                         onClick={handleConfirmClick}

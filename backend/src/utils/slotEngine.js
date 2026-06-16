@@ -1,84 +1,113 @@
 /**
  * Generates available time slots for a doctor on a specific date,
  * taking into account slot duration, buffer time, and existing bookings.
- * 
+ *
+ * KEY FIXES:
+ * - Bug #5: Iterates ALL windows per day (not just the first)
+ * - Bug #6: Filters out past slots when targetDate is today
+ * - Bug #7: Enforces advanceWindow server-side
+ * - Bug #9: Fixed overlap detection — compares HH:mm strings correctly
+ *
  * @param {Object} availability - The DoctorAvailability document
  * @param {String} targetDateStr - Target date in YYYY-MM-DD format
- * @param {Array} bookedSlots - Array of existing Appointment documents for that date
- * @returns {Array} Array of available slot objects { displayTime, isoStart, isoEnd }
+ * @param {Array}  bookedSlots   - Appointment documents for that date
+ * @returns {Array} Array of { displayTime, isoStart, isoEnd }
  */
 export function generateAvailableSlots(availability, targetDateStr, bookedSlots) {
-    const targetDate = new Date(targetDateStr);
-    
-    // Fallback if invalid date
+    // ─── Guard: valid date ───────────────────────────────────────────────────
+    const targetDate = new Date(`${targetDateStr}T00:00:00`); // parse as LOCAL midnight
     if (isNaN(targetDate.getTime())) return [];
 
-    // 1. Check if date is explicitly blocked
-    if (availability.blockedDates && availability.blockedDates.includes(targetDateStr)) {
-        return [];
-    }
+    // ─── Guard: date must be within advanceWindow ────────────────────────────
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const maxDate = new Date(today);
+    maxDate.setDate(maxDate.getDate() + (availability.advanceWindow || 7));
+    if (targetDate < today || targetDate > maxDate) return [];
 
-    // 2. Determine the day of the week
+    // ─── Guard: explicitly blocked date ─────────────────────────────────────
+    if (availability.blockedDates?.includes(targetDateStr)) return [];
+
+    // ─── Guard: find the day schedule ────────────────────────────────────────
     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    const dayOfWeek = days[targetDate.getUTCDay()];
-
-    // 3. Find schedule for that day
+    const dayOfWeek = days[targetDate.getDay()];
     const daySchedule = availability.weeklySchedule.find(d => d.day === dayOfWeek);
-    if (!daySchedule || !daySchedule.active) {
-        return [];
-    }
+    if (!daySchedule?.active || !daySchedule.windows?.length) return [];
+
+    // ─── Helpers ─────────────────────────────────────────────────────────────
+    const pad = (n) => n.toString().padStart(2, '0');
+
+    const hhmmToMinutes = (hhmm) => {
+        if (!hhmm || typeof hhmm !== 'string' || !hhmm.includes(':')) return NaN;
+        const [h, m] = hhmm.split(':').map(Number);
+        return h * 60 + m;
+    };
+
+    const minutesToHhmm = (mins) => `${pad(Math.floor(mins / 60))}:${pad(mins % 60)}`;
+
+    const formatDisplay = (hhmm) => {
+        const [h, m] = hhmm.split(':').map(Number);
+        const suffix = h >= 12 ? 'PM' : 'AM';
+        const displayH = h % 12 || 12;
+        return `${displayH}:${pad(m)} ${suffix}`;
+    };
+
+    // Current time in minutes (for today's "past slot" filter)
+    const isToday = targetDate.toDateString() === today.toDateString();
+    const nowMinutes = isToday ? (new Date().getHours() * 60 + new Date().getMinutes()) : -1;
+
+    // Pre-process booked slots into HH:mm minutes for fast comparison
+    const bookedRanges = bookedSlots
+        .filter(apt => apt.status !== 'cancelled')
+        .map(apt => {
+            // startTime stored as "HH:mm"
+            const startMins = hhmmToMinutes(apt.startTime);
+            const endMins   = hhmmToMinutes(apt.endTime);
+            return { startMins, endMins };
+        })
+        .filter(r => !isNaN(r.startMins) && !isNaN(r.endMins));
 
     const { slotDuration, bufferTime } = availability;
-    
-    // Logic Step 1: Calculate totalCycleTime
-    const totalCycleTime = slotDuration + bufferTime; // in minutes
-
-    const [startHour, startMin] = daySchedule.startTime.split(':').map(Number);
-    const [endHour, endMin] = daySchedule.endTime.split(':').map(Number);
-
-    const startMs = new Date(targetDate).setUTCHours(startHour, startMin, 0, 0);
-    const endMs = new Date(targetDate).setUTCHours(endHour, endMin, 0, 0);
+    const totalCycle = slotDuration + bufferTime;
 
     const availableSlots = [];
-    let currentMs = startMs;
 
-    // Logic Step 2: Map through time ranges
-    while (currentMs + (slotDuration * 60000) <= endMs) {
-        const candidateStart = currentMs;
-        const candidateEnd = currentMs + (slotDuration * 60000);
+    // ─── Iterate each time window for the day ────────────────────────────────
+    for (const window of daySchedule.windows) {
+        const windowStart = hhmmToMinutes(window.startTime);
+        const windowEnd   = hhmmToMinutes(window.endTime);
 
-        // Logic Step 3: Filter out overlaps with bookedSlots
-        // Rule: candidateStart < aptEnd && candidateEnd > aptStart
-        const isOverlapping = bookedSlots.some(apt => {
-            const aptStart = new Date(apt.startTime).getTime();
-            const aptEnd = new Date(apt.endTime).getTime();
-            return (candidateStart < aptEnd && candidateEnd > aptStart);
-        });
+        if (isNaN(windowStart) || isNaN(windowEnd) || windowStart >= windowEnd) continue;
 
-        if (!isOverlapping) {
-            const pad = (n) => n.toString().padStart(2, '0');
-            const dStart = new Date(candidateStart);
-            const dEnd = new Date(candidateEnd);
-            
-            // Format HH:mm using UTC hours since we constructed them with setUTCHours
-            const isoStart = `${pad(dStart.getUTCHours())}:${pad(dStart.getUTCMinutes())}`;
-            const isoEnd = `${pad(dEnd.getUTCHours())}:${pad(dEnd.getUTCMinutes())}`;
-            
-            // Format time for display (e.g. 09:00 AM)
-            const formatTime = (ms) => {
-                const d = new Date(ms);
-                return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
-            };
-            
-            availableSlots.push({
-                displayTime: `${formatTime(candidateStart)} - ${formatTime(candidateEnd)}`,
-                isoStart,
-                isoEnd
-            });
+        let cursor = windowStart;
+
+        while (cursor + slotDuration <= windowEnd) {
+            const candidateStart = cursor;
+            const candidateEnd   = cursor + slotDuration;
+
+            // Bug #6: Skip past slots for today
+            if (isToday && candidateStart <= nowMinutes) {
+                cursor += totalCycle;
+                continue;
+            }
+
+            // Bug #9: Overlap check uses HH:mm minutes consistently
+            const isOverlapping = bookedRanges.some(
+                r => candidateStart < r.endMins && candidateEnd > r.startMins
+            );
+
+            if (!isOverlapping) {
+                const isoStart = minutesToHhmm(candidateStart);
+                const isoEnd   = minutesToHhmm(candidateEnd);
+                availableSlots.push({
+                    displayTime: `${formatDisplay(isoStart)} – ${formatDisplay(isoEnd)}`,
+                    isoStart,
+                    isoEnd
+                });
+            }
+
+            cursor += totalCycle;
         }
-
-        // Advance by slot duration + buffer
-        currentMs += (totalCycleTime * 60000);
     }
 
     return availableSlots;
