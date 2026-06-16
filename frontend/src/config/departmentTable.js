@@ -27,15 +27,6 @@ export const getColumns = (onEdit, onDelete) => [
                 >
                     edit
                 </button>
-
-                <span className="text-slate-300">/</span>
-
-                <button
-                    className="text-red-500 hover:underline"
-                    onClick={() => onDelete(row)}
-                >
-                    delete
-                </button>
             </div>
         )
     },
