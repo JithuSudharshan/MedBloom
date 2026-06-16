@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Search, X } from "lucide-react";
 import SearchBar from "../../landing page/SearchBar";
+import SpecialityPills from "../../landing page/SpecialityPills";
 import DoctorsGrid from "../../landing page/DoctorGrid";
 import { fetchDoctorsData, fetchDepartmentsList } from "../../../api/landingPageApi";
 import Loader from "../../ui/Loading";
@@ -119,7 +120,7 @@ export default function FindDoctorModal({ isOpen, onClose }) {
                 {/* Content Area */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-8 scrollbar-hide w-full">
                     {/* Search Section */}
-                    <div className="mb-6">
+                    <div className="mb-2">
                         <SearchBar
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -129,28 +130,13 @@ export default function FindDoctorModal({ isOpen, onClose }) {
 
                     {/* Department Filter Pills */}
                     {!isLoading && departments.length > 0 && (
-                        <div className="mb-8 flex items-center gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-hide w-full">
-                            <button
-                                onClick={() => setSelectedDepartment("All")}
-                                className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${selectedDepartment === "All"
-                                    ? "bg-[#008C89] text-white shadow-md"
-                                    : "bg-white border border-gray-200 text-gray-600 hover:bg-teal-50 hover:text-[#008C89] hover:border-teal-200"
-                                    }`}
-                            >
-                                All Departments
-                            </button>
-                            {departments.map((dept) => (
-                                <button
-                                    key={dept._id}
-                                    onClick={() => setSelectedDepartment(dept.departmentName)}
-                                    className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${selectedDepartment === dept.departmentName
-                                        ? "bg-[#008C89] text-white shadow-md"
-                                        : "bg-white border border-gray-200 text-gray-600 hover:bg-teal-50 hover:text-[#008C89] hover:border-teal-200"
-                                        }`}
-                                >
-                                    {dept.departmentName}
-                                </button>
-                            ))}
+                        <div className="mb-8">
+                            <SpecialityPills 
+                                departments={departments}
+                                selected={selectedDepartment}
+                                onChange={setSelectedDepartment}
+                                className="mt-4 px-0" 
+                            />
                         </div>
                     )}
 

@@ -63,6 +63,8 @@ const doctorProfessionalInfoSchema = yup.object().shape({
 
     consultationFeesOnline: yup
         .number()
+        .transform((value, originalValue) => (String(originalValue).trim() === "" ? null : value))
+        .nullable()
         .typeError("Online fee must be a number")
         .min(0, "Online fee cannot be negative")
         .when("consultationMode", {
@@ -73,6 +75,8 @@ const doctorProfessionalInfoSchema = yup.object().shape({
 
     consultationFeesOffline: yup
         .number()
+        .transform((value, originalValue) => (String(originalValue).trim() === "" ? null : value))
+        .nullable()
         .typeError("Offline fee must be a number")
         .min(0, "Offline fee cannot be negative")
         .when("consultationMode", {

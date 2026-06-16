@@ -96,7 +96,7 @@ passport.use(
                     googleId: profile.id,
                     email: email,
                     name: profile.displayName,
-                    profile_url: profile.photos[0]?.value,
+                    profile_url: profile.photos && profile.photos.length > 0 ? profile.photos[0].value : undefined,
                     authMethod: 'google',
                     isVerified: true,
                     role: requestedRole
@@ -108,6 +108,13 @@ passport.use(
                         message: "Welcome to MedBloom! To start receiving patients, please complete your professional onboarding from the dashboard.",
                         type: 'system_alert',
                         link: '/doctor/basic-onboarding'
+                    });
+                } else if (user.role === 'patient') {
+                    await sendNotification({
+                        receiverId: user._id,
+                        message: `Welcome to MedBloom, ${user.name}! Complete your health profile to unlock appointment booking.`,
+                        type: 'system_alert',
+                        link: '/patient/onboarding'
                     });
                 }
 

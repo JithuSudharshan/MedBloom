@@ -226,6 +226,7 @@ const ProfileLayout = ({
                     <img 
                         src={localUser?.avatar?.src || "https://media.istockphoto.com/id/1451587807/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-vector.jpg?s=612x612&w=0&k=20&c=yDJ4ITX1cHMh25Lt1vI1zBn2cAKKAlByHBvPJ8gEiIg="} 
                         alt="avatar" 
+                        referrerPolicy="no-referrer"
                         className={`w-10 h-10 rounded-full object-cover border-2 ${user === 'doctor' ? 'border-[#B08B8C]' : 'border-teal-500'}`} 
                     />
                     <div className={`font-bold text-lg tracking-tight ${user === 'doctor' ? 'text-[#6B3B3D]' : 'text-teal-800'}`}>
@@ -320,17 +321,25 @@ const ProfileLayout = ({
                         </div>
                     )}
 
-                    {user === "doctor" && !profileData?.isOnboarded && activeKey !== "dashboard" ? (
+                    {(!profileData?.isOnboarded && 
+                        ((user === "doctor" && !["dashboard", "notifications"].includes(activeKey)) || 
+                         (user === "patient" && !["personal", "notifications"].includes(activeKey)))
+                    ) ? (
                         <div className="flex flex-col items-center justify-center h-full bg-white rounded-[2.5rem] p-10 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60">
-                            <div className="w-24 h-24 bg-rose-50 rounded-full flex items-center justify-center mb-6">
-                                <Lock className="w-10 h-10 text-rose-500" />
+                            <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 ${user === 'doctor' ? 'bg-rose-50' : 'bg-teal-50'}`}>
+                                <Lock className={`w-10 h-10 ${user === 'doctor' ? 'text-rose-500' : 'text-teal-500'}`} />
                             </div>
                             <h2 className="text-2xl font-bold text-gray-800 mb-4">Action Required</h2>
                             <p className="text-gray-500 max-w-md mb-8">
-                                You must complete your professional onboarding process before you can access {activeKey.replace('-', ' ')}. 
-                                This ensures your profile is fully verified for patients.
+                                {user === 'doctor' 
+                                    ? `You must complete your professional onboarding process before you can access ${activeKey.replace('-', ' ')}. This ensures your profile is fully verified for patients.`
+                                    : `You must complete your health profile onboarding before you can access ${activeKey.replace('-', ' ')}. This helps our doctors provide the best care.`}
                             </p>
-                            <Button role={user} onClick={() => navigate("/doctor/basic-onboarding")} className="px-8">
+                            <Button 
+                                role={user} 
+                                onClick={() => navigate(user === 'doctor' ? "/doctor/basic-onboarding" : "/patient/onboarding")} 
+                                className="px-8"
+                            >
                                 Complete Onboarding Now
                             </Button>
                         </div>

@@ -4,6 +4,7 @@ import HeroSection from '../../components/landing page/HeroSection'
 import Footer from '../../components/landing page/Footer'
 import findDoctorsImg from "../../assets/images/findDoctors.png"
 import SearchBar from '../../components/landing page/SearchBar'
+import SpecialityPills from '../../components/landing page/SpecialityPills'
 import { Pagination } from '../../components/ui/Pagination'
 import DoctorsGrid from '../../components/landing page/DoctorGrid'
 import { fetchDoctorsData, fetchDepartmentsList } from '../../api/landingPageApi'
@@ -155,6 +156,12 @@ const FindDoctorsPage = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onSearch={handleImmediateSearch}
             />
+
+            <SpecialityPills 
+                departments={departments}
+                selected={filters.speciality}
+                onChange={(val) => handleFilterChange({ target: { name: 'speciality', value: val } })}
+            />
             
             <section className="max-w-7xl mx-auto px-6 py-6 min-h-[400px]">
                 
@@ -173,22 +180,6 @@ const FindDoctorsPage = () => {
                     </div>
 
                     <div className={`flex-col lg:flex-row gap-4 ${showMobileFilters ? 'flex' : 'hidden lg:flex'}`}>
-                        {/* Speciality */}
-                        <div className="flex-1">
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Speciality</label>
-                            <select 
-                                name="speciality" 
-                                value={filters.speciality} 
-                                onChange={handleFilterChange}
-                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#00A4A3]/20 outline-none"
-                            >
-                                <option value="All">All Specialities</option>
-                                {departments.map((dept, idx) => (
-                                    <option key={idx} value={dept.departmentName}>{dept.departmentName}</option>
-                                ))}
-                            </select>
-                        </div>
-
                         {/* Mode */}
                         <div className="flex-1">
                             <label className="block text-xs font-medium text-gray-500 mb-1">Consultation Mode</label>

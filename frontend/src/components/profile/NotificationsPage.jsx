@@ -5,11 +5,13 @@ import NotificationsPanel from './NotificationPanel';
 import InquiryDetailModal from './admin/InquiryDetailModal';
 import { fetchEnquiryById } from '../../api/adminApi';
 import { showToast } from '../ui/Toast';
+import { useNavigate } from 'react-router-dom';
 
 export default function NotificationsPage({ userRole = 'patient' }) {
     const { notifications, markAsRead, markAllAsRead, fetchMoreNotifications, hasMore, isLoading } = useNotifications();
     const [selectedInquiry, setSelectedInquiry] = useState(null);
     const [selectedNotif, setSelectedNotif] = useState(null);
+    const navigate = useNavigate();
 
     const handleClick = async (n) => {
         markAsRead(n._id);
@@ -35,7 +37,7 @@ export default function NotificationsPage({ userRole = 'patient' }) {
         }
 
         if (n.link) {
-            window.location.href = n.link;
+            navigate(n.link);
         }
     };
 

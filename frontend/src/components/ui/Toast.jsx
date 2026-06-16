@@ -21,14 +21,13 @@ export const showToast = {
                 alignItems: "center",
                 boxShadow: isDoctorMode() ? "0 4px 12px rgba(176,139,140,0.2)" : "0 4px 12px rgba(0, 115, 122, 0.2)",
             },
-            icon: "✅",
+            icon: null,
             duration: 3000,
         }),
 
     error: (message) =>
         toast.error(message, {
             style: {
-
                 background: "#D32F2F",
                 color: "white",
                 borderRadius: "8px",
@@ -39,7 +38,7 @@ export const showToast = {
                 minHeight: "45px",
                 boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
             },
-            icon: "🚨",
+            icon: null,
             duration: 4000,
         }),
     info: (message) =>
@@ -56,7 +55,8 @@ export const showToast = {
                 alignItems: "center",
                 border: isDoctorMode() ? "1px solid #B08B8C" : "none",
             },
-            icon: "ℹ️",
+            icon: null,
             duration: 3000,
         }),
 };
+

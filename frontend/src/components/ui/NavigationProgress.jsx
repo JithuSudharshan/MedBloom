@@ -6,7 +6,7 @@ import NProgress from 'nprogress';
 const NPROGRESS_STYLE = `
   #nprogress { pointer-events: none; }
   #nprogress .bar {
-    background: linear-gradient(to right, #0d9488, #06b6d4, #0d9488);
+    background: var(--nprogress-bg, linear-gradient(to right, #0d9488, #06b6d4, #0d9488));
     background-size: 200% 100%;
     animation: nprogress-shimmer 1.2s linear infinite;
     position: fixed;
@@ -14,13 +14,13 @@ const NPROGRESS_STYLE = `
     top: 0; left: 0;
     width: 100%; height: 3px;
     border-radius: 0 2px 2px 0;
-    box-shadow: 0 0 10px rgba(6, 182, 212, 0.6), 0 0 5px rgba(6, 182, 212, 0.4);
+    box-shadow: var(--nprogress-shadow, 0 0 10px rgba(6, 182, 212, 0.6), 0 0 5px rgba(6, 182, 212, 0.4));
   }
   #nprogress .peg {
     display: block;
     position: absolute;
     right: 0px; width: 100px; height: 100%;
-    box-shadow: 0 0 10px rgba(6, 182, 212, 0.8), 0 0 5px rgba(6, 182, 212, 0.6);
+    box-shadow: var(--nprogress-peg-shadow, 0 0 10px rgba(6, 182, 212, 0.8), 0 0 5px rgba(6, 182, 212, 0.6));
     opacity: 1;
     transform: rotate(3deg) translate(0px, -4px);
   }
@@ -52,6 +52,18 @@ export default function NavigationProgress() {
   }, []);
 
   useEffect(() => {
+    const isDoctor = location.pathname.startsWith('/doctor');
+    
+    if (isDoctor) {
+      document.documentElement.style.setProperty('--nprogress-bg', 'linear-gradient(to right, #6B3B3D, #B08B8C, #6B3B3D)');
+      document.documentElement.style.setProperty('--nprogress-shadow', '0 0 10px rgba(176, 139, 140, 0.6), 0 0 5px rgba(176, 139, 140, 0.4)');
+      document.documentElement.style.setProperty('--nprogress-peg-shadow', '0 0 10px rgba(176, 139, 140, 0.8), 0 0 5px rgba(176, 139, 140, 0.6)');
+    } else {
+      document.documentElement.style.setProperty('--nprogress-bg', 'linear-gradient(to right, #0d9488, #06b6d4, #0d9488)');
+      document.documentElement.style.setProperty('--nprogress-shadow', '0 0 10px rgba(6, 182, 212, 0.6), 0 0 5px rgba(6, 182, 212, 0.4)');
+      document.documentElement.style.setProperty('--nprogress-peg-shadow', '0 0 10px rgba(6, 182, 212, 0.8), 0 0 5px rgba(6, 182, 212, 0.6)');
+    }
+
     NProgress.start();
     const timer = setTimeout(() => NProgress.done(), 300);
     return () => {

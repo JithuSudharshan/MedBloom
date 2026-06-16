@@ -20,6 +20,7 @@ const SidebarMenu = ({ menu, src, alt, name, activeKey, onChange, onLogout, onEd
                     <img
                         src={currentSrc}
                         alt={alt || "Profile Picture"}
+                        referrerPolicy="no-referrer"
                         className="rounded-full w-40 h-40 object-cover border-[4px] border-white shadow-sm relative z-10"
                     />
                     {!isAdmin && (<button

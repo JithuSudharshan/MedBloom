@@ -47,9 +47,16 @@ export const signUp = async (req, res) => {
         if (role === 'doctor') {
             await sendNotification({
                 receiverId: response._id,
-                message: "Welcome to MedBloom! To start receiving patients, please complete your professional onboarding from the dashboard.",
+                message: `Welcome to MedBloom, ${name}! Complete your professional profile to start receiving patients.`,
                 type: 'system_alert',
                 link: '/doctor/basic-onboarding'
+            });
+        } else if (role === 'patient') {
+            await sendNotification({
+                receiverId: response._id,
+                message: `Welcome to MedBloom, ${name}! Complete your health profile to unlock appointment booking.`,
+                type: 'system_alert',
+                link: '/patient/onboarding'
             });
         }
 
