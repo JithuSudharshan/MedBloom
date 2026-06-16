@@ -31,6 +31,7 @@ import VideoConsultationRoom from '../pages/consultation/VideoConsultationRoom';
 import DoctorWelcomeCelebration from '../pages/user/doctor/DoctorWelcomeCelebration';
 import ApplicationReviewPage from '../pages/admin/dashboard/ApplicationReviewPage';
 import NavigationProgress from './ui/NavigationProgress';
+import Unauthorized from '../pages/error/Unauthorized';
 
 export const AppInner = () => {
     const { user } = useAuth();
@@ -57,6 +58,7 @@ export const AppInner = () => {
                 <Route path="/verify/email/link" element={<VerifyEmail />} />
                 <Route path="/create-newPassword/link" element={<CreateNewPassword />} />
                 <Route path="/doctor/:id" element={<PublicDoctorProfile />} />
+                <Route path="/unauthorized" element={<Unauthorized />} />
 
                 <Route element={<ProtectedRoute allowedRoles={['patient']} />}>
                     <Route path="/patient">
