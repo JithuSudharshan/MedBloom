@@ -226,3 +226,13 @@ export const fetchAdminWalletData = async () => {
         throw error;
     }
 };
+
+export const fetchEnquiryById = async (id) => {
+    try {
+        const response = await api.get(`/admin/enquiry/${id}`);
+        return response;
+    } catch (error) {
+        console.log("Error fetching enquiry:", error);
+        throw error;
+    }
+};

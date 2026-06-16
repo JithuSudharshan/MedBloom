@@ -17,7 +17,8 @@ export default function AddDepartmentForm({
     errors,
     isSubmitting,
     submitError,
-    department_id
+    department_id,
+    watch
 }) {
 
 
@@ -61,6 +62,8 @@ export default function AddDepartmentForm({
                         placeholder={field.placeholder}
                         rows={field.rows}
                         setValue={setValue}
+                        maxWords={field.maxWords}
+                        watch={watch}
                     />
                 );
             default:

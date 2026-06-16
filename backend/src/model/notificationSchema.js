@@ -29,13 +29,22 @@ const notificationSchema = new mongoose.Schema({
             'appointment_rescheduled', 
             'video_reminder',
             'new_review',
-            'system_alert'
+            'system_alert',
+            'contact_inquiry'
         ],
         required: true
     },
 
     link: {
         type: String
+    },
+
+    metadata: {
+        enquiryId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Enquiry',
+            default: null
+        }
     },
 
     read: {

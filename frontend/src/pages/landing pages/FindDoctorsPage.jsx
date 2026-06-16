@@ -10,6 +10,13 @@ import { fetchDoctorsData, fetchDepartmentsList } from '../../api/landingPageApi
 import Loader from '../../components/ui/Loading'
 import AISymptomChecker from '../../components/landing page/AISymptomChecker'
 import { Search, Filter, SlidersHorizontal, Loader2 } from 'lucide-react'
+import { motion } from 'framer-motion';
+
+const PAGE_TRANSITION = {
+    initial: { opacity: 0, y: 8 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.35, ease: 'easeOut' }
+};
 
 const FindDoctorsPage = () => {
 
@@ -120,7 +127,12 @@ const FindDoctorsPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white">
+        <motion.div 
+            className="min-h-screen bg-white"
+            initial={PAGE_TRANSITION.initial}
+            animate={PAGE_TRANSITION.animate}
+            transition={PAGE_TRANSITION.transition}
+        >
             <Navbar current={"findDoctors"} />
 
             <HeroSection
@@ -265,7 +277,7 @@ const FindDoctorsPage = () => {
 
             <Footer />
 
-        </div>
+        </motion.div>
     )
 }
 

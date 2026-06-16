@@ -25,7 +25,9 @@ export const departmentForm = [
         name: "departmentDescription",
         label: "Department Description",
         inputType: "text",
-        placeholder: "...write the description explaning the service it provides...",
-        showIn: ["addDepartment", "edit"]
-    },
+        placeholder: "Describe the services this department provides (max 20 words)...",
+        showIn: ["addDepartment", "edit"],
+        rows: 3,
+        maxWords: 20
+    }
 ];

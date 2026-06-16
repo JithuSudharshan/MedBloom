@@ -30,6 +30,7 @@ import PatientOnboardingForm from '../pages/user/patient/PatientOnboardingForm';
 import VideoConsultationRoom from '../pages/consultation/VideoConsultationRoom';
 import DoctorWelcomeCelebration from '../pages/user/doctor/DoctorWelcomeCelebration';
 import ApplicationReviewPage from '../pages/admin/dashboard/ApplicationReviewPage';
+import NavigationProgress from './ui/NavigationProgress';
 
 export const AppInner = () => {
     const { user } = useAuth();
@@ -37,6 +38,7 @@ export const AppInner = () => {
     return (
         <NotificationProvider user={user}>
             <Toaster position="top-right" richColors />
+            <NavigationProgress />
 
             <Routes>
                 <Route path="/" element={<Navigate to="/homePage" replace />} />

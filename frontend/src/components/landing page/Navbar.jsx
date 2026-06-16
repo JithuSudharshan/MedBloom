@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import Button from './Button';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = ({ current, userRole = 'patient', onBookNow }) => {
     const [isScrolled, setIsScrolled] = useState(false);
     const isDoctor = userRole === 'doctor';
     const isAdmin = userRole === 'admin' || window.location.pathname.startsWith('/admin');
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -25,8 +27,7 @@ const Navbar = ({ current, userRole = 'patient', onBookNow }) => {
         { label: 'Services', href: '/services', active: current === "services" && true },
         { label: 'Find Doctors', href: '/doctors', active: current === "findDoctors" && true },
         { label: 'Login', href: '/login', active: current === "login" && true },
-        { label: 'Admin', href: '/admin/login', active: current === "adminLogin" && true },
-        { label: 'Articles', href: '/articles', active: current === "articles" && true }
+        { label: 'Admin', href: '/admin/login', active: current === "adminLogin" && true }
     ];
 
     return (
@@ -52,9 +53,9 @@ const Navbar = ({ current, userRole = 'patient', onBookNow }) => {
                         : "bg-[#DBFFFF] shadow-sm"
                 }`}>
                     {navLinks.map((link, index) => (
-                        <a
+                        <Link
                             key={index}
-                            href={link.href}
+                            to={link.href}
                             className={`text-[13px] tracking-wide font-semibold transition-all ${
                                 link.active
                                     ? `text-white px-5 py-2 rounded-full shadow-md ${isDoctor ? "bg-gradient-to-r from-[#B08B8C] to-[#9D7778]" : "bg-teal-600"}`
@@ -62,7 +63,7 @@ const Navbar = ({ current, userRole = 'patient', onBookNow }) => {
                             }`}
                         >
                             {link.label}
-                        </a>
+                        </Link>
                     ))}
                 </div>
 
@@ -73,7 +74,7 @@ const Navbar = ({ current, userRole = 'patient', onBookNow }) => {
                             if (onBookNow) {
                                 onBookNow();
                             } else {
-                                window.location.href = '/doctors';
+                                navigate('/doctors');
                             }
                         }}
                         className="bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600 text-white px-5 py-2 rounded-full font-medium text-sm transition-all shadow-md hover:shadow-lg"

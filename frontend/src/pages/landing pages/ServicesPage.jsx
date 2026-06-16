@@ -5,12 +5,22 @@ import Footer from '../../components/landing page/Footer'
 import ServicesImg from "../../assets/images/Services.png"
 import ServicesSection from '../../components/landing page/ServicesSection.services'
 import CTASection from '../../components/landing page/CTASection'
+import { motion } from 'framer-motion';
 
-
+const PAGE_TRANSITION = {
+    initial: { opacity: 0, y: 8 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.35, ease: 'easeOut' }
+};
 
 const ServicesPage = () => {
     return (
-        <div className="min-h-screen bg-white">
+        <motion.div 
+            className="min-h-screen bg-white"
+            initial={PAGE_TRANSITION.initial}
+            animate={PAGE_TRANSITION.animate}
+            transition={PAGE_TRANSITION.transition}
+        >
             <Navbar current={"services"} />
 
             <HeroSection
@@ -35,7 +45,7 @@ const ServicesPage = () => {
             <ServicesSection />
             <CTASection />
             <Footer />
-        </div>
+        </motion.div>
     )
 }
 

@@ -571,6 +571,11 @@ export const addNewDepartment = async (req, res) => {
         if (!departmentName || !status || !departmentDescription)
             return res.status(400).json({ success: false, message: "All fields are mandatory" })
 
+        const countWords = (str) => str.trim().split(/\s+/).filter(Boolean).length;
+        if (countWords(departmentDescription) > 20) {
+            return res.status(400).json({ success: false, message: "Department description must not exceed 20 words" });
+        }
+
         const isExisting = await Department.findOne({ departmentName })
 
         if (isExisting)
@@ -689,6 +694,11 @@ export const editDepartmentInfo = async (req, res) => {
                 success: false,
                 message: "All fields are required"
             })
+
+        const countWords = (str) => str.trim().split(/\s+/).filter(Boolean).length;
+        if (countWords(departmentDescription) > 20) {
+            return res.status(400).json({ success: false, message: "Department description must not exceed 20 words" });
+        }
 
         const department = await Department.findById(id)
 
@@ -986,3 +996,22 @@ export const fetchMetrics = async (req, res) => {
         });
     }
 }
+
+// ----------------------------------------------------------------------------------------------------------
+
+export const fetchEnquiryById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const Enquiry = (await import('../../../model/enquirySchema.js')).default;
+        const enquiry = await Enquiry.findById(id);
+        
+        if (!enquiry) {
+            return res.status(404).json({ success: false, message: "Enquiry not found" });
+        }
+        
+        return res.status(200).json({ success: true, data: enquiry });
+    } catch (error) {
+        console.error("Error fetching enquiry:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};

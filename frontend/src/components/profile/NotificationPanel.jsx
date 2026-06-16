@@ -1,7 +1,7 @@
 // components/notifications/NotificationsPanel.jsx
 import dayjs from 'dayjs';
 import { twMerge } from 'tailwind-merge';
-import { CheckCheck, Wallet, CalendarClock, Video, ShieldCheck, MessageSquare, Bell } from 'lucide-react';
+import { CheckCheck, Wallet, CalendarClock, Video, ShieldCheck, MessageSquare, Bell, Mail } from 'lucide-react';
 import { useRef, useCallback } from 'react';
 
 export default function NotificationsPanel({
@@ -142,6 +142,9 @@ export default function NotificationsPanel({
                         } else if (n.type === 'video_reminder') {
                             Icon = Video;
                             nTitle = 'Video Consultation Reminder';
+                        } else if (n.type === 'contact_inquiry') {
+                            Icon = Mail;
+                            nTitle = 'Contact Inquiry';
                         } else {
                             const msg = (n.message || '').toLowerCase();
                             if (msg.includes('wallet has been topped up') || msg.includes('wallet deduction')) { nTitle = 'Wallet Update'; Icon = Wallet; }

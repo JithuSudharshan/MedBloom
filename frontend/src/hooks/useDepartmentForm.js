@@ -25,8 +25,22 @@ const departmentInfoSchema = yup.object().shape({
         .string()
         .trim()
         .required('Description is required')
-        .min(10, 'Description must be at least 10 characters')
-        .max(500, 'Description must not exceed 500 characters')
+        .test(
+            'min-words',
+            'Description must be at least 3 words',
+            (value) => {
+                if (!value) return true;
+                return value.trim().split(/\s+/).filter(Boolean).length >= 3;
+            }
+        )
+        .test(
+            'max-words',
+            'Description must not exceed 20 words',
+            (value) => {
+                if (!value) return true;
+                return value.trim().split(/\s+/).filter(Boolean).length <= 20;
+            }
+        )
 })
 
 export const useDepartmentForm = (initialData = null) => {

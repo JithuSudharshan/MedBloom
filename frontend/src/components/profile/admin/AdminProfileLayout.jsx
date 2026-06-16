@@ -340,6 +340,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
         errors,
         isSubmitting,
         submitError,
+        watch,
     } = useDepartmentForm();
 
     useEffect(() => {
@@ -554,6 +555,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                     errors={errors}
                     isSubmitting={isSubmitting}
                     submitError={submitError}
+                    watch={watch}
                 />
             </Modal>
 
@@ -580,6 +582,7 @@ const AdminProfileLayout = ({ sidebarMenu, onLogout, isLoggingOut }) => {
                     errors={errors}
                     isSubmitting={isSubmitting}
                     submitError={submitError}
+                    watch={watch}
                 />
             </Modal>
             {loading && <Loader />}

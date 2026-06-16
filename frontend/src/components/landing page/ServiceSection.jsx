@@ -16,9 +16,14 @@ const ServicesSection = () => {
             try {
                 const res = await fetchDepartmentsList();
                 if (res.data?.success) {
+                    const truncateWords = (text, maxWords) => {
+                        if (!text) return 'Comprehensive and specialized care for your health and well-being.';
+                        const words = text.trim().split(/\s+/);
+                        return words.length <= maxWords ? text : words.slice(0, maxWords).join(' ') + '...';
+                    };
                     const formattedServices = res.data.data.map((dept, index) => ({
                         title: dept.departmentName,
-                        description: dept.description || 'Comprehensive and specialized care for your health and well-being.',
+                        description: truncateWords(dept.departmentDescription, 20),
                         isHighlighted: index === 0
                     }));
                     setAllServices(formattedServices);

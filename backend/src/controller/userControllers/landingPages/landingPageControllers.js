@@ -105,7 +105,7 @@ export const fetchDoctorData = async (req, res) => {
 
 export const fetchActiveDepartments = async (req, res) => {
     try {
-        const departments = await Department.find({ status: 'active' }).select('departmentName');
+        const departments = await Department.find({ status: 'active' }).select('departmentName departmentDescription');
 
         if (!departments) {
             return res.status(400).json({ success: false, message: "Failed to fetch departments" });

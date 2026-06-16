@@ -12,7 +12,7 @@ const departmentSchema = new mongoose.Schema({
         required: [true, 'Description is required'],
         trim: true,
         minLength: [10, 'Description must be at least 10 characters'],
-        maxLength: [500, 'Description must not exceed 500 characters']
+        maxLength: [160, 'Description must not exceed 20 words (~160 characters)']
     },
     status: {
         type: String,
