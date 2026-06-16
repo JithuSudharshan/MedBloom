@@ -56,7 +56,7 @@ export const approveDoctor = async (req, res) => {
 
         const doctor = await Doctor.findByIdAndUpdate(
             { _id: id },
-            { status: "approved" },
+            { status: "approved", isAdminVerified: true },
             { new: true }
         );
 
@@ -107,6 +107,20 @@ export const rejectDoctor = async (req, res) => {
 
         if (!doctor) {
             return res.status(404).json({ success: false, message: "Doctor not found" });
+        }
+
+        const localUser = await User.findById({ _id: doctor.user });
+        if (localUser) {
+            const notification = await Notification.create({
+                senderId: req.user._id,
+                receiverId: localUser._id,
+                message: 'Your doctor profile application has been rejected. Please contact support for more details.',
+                type: 'admin_rejection',
+                link: '/doctor/notifications',
+            });
+
+            const io = getIO();
+            io.to(localUser._id.toString()).emit('notification', notification);
         }
 
         return res.status(200).json({

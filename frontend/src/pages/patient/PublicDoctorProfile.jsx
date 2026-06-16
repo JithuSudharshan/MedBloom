@@ -82,7 +82,25 @@ export default function PublicDoctorProfile() {
     }, [id]);
 
     if (loading) return <Loader />;
-    if (!doctorData) return <div className="p-8 text-center text-gray-500">Doctor not found.</div>;
+    if (!doctorData) return (
+        <div className="min-h-screen w-full bg-slate-50 flex items-center justify-center p-4">
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center max-w-md">
+                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-6">
+                    <AlertCircle className="w-10 h-10 text-slate-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800 mb-2">Doctor Not Available</h2>
+                <p className="text-slate-500 mb-8">
+                    This doctor's profile is currently unavailable for appointments. They may be pending approval or their profile has been deactivated.
+                </p>
+                <button 
+                    onClick={() => navigate('/doctors')}
+                    className="px-6 py-3 bg-[#00A4A3] text-white rounded-xl font-bold hover:bg-[#008A89] transition shadow-md w-full"
+                >
+                    &larr; Find Another Doctor
+                </button>
+            </div>
+        </div>
+    );
 
     const user = doctorData.user || {};
     const doctor = doctorData;

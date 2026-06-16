@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Lock, Menu, X } from "lucide-react";
+import { Lock, Menu, X, AlertCircle } from "lucide-react";
 import SidebarMenu from "./SidebarMenu";
 import PatientInformation from "./PatientInformation";
 import AppointmentsSection from "./appointments/AppointmentsSection";
@@ -292,6 +292,34 @@ const ProfileLayout = ({
                     [&::-webkit-scrollbar-thumb]:rounded-full 
                     ${user === 'doctor' ? "[&::-webkit-scrollbar-thumb]:bg-[#F5EBEB] hover:[&::-webkit-scrollbar-thumb]:bg-[#E8D3D4]" : "[&::-webkit-scrollbar-thumb]:bg-teal-50 hover:[&::-webkit-scrollbar-thumb]:bg-teal-100"}`}>
                     
+                    {user === 'doctor' && localUser?.status === 'pending' && (
+                        <div className="bg-amber-50 border border-amber-200 text-amber-800 px-6 py-4 rounded-2xl mb-6 flex items-start gap-3 shadow-sm">
+                            <AlertCircle className="w-6 h-6 text-amber-500 shrink-0 mt-0.5" />
+                            <div>
+                                <h3 className="font-bold text-lg mb-1">Profile Under Review</h3>
+                                <p className="text-sm opacity-90">Your profile is currently under review. You will be notified once the admin approves your account. Until then, patients cannot see your profile or book appointments.</p>
+                            </div>
+                        </div>
+                    )}
+                    {user === 'doctor' && localUser?.status === 'rejected' && (
+                        <div className="bg-rose-50 border border-rose-200 text-rose-800 px-6 py-4 rounded-2xl mb-6 flex items-start gap-3 shadow-sm">
+                            <AlertCircle className="w-6 h-6 text-rose-500 shrink-0 mt-0.5" />
+                            <div>
+                                <h3 className="font-bold text-lg mb-1">Application Rejected</h3>
+                                <p className="text-sm opacity-90">Your application was not approved. Please contact support for more information or to re-apply.</p>
+                            </div>
+                        </div>
+                    )}
+                    {user === 'doctor' && localUser?.status === 'blocked' && (
+                        <div className="bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-2xl mb-6 flex items-start gap-3 shadow-sm">
+                            <Lock className="w-6 h-6 text-red-500 shrink-0 mt-0.5" />
+                            <div>
+                                <h3 className="font-bold text-lg mb-1">Account Suspended</h3>
+                                <p className="text-sm opacity-90">Your profile has been suspended by an administrator. Please contact support for assistance.</p>
+                            </div>
+                        </div>
+                    )}
+
                     {user === "doctor" && !profileData?.isOnboarded && activeKey !== "dashboard" ? (
                         <div className="flex flex-col items-center justify-center h-full bg-white rounded-[2.5rem] p-10 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60">
                             <div className="w-24 h-24 bg-rose-50 rounded-full flex items-center justify-center mb-6">

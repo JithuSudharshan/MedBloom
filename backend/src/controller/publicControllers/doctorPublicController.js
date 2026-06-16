@@ -18,6 +18,10 @@ export const getDoctorProfile = async (req, res) => {
             return res.status(404).json({ success: false, message: "Doctor not found" });
         }
 
+        if (doctor.status !== 'approved') {
+            return res.status(404).json({ success: false, message: "Doctor profile is currently unavailable." });
+        }
+
         const availability = await DoctorAvailability.findOne({ doctor: doctorId });
 
         return res.status(200).json({
@@ -54,6 +58,11 @@ export const getAvailableSlots = async (req, res) => {
         const availability = await DoctorAvailability.findOne({ doctor: doctorId });
         if (!availability) {
             return res.status(404).json({ success: false, message: "Doctor availability configuration not found" });
+        }
+
+        const doctor = await Doctor.findById(doctorId);
+        if (!doctor || doctor.status !== 'approved') {
+            return res.status(403).json({ success: false, message: "Doctor is not available for booking." });
         }
 
         // 2. Fetch Booked Appointments for that specific date
