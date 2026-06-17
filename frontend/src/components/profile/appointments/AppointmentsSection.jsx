@@ -264,6 +264,7 @@ export default function AppointmentsSection({
                     setAppointmentToViewPrescription(null);
                 }}
                 appointment={appointmentToViewPrescription}
+                userRole={userRole}
             />
 
             {/* Slide-over Drawer */}

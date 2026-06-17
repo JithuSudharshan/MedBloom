@@ -29,6 +29,14 @@ export const signUp = async (req, res) => {
             return res.status(400).json({ success: false, message: "Password do not match" })
         }
 
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        if (!passwordRegex.test(password)) {
+            return res.status(400).json({
+                success: false,
+                message: "Password must be at least 8 characters and include uppercase, lowercase, and a number"
+            });
+        }
+
         //Hashing the password before storing in DB
         const passwordHash = await bcrypt.hash(password, ENV.SALTROUND)
 
@@ -64,7 +72,7 @@ export const signUp = async (req, res) => {
         const token = await generateAndStoreToken(response._id)
 
         //basic skeleton of the verification link send to user
-        const verificationLink = `http://localhost:5000/api/user/verify-email/${response._id.toString()}/${token}`
+        const verificationLink = `${ENV.BACKEND_URL}/api/user/verify-email/${response._id.toString()}/${token}`
 
         //sending verification Email to user
         await sendVerificationEmail(email, verificationLink);

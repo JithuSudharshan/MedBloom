@@ -5,20 +5,20 @@ dotenv.config();
 //All backend .env variables
 export const ENV = {
     PORT: process.env.PORT || 5000,
-    NODE_ENV: process.env.NODE_ENV || "production",
+    NODE_ENV: process.env.NODE_ENV || "development",
     MONGO_URI: process.env.MONGO_URI,
-    SALTROUND: Number(process.env.SALTROUND),
-    JWT_SECRET: process.env.JWT_SECRET || "supersecretkey",
+    SALTROUND: Number(process.env.SALTROUND) || 10,
+    JWT_SECRET: process.env.JWT_SECRET,
     REDIS_HOST: process.env.REDIS_HOST || "127.0.0.1",
-    REDIS_PORT: process.env.REDIS_PORT6379,
+    REDIS_PORT: Number(process.env.REDIS_PORT) || 6379,
     MAILER_HOST: process.env.MAILER_HOST,
     MAILER_PORT: process.env.MAILER_PORT,
     SERVICE: process.env.SERVICE,
     SECURE: process.env.SECURE,
     EMAIL_USER: process.env.EMAIL_USER,
     EMAIL_PASS: process.env.EMAIL_PASS,
-    JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || "my secret access token",
-    JWT_REFERSH_TOKEN: process.env.JWT_REFERSH_TOKEN || "my secret refresh token",
+    JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
+    JWT_REFERSH_TOKEN: process.env.JWT_REFERSH_TOKEN,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     SESSION_SECRET: process.env.SESSION_SECRET,
@@ -28,5 +28,22 @@ export const ENV = {
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
     RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
     RAZORPAY_SECRET_KEY: process.env.RAZORPAY_SECRET_KEY,
-    GEMINI_API_KEY: process.env.GEMINI_API_KEY
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",
+    BACKEND_URL: process.env.BACKEND_URL || "http://localhost:5000",
+}
+
+// Crash at startup if critical secrets are missing
+const REQUIRED = [
+    'MONGO_URI',
+    'JWT_SECRET',
+    'JWT_ACCESS_SECRET',
+    'JWT_REFERSH_TOKEN',
+    'SESSION_SECRET',
+];
+
+for (const key of REQUIRED) {
+    if (!ENV[key]) {
+        throw new Error(`[STARTUP FATAL] Missing required environment variable: ${key}. Check your .env file.`);
+    }
 }

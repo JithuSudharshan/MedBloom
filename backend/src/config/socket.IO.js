@@ -1,12 +1,13 @@
 import { Server } from 'socket.io';
 import { videoCallSocket } from '../sockets/videoCallSocket.js';
+import { ENV } from '../config/env.js';
 
 let io;
 
 export const initSocket = (server) => {
     io = new Server(server, {
         cors: {
-            origin: ['http://localhost:5173'],
+            origin: [ENV.FRONTEND_URL],
             credentials: true
         },
     })

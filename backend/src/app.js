@@ -25,7 +25,7 @@ app.use(cookieParser())
 app.use(express.json())
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: ENV.FRONTEND_URL,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -48,8 +48,8 @@ app.use(session({
     }),
     cookie: {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax",
+        secure: ENV.NODE_ENV === 'production',
+        sameSite: ENV.NODE_ENV === 'production' ? 'strict' : 'lax',
         maxAge: 24 * 60 * 60 * 1000,
         path: '/'
     },
@@ -59,6 +59,24 @@ app.use(session({
 // Passport middleware
 app.use(passport.initialize())
 app.use(passport.session())
+
+import mongoose from 'mongoose';
+import redisClient from './config/redisClient.js';
+
+// Health check endpoint — used by load balancers and uptime monitors
+app.get('/health', async (req, res) => {
+    const health = {
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        services: {
+            mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+            redis: redisClient.isReady ? 'connected' : 'disconnected',
+        }
+    };
+
+    const isHealthy = health.services.mongodb === 'connected';
+    res.status(isHealthy ? 200 : 503).json(health);
+});
 
 // Routes
 app.get('/', (req, res) => {

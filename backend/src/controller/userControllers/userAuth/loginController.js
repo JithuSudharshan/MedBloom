@@ -38,7 +38,7 @@ export const loginUser = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid credentials" })
         }
 
-        const recentFailedAttempts = await checkLoginAttempts(user._id, req.ip);
+        const recentFailedAttempts = await checkLoginAttempts(user.email, req.ip);
         if (recentFailedAttempts.isLocked) {
             return res.status(429).json({ success: false, message: "Too many failed Attempts, Try again in 15 Minutes!" })
         }
@@ -77,12 +77,11 @@ export const loginUser = async (req, res) => {
                 httpOnly: true,
                 secure: ENV.NODE_ENV === 'production',
                 sameSite: 'strict',
-                maxAge: 7 * 24 * 60 * 60 * 1000 //15 * 60 * 1000 15 min
+                maxAge: 15 * 60 * 1000 // 15 minutes
             })
         }
 
-        //clear all failed login after successfull login
-        await clearFailedLoginAttempts(user._id, req.ip)
+        await clearFailedLoginAttempts(user.email, req.ip)
 
         res.status(200).json({
             success: true,

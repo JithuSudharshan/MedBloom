@@ -6,8 +6,8 @@ export const logFailedLoginAttempt = async (userId, ipAddress) => {
             {
                 $push: {
                     failedLoginAttempts: {
-                        ipAddress,
-                        timestamp: Date.now()
+                        $each: [{ ipAddress, timestamp: Date.now() }],
+                        $slice: -20
                     }
                 }
             })

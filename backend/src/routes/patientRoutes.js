@@ -7,7 +7,7 @@ import { editProfile, fetchPatientAppointments, fetchUserDetails, updateProfileP
 import { createPaymentOrder, verifyPaymentAndBook, getRefundEstimate, cancelAppointment, rescheduleAppointment, bookAppointmentWithWallet } from "../controller/userControllers/patientControllers/bookingController.js";
 import { authenticateToken, authorizeRole } from "../middlewares/authMiddleware.js";
 
-import { uploadRecord, getRecords, updateRecord, deleteRecord } from "../controllers/medicalRecordController.js";
+import { uploadRecord, getRecords, updateRecord, deleteRecord } from "../controller/patientControllers/medicalRecordController.js";
 
 import { getTransactions, initiateTopUp, verifyTopUp } from "../controller/userControllers/walletController.js";
 import { submitReview } from "../controller/userControllers/patientDashBoard/reviewController.js";

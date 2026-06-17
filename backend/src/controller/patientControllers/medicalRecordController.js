@@ -1,11 +1,16 @@
-import { MedicalRecord } from "../model/medicalRecordModel.js";
-import { uploadBufferToCloudinary } from "../utils/cloudinaryUploader.js";
-import cloudinary from "../config/cloudinary.js";
+import { MedicalRecord } from "../../model/medicalRecordModel.js";
+import Patient from "../../model/patientModel.js";
+import { uploadBufferToCloudinary } from "../../utils/cloudinaryUploader.js";
+import cloudinary from "../../config/cloudinary.js";
 
 // Upload a new medical record
 export const uploadRecord = async (req, res) => {
     try {
-        const patientId = req.user._id;
+        const userId = req.user._id;
+        const patient = await Patient.findOne({ user: userId });
+        if (!patient) return res.status(404).json({ success: false, message: "Patient profile not found" });
+        const patientId = patient._id;
+
         const { title, category, description } = req.body;
 
         if (!req.file) {
@@ -44,7 +49,11 @@ export const uploadRecord = async (req, res) => {
 // Fetch all medical records for the authenticated patient
 export const getRecords = async (req, res) => {
     try {
-        const patientId = req.user._id;
+        const userId = req.user._id;
+        const patient = await Patient.findOne({ user: userId });
+        if (!patient) return res.status(404).json({ success: false, message: "Patient profile not found" });
+        const patientId = patient._id;
+
         const page = parseInt(req.query.page || "1", 10);
         const limit = parseInt(req.query.limit || "5", 10);
         const skip = (page - 1) * limit;
@@ -91,11 +100,16 @@ export const getRecords = async (req, res) => {
 // Update record metadata
 export const updateRecord = async (req, res) => {
     try {
+        const userId = req.user._id;
+        const patient = await Patient.findOne({ user: userId });
+        if (!patient) return res.status(404).json({ success: false, message: "Patient profile not found" });
+        const patientId = patient._id;
+
         const { id } = req.params;
         const { title, category, description } = req.body;
 
         const record = await MedicalRecord.findOneAndUpdate(
-            { _id: id, patientId: req.user._id },
+            { _id: id, patientId: patientId },
             { title, category, description },
             { new: true }
         );
@@ -114,31 +128,32 @@ export const updateRecord = async (req, res) => {
 // Delete record
 export const deleteRecord = async (req, res) => {
     try {
+        const userId = req.user._id;
+        const patient = await Patient.findOne({ user: userId });
+        if (!patient) return res.status(404).json({ success: false, message: "Patient profile not found" });
+        const patientId = patient._id;
+
         const { id } = req.params;
 
-        const record = await MedicalRecord.findOne({ _id: id, patientId: req.user._id });
+        const record = await MedicalRecord.findOne({ _id: id, patientId: patientId });
         if (!record) {
             return res.status(404).json({ success: false, message: "Record not found" });
         }
 
         // Extract public_id from Cloudinary URL to delete it from storage
-        // Example URL: https://res.cloudinary.com/cloud_name/image/upload/v1234567890/medbloom/medical_records/file_name.pdf
         const urlParts = record.fileUrl.split('/');
         const versionIndex = urlParts.findIndex(part => part.startsWith('v') && !isNaN(part.substring(1)));
         
         if (versionIndex !== -1 && versionIndex < urlParts.length - 1) {
-            // Join the rest of the path after the version folder, and strip the extension
             let publicId = urlParts.slice(versionIndex + 1).join('/');
             publicId = publicId.substring(0, publicId.lastIndexOf('.'));
             
             if (publicId) {
                 try {
-                    // Resource type might be raw (PDF) or image
                     const resourceType = record.fileType === 'pdf' ? 'raw' : 'image';
                     await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
                 } catch (cloudinaryErr) {
                     console.error("Failed to delete from Cloudinary:", cloudinaryErr);
-                    // Continue with DB deletion even if Cloudinary fails
                 }
             }
         }

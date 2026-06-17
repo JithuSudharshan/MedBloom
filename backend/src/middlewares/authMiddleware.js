@@ -12,7 +12,6 @@ export const authenticateToken =
                 const accessToken = req.cookies.accessToken
 
                 const refreshToken = req.cookies.refreshToken
-                console.log(" Refresh function called at middleware ", refreshToken)
 
                 if (accessToken) {
                     try {
@@ -34,7 +33,6 @@ export const authenticateToken =
 
                         // Get user from database
                         const user = await User.findById(decoded.userId)
-                        console.log("user : ", user.name)
 
                         if (!user) {
                             return res.status(401).json({
@@ -47,7 +45,9 @@ export const authenticateToken =
                         req.user = user;
                         return next();
                     } catch (jwtError) {
-                        console.error('JWT verification failed:', jwtError.message);
+                        if (process.env.NODE_ENV !== 'production') {
+                            console.error('JWT verification failed:', jwtError.name);
+                        }
                         // Fall through to check Passport session
                         if (jwtError.name === 'TokenExpiredError' && sendRequiresRefresh) {
                             return res.status(401).json({
@@ -71,7 +71,6 @@ export const authenticateToken =
                 })
 
             } catch (error) {
-                console.error('Authentication middleware error:', error);
                 return res.status(500).json({
                     success: false,
                     message: 'Authentication failed'

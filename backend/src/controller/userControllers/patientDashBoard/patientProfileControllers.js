@@ -326,6 +326,8 @@ export const fetchPatientAppointments = async (req, res) => {
                 rawEndTime: app.endTime,
                 status: mappedStatus,
                 isReviewed: app.isReviewed || false,
+                prescription: app.prescription || [],
+                notes: app.notes || "",
             }
         });
 

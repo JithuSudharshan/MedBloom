@@ -8,8 +8,6 @@ export const refreshToken = async (req, res) => {
         // Get refresh token from httpOnly cookie
         const refreshToken = req.cookies.refreshToken;
 
-        console.log("Refresh function called. Token:", refreshToken);
-
         if (!refreshToken) {
             return res.status(401).json({
                 success: false,
@@ -19,7 +17,6 @@ export const refreshToken = async (req, res) => {
 
         let decoded;
         decoded = jwt.verify(refreshToken, ENV.JWT_REFERSH_TOKEN);
-        console.log("Decoded token:", decoded);
 
         if (!decoded)
             return res.status(401).json({
@@ -29,8 +26,6 @@ export const refreshToken = async (req, res) => {
 
         // Find user and check if token exists in database
         const user = await User.findById(decoded.userId);
-
-        console.log("Decoded user:", user);
 
         if (!user) {
             return res.status(401).json({

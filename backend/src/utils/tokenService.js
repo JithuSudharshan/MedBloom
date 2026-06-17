@@ -77,7 +77,7 @@ export const generateAccessToken = (user_Id, user_email, user_role) => {
             userEmail: user_email,
             userRole: user_role
 
-        }, ENV.JWT_ACCESS_SECRET, { expiresIn: '7d' },
+        }, ENV.JWT_ACCESS_SECRET, { expiresIn: '15m' },
             (err, token) => {
 
                 if (err) reject(err)

@@ -6,6 +6,7 @@ import Patient from "../../../model/patientModel.js";
 import Department from "../../../model/departmentModel.js";
 import Appointment from "../../../model/appointmentModel.js";
 import Transaction from "../../../model/transactionModel.js";
+import logger from '../../../config/logger.js';
 
 
 export const fetchPendingDoctorList = async (req, res) => {
@@ -31,7 +32,7 @@ export const fetchPendingDoctorList = async (req, res) => {
 
         const totalPages = Math.max(1, Math.ceil(total / limit));
 
-        console.log("fetched doctors : ", doctors)
+        logger.debug("fetched doctors", { count: doctors.length })
 
         return res.status(200).json({
             success: true,
@@ -43,7 +44,7 @@ export const fetchPendingDoctorList = async (req, res) => {
             },
         });
     } catch (error) {
-        console.error("Error fetching pending doctors:", error);
+        logger.error("Error fetching pending doctors:", { error: error.message });
         return res
             .status(500)
             .json({ success: false, message: "internal server error" });
@@ -81,8 +82,17 @@ export const approveDoctor = async (req, res) => {
             link: '/doctor/notifications',
         });
 
+        const availabilityNotification = await Notification.create({
+            senderId: req.user._id,
+            receiverId: localUser._id,
+            message: 'Action Required: Please set your weekly availability schedule so patients can start booking appointments with you.',
+            type: 'system',
+            link: '/doctor/availability',
+        });
+
         const io = getIO();
         io.to(localUser._id.toString()).emit('notification', notification);
+        io.to(localUser._id.toString()).emit('notification', availabilityNotification);
 
         return res.status(200).json({
             success: true,
