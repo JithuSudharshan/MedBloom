@@ -568,11 +568,11 @@ When a doctor completes a consultation, the backend generates a PDF with PDFKit,
 
 ## 👨‍💻 Author
 
-**[Your Name]**
+**Jithu S Pillai**
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/your-profile)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/jithu-sudharshan-a6168a252/)
 [![Portfolio](https://img.shields.io/badge/Portfolio-Visit-FF5722?style=for-the-badge&logo=google-chrome&logoColor=white)](https://your-portfolio.dev)
-[![Email](https://img.shields.io/badge/Email-Contact-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:your@email.com)
+[![Email](https://img.shields.io/badge/Email-Contact-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:jithu.codes@gmail.com)
 
 ---
 
@@ -599,5 +599,5 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 ---
 
 <div align="center">
-  <sub>Built with ❤️ by the MedBloom team · © 2026</sub>
+  <sub>Built with ❤️ by the JithuSudarsan · © 2026</sub>
 </div>
